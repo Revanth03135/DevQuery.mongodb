@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>DevQuery - Home</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 <body>
   <!-- Navbar -->
@@ -14,9 +15,10 @@
       <span>DevQuery</span>
     </div>
     <ul class="nav-links">
-      <li><a href="#">Home</a></li>
-      <li><a href="#">Features</a></li>
-      <li><a href="#">Docs</a></li>
+      <li><a class="active" href="#home">Home</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#docs">Docs</a></li>
+      <li><a href="dash.html">Dashboard</a></li>
       <li><a href="index.html">Login</a></li>
     </ul>
   </nav>
@@ -25,8 +27,93 @@
   <section class="hero">
     <h1>LLM-Powered SQL & Code Intelligence</h1>
     <p>Convert natural language to SQL and auto-document your codebase effortlessly.</p>
-    <a href="#" class="cta-button">Explore Features</a>
+    <div class="cta-buttons">
+      <a href="dash.html" class="cta-button primary">Try DevQuery</a>
+      <a href="#features" class="cta-button secondary">Learn More</a>
+    </div>
   </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <div class="container">
+      <h2>Powerful Features</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-language"></i>
+          </div>
+          <h3>Natural Language to SQL</h3>
+          <p>Convert plain English descriptions into optimized SQL queries instantly using advanced AI.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-database"></i>
+          </div>
+          <h3>Multi-Database Support</h3>
+          <p>Connect to MySQL, PostgreSQL, SQLite, SQL Server, and Oracle databases seamlessly.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-chart-bar"></i>
+          </div>
+          <h3>Query Analytics</h3>
+          <p>Analyze query performance, get suggestions, and track your database usage patterns.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-save"></i>
+          </div>
+          <h3>Query Management</h3>
+          <p>Save, organize, and share your queries with team members for better collaboration.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-sitemap"></i>
+          </div>
+          <h3>Schema Explorer</h3>
+          <p>Visualize database structures and relationships with an intuitive schema browser.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-code"></i>
+          </div>
+          <h3>Code Documentation</h3>
+          <p>Automatically generate documentation for your codebase with AI-powered analysis.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="docs" class="docs-preview">
+  <h2>📚 Docs</h2>
+  <div class="doc-grid">
+    <div class="doc-card">
+      <h3>Introduction</h3>
+      <p>Get an overview of how DevQuery helps developers generate SQL with ease.</p>
+    </div>
+    <div class="doc-card">
+      <h3>Setup</h3>
+      <p>Install dependencies, connect your database, and configure your environment.</p>
+    </div>
+    <div class="doc-card">
+      <h3>Usage</h3>
+      <p>Start using DevQuery by logging in and entering your query prompts.</p>
+    </div>
+    <div class="doc-card">
+      <h3>API Reference</h3>
+      <p>Explore available endpoints, authentication, and request formats.</p>
+    </div>
+    <div class="doc-card">
+      <h3>FAQs</h3>
+      <p>Common questions answered: from login issues to advanced usage.</p>
+    </div>
+  </div>
+</section>
 
   <!-- Footer -->
   <footer>

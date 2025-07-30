@@ -1,13 +1,10 @@
 document.getElementById("loginForm").addEventListener("submit", function (e) {
-  e.preventDefault();
+    e.preventDefault(); // Stop form from submitting normally
 
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
 
-  // For now, just show in console
-  console.log("Email:", email);
-  console.log("Password:", password);
+    localStorage.setItem("userEmail", email);
 
-  // You can now connect to backend using fetch() or show an alert
-  alert("Login submitted!");
-});
+    window.location.href = "dash.html";
+  });
