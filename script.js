@@ -4,7 +4,10 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
 
-    localStorage.setItem("userEmail", email);
+  // For now, just show in console
+  console.log("Email:", email);
+  console.log("Password:", password);
 
-    window.location.href = "dash.html";
-  });
+  // You can now connect to backend using fetch() or show an alert
+  alert("Login submitted!");
+});
