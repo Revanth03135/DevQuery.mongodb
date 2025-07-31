@@ -9,10 +9,38 @@ class DevQueryDashboard {
   }
 
   init() {
+    this.checkAuthentication();
     this.bindEvents();
     this.setupTabSwitching();
     this.loadExampleQueries();
     this.initializeCodeEditor();
+  }
+
+  checkAuthentication() {
+    const token = localStorage.getItem('devquery_token');
+    if (!token) {
+      // No token found, redirect to login
+      window.location.href = '/login';
+      return;
+    }
+    
+    // Load user info and update UI
+    const user = JSON.parse(localStorage.getItem('devquery_user') || '{}');
+    this.updateUserInfo(user);
+  }
+
+  updateUserInfo(user) {
+    // Update user display in the UI
+    const userNameElement = document.querySelector('.user-name');
+    const userRoleElement = document.querySelector('.user-role');
+    
+    if (userNameElement && user.username) {
+      userNameElement.textContent = user.username;
+    }
+    
+    if (userRoleElement && user.role) {
+      userRoleElement.textContent = user.role === 'admin' ? 'Administrator' : 'Developer';
+    }
   }
 
   bindEvents() {
@@ -584,9 +612,9 @@ LIMIT 100;`;
     });
 
     // Logout button
-    document.querySelector('.logout-btn').addEventListener('click', () => {
+    document.querySelector('.logout-btn').addEventListener('click', async () => {
       if (confirm('Are you sure you want to logout?')) {
-        window.location.href = 'index.html';
+        await this.logout();
       }
     });
   }
@@ -609,6 +637,57 @@ LIMIT 100;`;
       case '#analytics':
         this.showAnalytics();
         break;
+    }
+  }
+
+  async logout() {
+    try {
+      // Show loading state
+      const logoutBtn = document.querySelector('.logout-btn');
+      const originalHTML = logoutBtn.innerHTML;
+      logoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      logoutBtn.disabled = true;
+
+      // Call backend logout API if available
+      const token = localStorage.getItem('devquery_token');
+      if (token && window.devQueryAPI) {
+        try {
+          await window.devQueryAPI.logout();
+        } catch (error) {
+          console.warn('Backend logout failed, continuing with local logout:', error);
+        }
+      }
+
+      // Clear local storage
+      localStorage.removeItem('devquery_token');
+      localStorage.removeItem('devquery_user');
+      localStorage.removeItem('devquery_session');
+
+      // Show success message
+      this.showNotification('Logged out successfully!', 'success');
+
+      // Redirect to home page after short delay
+      setTimeout(() => {
+        window.location.href = '/';
+        // Force page reload to ensure clean state
+        window.location.reload();
+      }, 1500);
+
+    } catch (error) {
+      console.error('Logout error:', error);
+
+      // Force local logout even if backend fails
+      localStorage.removeItem('devquery_token');
+      localStorage.removeItem('devquery_user');
+      localStorage.removeItem('devquery_session');
+
+      this.showNotification('Logged out locally', 'info');
+
+      // Redirect anyway
+      setTimeout(() => {
+        window.location.href = '/';
+        window.location.reload();
+      }, 1500);
     }
   }
 

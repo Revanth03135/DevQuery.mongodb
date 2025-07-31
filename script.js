@@ -1,13 +1,17 @@
-document.getElementById("loginForm").addEventListener("submit", function (e) {
-    e.preventDefault(); // Stop form from submitting normally
+// Only add event listener if loginForm exists
+const loginForm = document.getElementById("loginForm");
+if (loginForm) {
+    loginForm.addEventListener("submit", function (e) {
+        e.preventDefault(); // Stop form from submitting normally
 
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
 
-  // For now, just show in console
-  console.log("Email:", email);
-  console.log("Password:", password);
+        // For now, just show in console
+        console.log("Email:", email);
+        console.log("Password:", password);
 
-  // You can now connect to backend using fetch() or show an alert
-  alert("Login submitted!");
-});
+        // You can now connect to backend using fetch() or show an alert
+        alert("Login submitted!");
+    });
+}

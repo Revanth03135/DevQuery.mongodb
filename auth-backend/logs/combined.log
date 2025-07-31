@@ -1,0 +1,936 @@
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 14:51:53"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 14:54:56"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 14:57:00"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:00:18"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:02:42"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:03:00"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:03:20"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:05:36"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:06:48"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:08:50"}
+{"code":"23505","constraint":"pg_class_relname_nsp_index","detail":"Key (relname, relnamespace)=(users_id_seq, 2200) already exists.","file":"nbtinsert.c","length":255,"level":"error","line":"673","message":"Error initializing database tables: duplicate key value violates unique constraint \"pg_class_relname_nsp_index\"","name":"error","routine":"_bt_check_unique","schema":"pg_catalog","service":"devquery-backend","severity":"ERROR","stack":"error: duplicate key value violates unique constraint \"pg_class_relname_nsp_index\"\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:43:7)","table":"pg_class","timestamp":"2025-07-31 15:08:50"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:10:32"}
+{"code":"23505","constraint":"pg_class_relname_nsp_index","detail":"Key (relname, relnamespace)=(user_sessions_id_seq, 2200) already exists.","file":"nbtinsert.c","length":263,"level":"error","line":"673","message":"Error initializing database tables: duplicate key value violates unique constraint \"pg_class_relname_nsp_index\"","name":"error","routine":"_bt_check_unique","schema":"pg_catalog","service":"devquery-backend","severity":"ERROR","stack":"error: duplicate key value violates unique constraint \"pg_class_relname_nsp_index\"\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:82:7)","table":"pg_class","timestamp":"2025-07-31 15:10:32"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:14:01"}
+{"code":"23505","constraint":"pg_class_relname_nsp_index","detail":"Key (relname, relnamespace)=(subscription_plans_id_seq, 2200) already exists.","file":"nbtinsert.c","length":268,"level":"error","line":"673","message":"Error initializing database tables: duplicate key value violates unique constraint \"pg_class_relname_nsp_index\"","name":"error","routine":"_bt_check_unique","schema":"pg_catalog","service":"devquery-backend","severity":"ERROR","stack":"error: duplicate key value violates unique constraint \"pg_class_relname_nsp_index\"\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:123:7)","table":"pg_class","timestamp":"2025-07-31 15:14:01"}
+{"code":"23505","constraint":"pg_class_relname_nsp_index","detail":"Key (relname, relnamespace)=(subscription_plans_id_seq, 2200) already exists.","file":"nbtinsert.c","length":268,"level":"error","line":"673","message":"Error initializing database tables: duplicate key value violates unique constraint \"pg_class_relname_nsp_index\"","name":"error","routine":"_bt_check_unique","schema":"pg_catalog","service":"devquery-backend","severity":"ERROR","stack":"error: duplicate key value violates unique constraint \"pg_class_relname_nsp_index\"\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:123:7)","table":"pg_class","timestamp":"2025-07-31 15:14:01"}
+{"level":"info","message":"Default super admin created: username=superadmin, password=admin123","service":"devquery-backend","timestamp":"2025-07-31 15:14:02"}
+{"level":"info","message":"Database tables initialized successfully","service":"devquery-backend","timestamp":"2025-07-31 15:14:02"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 15:16:47"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 15:16:48"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:20:15"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:22:16"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:32:47"}
+{"level":"info","message":"Database tables initialized successfully","service":"devquery-backend","timestamp":"2025-07-31 15:32:47"}
+{"level":"info","message":"Database tables initialized successfully","service":"devquery-backend","timestamp":"2025-07-31 15:32:47"}
+{"level":"info","message":"Database tables initialized successfully","service":"devquery-backend","timestamp":"2025-07-31 15:32:47"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:35:21"}
+{"level":"info","message":"Database tables initialized successfully","service":"devquery-backend","timestamp":"2025-07-31 15:35:21"}
+{"level":"info","message":"Database tables initialized successfully","service":"devquery-backend","timestamp":"2025-07-31 15:35:21"}
+{"level":"info","message":"Database tables initialized successfully","service":"devquery-backend","timestamp":"2025-07-31 15:35:21"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 15:35:45"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 15:35:48"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 15:36:23"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:41:02"}
+{"level":"info","message":"Database tables initialized successfully","service":"devquery-backend","timestamp":"2025-07-31 15:41:02"}
+{"level":"info","message":"Database tables initialized successfully","service":"devquery-backend","timestamp":"2025-07-31 15:41:02"}
+{"level":"info","message":"Database tables initialized successfully","service":"devquery-backend","timestamp":"2025-07-31 15:41:02"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:45:53"}
+{"code":"23505","constraint":"pg_class_relname_nsp_index","detail":"Key (relname, relnamespace)=(admins_id_seq, 2200) already exists.","file":"nbtinsert.c","length":256,"level":"error","line":"673","message":"Error initializing database tables: duplicate key value violates unique constraint \"pg_class_relname_nsp_index\"","name":"error","routine":"_bt_check_unique","schema":"pg_catalog","service":"devquery-backend","severity":"ERROR","stack":"error: duplicate key value violates unique constraint \"pg_class_relname_nsp_index\"\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:66:7)","table":"pg_class","timestamp":"2025-07-31 15:45:53"}
+{"code":"23505","constraint":"pg_class_relname_nsp_index","detail":"Key (relname, relnamespace)=(admins_id_seq, 2200) already exists.","file":"nbtinsert.c","length":256,"level":"error","line":"673","message":"Error initializing database tables: duplicate key value violates unique constraint \"pg_class_relname_nsp_index\"","name":"error","routine":"_bt_check_unique","schema":"pg_catalog","service":"devquery-backend","severity":"ERROR","stack":"error: duplicate key value violates unique constraint \"pg_class_relname_nsp_index\"\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:66:7)","table":"pg_class","timestamp":"2025-07-31 15:45:53"}
+{"code":"42703","file":"tablecmds.c","length":141,"level":"error","line":"11911","message":"Error initializing database tables: column \"user_id\" referenced in foreign key constraint does not exist","name":"error","routine":"transformColumnNameList","service":"devquery-backend","severity":"ERROR","stack":"error: column \"user_id\" referenced in foreign key constraint does not exist\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:102:7)","timestamp":"2025-07-31 15:45:53"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:47:21"}
+{"code":"42703","file":"tablecmds.c","length":141,"level":"error","line":"11911","message":"Error initializing database tables: column \"user_id\" referenced in foreign key constraint does not exist","name":"error","routine":"transformColumnNameList","service":"devquery-backend","severity":"ERROR","stack":"error: column \"user_id\" referenced in foreign key constraint does not exist\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:102:7)","timestamp":"2025-07-31 15:47:21"}
+{"code":"42703","file":"tablecmds.c","length":141,"level":"error","line":"11911","message":"Error initializing database tables: column \"user_id\" referenced in foreign key constraint does not exist","name":"error","routine":"transformColumnNameList","service":"devquery-backend","severity":"ERROR","stack":"error: column \"user_id\" referenced in foreign key constraint does not exist\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:102:7)","timestamp":"2025-07-31 15:47:21"}
+{"code":"42703","file":"tablecmds.c","length":141,"level":"error","line":"11911","message":"Error initializing database tables: column \"user_id\" referenced in foreign key constraint does not exist","name":"error","routine":"transformColumnNameList","service":"devquery-backend","severity":"ERROR","stack":"error: column \"user_id\" referenced in foreign key constraint does not exist\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:102:7)","timestamp":"2025-07-31 15:47:21"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:49:57"}
+{"code":"42703","file":"tablecmds.c","length":141,"level":"error","line":"11911","message":"Error initializing database tables: column \"user_id\" referenced in foreign key constraint does not exist","name":"error","routine":"transformColumnNameList","service":"devquery-backend","severity":"ERROR","stack":"error: column \"user_id\" referenced in foreign key constraint does not exist\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:102:7)","timestamp":"2025-07-31 15:49:57"}
+{"code":"42703","file":"tablecmds.c","length":141,"level":"error","line":"11911","message":"Error initializing database tables: column \"user_id\" referenced in foreign key constraint does not exist","name":"error","routine":"transformColumnNameList","service":"devquery-backend","severity":"ERROR","stack":"error: column \"user_id\" referenced in foreign key constraint does not exist\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:102:7)","timestamp":"2025-07-31 15:49:57"}
+{"code":"42703","file":"tablecmds.c","length":141,"level":"error","line":"11911","message":"Error initializing database tables: column \"user_id\" referenced in foreign key constraint does not exist","name":"error","routine":"transformColumnNameList","service":"devquery-backend","severity":"ERROR","stack":"error: column \"user_id\" referenced in foreign key constraint does not exist\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:102:7)","timestamp":"2025-07-31 15:49:57"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:50:04"}
+{"code":"42703","file":"tablecmds.c","length":141,"level":"error","line":"11911","message":"Error initializing database tables: column \"user_id\" referenced in foreign key constraint does not exist","name":"error","routine":"transformColumnNameList","service":"devquery-backend","severity":"ERROR","stack":"error: column \"user_id\" referenced in foreign key constraint does not exist\n    at c:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (c:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:102:7)","timestamp":"2025-07-31 15:50:04"}
+{"code":"42703","file":"tablecmds.c","length":141,"level":"error","line":"11911","message":"Error initializing database tables: column \"user_id\" referenced in foreign key constraint does not exist","name":"error","routine":"transformColumnNameList","service":"devquery-backend","severity":"ERROR","stack":"error: column \"user_id\" referenced in foreign key constraint does not exist\n    at c:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (c:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:102:7)","timestamp":"2025-07-31 15:50:04"}
+{"code":"42703","file":"tablecmds.c","length":141,"level":"error","line":"11911","message":"Error initializing database tables: column \"user_id\" referenced in foreign key constraint does not exist","name":"error","routine":"transformColumnNameList","service":"devquery-backend","severity":"ERROR","stack":"error: column \"user_id\" referenced in foreign key constraint does not exist\n    at c:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (c:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:102:7)","timestamp":"2025-07-31 15:50:04"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:50:31"}
+{"code":"42703","file":"tablecmds.c","length":141,"level":"error","line":"11911","message":"Error initializing database tables: column \"user_id\" referenced in foreign key constraint does not exist","name":"error","routine":"transformColumnNameList","service":"devquery-backend","severity":"ERROR","stack":"error: column \"user_id\" referenced in foreign key constraint does not exist\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:102:7)","timestamp":"2025-07-31 15:50:31"}
+{"code":"42703","file":"tablecmds.c","length":141,"level":"error","line":"11911","message":"Error initializing database tables: column \"user_id\" referenced in foreign key constraint does not exist","name":"error","routine":"transformColumnNameList","service":"devquery-backend","severity":"ERROR","stack":"error: column \"user_id\" referenced in foreign key constraint does not exist\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:102:7)","timestamp":"2025-07-31 15:50:31"}
+{"code":"42703","file":"tablecmds.c","length":141,"level":"error","line":"11911","message":"Error initializing database tables: column \"user_id\" referenced in foreign key constraint does not exist","name":"error","routine":"transformColumnNameList","service":"devquery-backend","severity":"ERROR","stack":"error: column \"user_id\" referenced in foreign key constraint does not exist\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:102:7)","timestamp":"2025-07-31 15:50:31"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:51:51"}
+{"code":"42703","file":"tablecmds.c","length":141,"level":"error","line":"11911","message":"Error initializing database tables: column \"user_id\" referenced in foreign key constraint does not exist","name":"error","routine":"transformColumnNameList","service":"devquery-backend","severity":"ERROR","stack":"error: column \"user_id\" referenced in foreign key constraint does not exist\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:102:7)","timestamp":"2025-07-31 15:51:51"}
+{"code":"42703","file":"tablecmds.c","length":141,"level":"error","line":"11911","message":"Error initializing database tables: column \"user_id\" referenced in foreign key constraint does not exist","name":"error","routine":"transformColumnNameList","service":"devquery-backend","severity":"ERROR","stack":"error: column \"user_id\" referenced in foreign key constraint does not exist\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:102:7)","timestamp":"2025-07-31 15:51:51"}
+{"code":"42703","file":"tablecmds.c","length":141,"level":"error","line":"11911","message":"Error initializing database tables: column \"user_id\" referenced in foreign key constraint does not exist","name":"error","routine":"transformColumnNameList","service":"devquery-backend","severity":"ERROR","stack":"error: column \"user_id\" referenced in foreign key constraint does not exist\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:102:7)","timestamp":"2025-07-31 15:51:51"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:53:26"}
+{"code":"42703","file":"tablecmds.c","length":141,"level":"error","line":"11911","message":"Error initializing database tables: column \"user_id\" referenced in foreign key constraint does not exist","name":"error","routine":"transformColumnNameList","service":"devquery-backend","severity":"ERROR","stack":"error: column \"user_id\" referenced in foreign key constraint does not exist\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:102:7)","timestamp":"2025-07-31 15:53:26"}
+{"code":"42703","file":"tablecmds.c","length":141,"level":"error","line":"11911","message":"Error initializing database tables: column \"user_id\" referenced in foreign key constraint does not exist","name":"error","routine":"transformColumnNameList","service":"devquery-backend","severity":"ERROR","stack":"error: column \"user_id\" referenced in foreign key constraint does not exist\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:102:7)","timestamp":"2025-07-31 15:53:26"}
+{"code":"42703","file":"tablecmds.c","length":141,"level":"error","line":"11911","message":"Error initializing database tables: column \"user_id\" referenced in foreign key constraint does not exist","name":"error","routine":"transformColumnNameList","service":"devquery-backend","severity":"ERROR","stack":"error: column \"user_id\" referenced in foreign key constraint does not exist\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.initializeTables (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:102:7)","timestamp":"2025-07-31 15:53:26"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 15:59:44"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 16:00:37"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:01:38"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:01:39"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 16:10:01"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 16:12:13"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 16:15:46"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 16:18:49"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:18:59"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:19:08"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:19:09"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:19:24"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-07-31 16:19:24"}
+{"level":"info","message":"POST /api/auth/register - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:19:33"}
+{"level":"info","message":"New user registered: testuser (test@example.com)","service":"devquery-backend","timestamp":"2025-07-31 16:19:33"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:20:26"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:20:26"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:20:26"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:20:26"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:20:27"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:20:37"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-07-31 16:20:38"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:20:39"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:20:39"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:20:39"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:20:39"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:20:39"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:20:40"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 16:24:02"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 16:24:33"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:24:45"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:24:54"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:24:54"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:24:54"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:24:54"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:25:03"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:07"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 16:27:20"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:28"}
+{"level":"info","message":"GET /style.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:28"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:28"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:28"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:28"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:30"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:39"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:39"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:39"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:39"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:39"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:39"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:39"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:39"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:39"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:55"}
+{"level":"info","message":"GET /style.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:55"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:55"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:55"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:27:55"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:28:58"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:28:58"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:28:58"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:28:58"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:28:58"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:28:59"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:28:59"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:28:59"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:28:59"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:28:59"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 16:29:16"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:29:20"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:29:20"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:29:20"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:29:20"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:29:20"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:29:20"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:29:20"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:29:20"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:29:20"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:29:21"}
+{"level":"info","message":"POST /api/auth/register - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:30:30"}
+{"level":"info","message":"New user registered: Genesis (shivasada2005@gmail.com)","service":"devquery-backend","timestamp":"2025-07-31 16:30:31"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:30:33"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:32:02"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:32:02"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:32:02"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:32:02"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:32:02"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:32:02"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:32:02"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:32:02"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:32:02"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:32:02"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:32:37"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:32:46"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:33:13"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:33:21"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 16:33:30"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:33:42"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:33:49"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 16:40:34"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:40:49"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:40:49"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:40:49"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:40:49"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:40:49"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:40:50"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:40:50"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:40:50"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:40:50"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:40:50"}
+{"level":"info","message":"POST /api/auth/logout - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:41:26"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 16:42:11"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 16:48:36"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:48:38"}
+{"level":"info","message":"GET /style.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:48:38"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:48:38"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:48:38"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:48:38"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:48:39"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:48:49"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:48:49"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:48:49"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:48:49"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:48:49"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:48:49"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:48:49"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:48:49"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:48:49"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 16:52:56"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 16:54:41"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 16:55:15"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 16:56:50"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 17:19:07"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:19:19"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:19:53"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:19:53"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:19:53"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:19:53"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:19:53"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:19:56"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:19:56"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:19:56"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:19:56"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:19:57"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:22:14"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:22:14"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:22:14"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:22:14"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:22:14"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:22:14"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:22:14"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:22:14"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:22:14"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:22:22"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:22:22"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:22:22"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:22:22"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:22:22"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:22:22"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:22:22"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:22:22"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:22:22"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 17:23:26"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:32"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:32"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:32"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:32"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:32"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:33"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:33"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:33"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:33"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:34"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:39"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:39"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:39"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:39"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:39"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:39"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:39"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:39"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:39"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:44"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:44"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:44"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:44"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:44"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:44"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:44"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:44"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:23:44"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 17:27:06"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:28:32"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:29:23"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 17:30:15"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:21"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:21"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:21"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:21"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:21"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:24"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:24"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:24"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:24"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:24"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:24"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:24"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:24"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:24"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:31"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:31"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:31"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:31"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:31"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:31"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:31"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:31"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:30:31"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:31:03"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:31:03"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:31:03"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:31:03"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:31:03"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:31:03"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:31:03"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:31:03"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:31:03"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:31:12"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:31:12"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:31:12"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:31:12"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:31:12"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:31:12"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:31:12"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:31:12"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:31:12"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 17:32:38"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 17:32:45"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:32:56"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:32:56"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:32:56"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:32:56"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:32:56"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:32:57"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:32:57"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:32:57"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:32:57"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:32:57"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:01"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:01"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:01"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:01"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:01"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:01"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:01"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:01"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:01"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:05"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:06"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:06"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:06"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:06"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:06"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:06"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:06"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:06"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:09"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:09"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:09"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:09"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:09"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:09"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:09"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:09"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:09"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:20"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:20"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:20"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:20"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:20"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:20"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:20"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:20"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:33:20"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:35:53"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 17:36:34"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:36:40"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:36:40"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:36:40"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:36:40"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:36:40"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:36:50"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:36:50"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:36:50"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:36:50"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:36:58"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-07-31 17:36:58"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:36:59"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:36:59"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:36:59"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:36:59"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:36:59"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:05"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:05"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:05"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:05"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:05"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:05"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:05"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:05"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:05"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:09"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:09"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:09"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:09"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:09"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:09"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:09"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:09"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:09"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:21"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:21"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:21"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:21"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:21"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:21"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:21"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:21"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 17:37:21"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 20:03:27"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:04:07"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:04:08"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:04:08"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:04:08"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:04:08"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:04:31"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:04:31"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:04:31"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:04:31"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:04:31"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:04:31"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:04:31"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:04:31"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:04:31"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 20:08:35"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 20:22:04"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:22:11"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:22:11"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:22:11"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:22:11"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 20:22:35"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:22:50"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:22:50"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:22:50"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:22:50"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:22:52"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 20:23:08"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:23:34"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:23:34"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:23:34"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:23:34"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:23:34"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:23:35"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:23:35"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:23:35"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:23:35"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:23:36"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:23:41"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:23:41"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:23:41"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:23:41"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:23:41"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:23:42"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:23:42"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:23:42"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:23:42"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 20:24:33"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:36"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:37"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:37"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:37"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:37"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:37"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:37"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:37"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:37"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:38"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:43"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:43"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:43"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:43"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:43"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:43"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:43"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:43"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:43"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:52"}
+{"level":"info","message":"GET /style.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:52"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:52"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:52"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:24:52"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:00"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:00"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:00"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:00"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:00"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:00"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:00"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:00"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:00"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:05"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:05"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:05"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:05"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:05"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:05"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:05"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:05"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:05"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:26"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:26"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:26"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:26"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:26"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:32"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:32"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:32"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:32"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:32"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:32"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:32"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:32"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:25:32"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:26:13"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:26:13"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:26:13"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:26:13"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:26:13"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:26:13"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:26:13"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:26:13"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:26:13"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:26:14"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:27:22"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:27:22"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:27:22"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:27:22"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:27:22"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:27:22"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:27:22"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:27:22"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:27:22"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 20:28:51"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:28:59"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:30:32"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:30:32"}
+{"level":"info","message":"User logged in: Genesis","service":"devquery-backend","timestamp":"2025-07-31 20:30:33"}
+{"level":"info","message":"User logged in: Genesis","service":"devquery-backend","timestamp":"2025-07-31 20:30:33"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:30:34"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:03"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:06"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:08"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:14"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 20:34:25"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:36"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:36"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:36"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:36"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:36"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:37"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:37"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:37"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:37"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:37"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:40"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:41"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:41"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:41"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:41"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:41"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:41"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:41"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:34:41"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:35:24"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:35:24"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:35:24"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:35:24"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:35:24"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:35:24"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:35:24"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:35:24"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:35:24"}
+{"level":"info","message":"GET /index.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:35:27"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:35:27"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:35:27"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:35:27"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:35:27"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:35:27"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:35:27"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:35:27"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:35:27"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:36:31"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:36:35"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:36:49"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 20:53:11"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:53:38"}
+{"level":"info","message":"POST /api/auth/logout - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:54:02"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 20:55:01"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:07"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:07"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:07"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:07"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:08"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:27"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-07-31 20:55:28"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:29"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:29"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:29"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:29"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:29"}
+{"level":"info","message":"POST /api/auth/logout - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:34"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:36"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:36"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:36"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:36"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:36"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:36"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:36"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:36"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:36"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:54"}
+{"level":"info","message":"User logged in: Genesis","service":"devquery-backend","timestamp":"2025-07-31 20:55:55"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:56"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:56"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:56"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:56"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:55:56"}
+{"level":"info","message":"POST /api/auth/logout - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:56:04"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:56:06"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:56:06"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:56:06"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:56:06"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:56:06"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:56:06"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:56:06"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:56:06"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:56:06"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:56:51"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:56:51"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:56:51"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:56:51"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:56:51"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:57:27"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:57:28"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:57:28"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:57:28"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:57:37"}
+{"level":"info","message":"GET /style.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:57:37"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:57:37"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:57:37"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:57:37"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:57:37"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:57:49"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:57:49"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:57:49"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:57:50"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:58:22"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:58:22"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:58:22"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:58:22"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:58:41"}
+{"level":"info","message":"GET /style.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:58:41"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:58:41"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:58:41"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:58:41"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:58:44"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:58:44"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:58:44"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 20:58:44"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:01:31"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 21:02:11"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:02:33"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:03:14"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:04:26"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:07:41"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:08:03"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 21:09:19"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:32"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:32"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:32"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:32"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:49"}
+{"level":"info","message":"User logged in: Genesis","service":"devquery-backend","timestamp":"2025-07-31 21:09:49"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:50"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:50"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:50"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:50"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:50"}
+{"level":"info","message":"POST /api/auth/logout - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:57"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:59"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:59"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:59"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:59"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:59"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:59"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:59"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:59"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:09:59"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:11:49"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:11:49"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:11:49"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:11:49"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:11:59"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-07-31 21:12:00"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:12:01"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:12:01"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:12:01"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:12:01"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:12:01"}
+{"level":"info","message":"POST /api/auth/logout - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:15:00"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:15:01"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:15:01"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:15:01"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:15:01"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:15:01"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:15:01"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:15:02"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:15:02"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:15:02"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 21:19:37"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:19:43"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:19:44"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:19:44"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:19:44"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:19:51"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:20:24"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:20:24"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:20:24"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:20:24"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:20:28"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:20:28"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:20:31"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 21:20:37"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:20:39"}
+{"level":"info","message":"GET /style.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:20:39"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:20:39"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:20:39"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:20:39"}
+{"level":"info","message":"GET /style.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:20:44"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:20:44"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:15"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:20"}
+{"level":"info","message":"GET /style.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:20"}
+{"level":"info","message":"GET /home.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:20"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:20"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:20"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:20"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:27"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:27"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:27"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:27"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:42"}
+{"level":"info","message":"User logged in: Genesis","service":"devquery-backend","timestamp":"2025-07-31 21:24:42"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:43"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:43"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:43"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:43"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:43"}
+{"level":"info","message":"POST /api/auth/logout - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:46"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:48"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:48"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:48"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:48"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:48"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:48"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:48"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:48"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:24:48"}
+{"level":"info","message":"GET /signup - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:25:01"}
+{"level":"info","message":"GET /sign.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:25:01"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:25:01"}
+{"level":"info","message":"GET / - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:25:52"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:25:52"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:25:52"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:25:52"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:26:00"}
+{"level":"info","message":"GET /style.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:26:00"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:26:00"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:26:00"}
+{"level":"info","message":"GET /home.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:26:00"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:26:00"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:26:01"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 21:26:39"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:26:44"}
+{"level":"info","message":"GET /style.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:26:44"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:26:44"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:26:44"}
+{"level":"info","message":"GET /home.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:26:44"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:26:44"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:26:45"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 21:27:13"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:27:25"}
+{"level":"info","message":"GET /style.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:27:25"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:27:25"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:27:25"}
+{"level":"info","message":"GET /home.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:27:25"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:27:25"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:27:27"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:27:31"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:27:31"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:27:31"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:27:31"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:27:36"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:27:36"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:27:36"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:27:36"}
+{"level":"info","message":"GET /signup.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:27:44"}
+{"level":"info","message":"GET /sign.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:27:44"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:27:44"}
+{"level":"info","message":"GET /signup.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:28:49"}
+{"level":"info","message":"GET /sign.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:28:49"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:28:49"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:28:51"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:28:51"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:28:51"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:28:51"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:29:01"}
+{"level":"error","message":"User login failed: Invalid credentials","service":"devquery-backend","stack":"Error: Invalid credentials\n    at UserManager.loginUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:161:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async login (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\controllers\\authController.js:87:24)","timestamp":"2025-07-31 21:29:01"}
+{"level":"error","message":"Login error: Invalid credentials","service":"devquery-backend","stack":"Error: Invalid credentials\n    at UserManager.loginUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:161:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async login (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\controllers\\authController.js:87:24)","timestamp":"2025-07-31 21:29:01"}
+{"level":"info","message":"GET /signup.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:29:06"}
+{"level":"info","message":"GET /sign.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:29:06"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:29:06"}
+{"level":"info","message":"GET /signup.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:29:51"}
+{"level":"info","message":"GET /sign.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:29:52"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:29:52"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:30:08"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:30:08"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:30:08"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:30:08"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:30:21"}
+{"level":"error","message":"User login failed: Invalid credentials","service":"devquery-backend","stack":"Error: Invalid credentials\n    at UserManager.loginUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:161:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async login (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\controllers\\authController.js:87:24)","timestamp":"2025-07-31 21:30:21"}
+{"level":"error","message":"Login error: Invalid credentials","service":"devquery-backend","stack":"Error: Invalid credentials\n    at UserManager.loginUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:161:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async login (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\controllers\\authController.js:87:24)","timestamp":"2025-07-31 21:30:21"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:30:41"}
+{"level":"error","message":"User login failed: Invalid credentials","service":"devquery-backend","stack":"Error: Invalid credentials\n    at UserManager.loginUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:180:15)\n    at async login (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\controllers\\authController.js:87:24)","timestamp":"2025-07-31 21:30:42"}
+{"level":"error","message":"Login error: Invalid credentials","service":"devquery-backend","stack":"Error: Invalid credentials\n    at UserManager.loginUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:180:15)\n    at async login (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\controllers\\authController.js:87:24)","timestamp":"2025-07-31 21:30:42"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:30:50"}
+{"level":"info","message":"User logged in: Genesis","service":"devquery-backend","timestamp":"2025-07-31 21:30:50"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:30:51"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:30:51"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:30:51"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:30:51"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:30:51"}
+{"level":"info","message":"POST /api/auth/logout - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:31:02"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:31:03"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:31:03"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:31:03"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:31:03"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:31:03"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:31:03"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:31:04"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:31:04"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:31:04"}
+{"level":"info","message":"GET /signup.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:31:41"}
+{"level":"info","message":"GET /sign.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:31:41"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:31:41"}
+{"level":"info","message":"GET /signup.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:31:58"}
+{"level":"info","message":"GET /sign.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:31:58"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:31:58"}
+{"level":"info","message":"GET /sign.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:32:03"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:32:03"}
+{"level":"info","message":"GET /signup - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:34:47"}
+{"level":"info","message":"GET /sign.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:34:47"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:34:47"}
+{"level":"info","message":"GET /signup.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:34:47"}
+{"level":"info","message":"POST /api/auth/register - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:01"}
+{"level":"info","message":"New user registered: Rev Sniper (revanthp655@gmail.com)","service":"devquery-backend","timestamp":"2025-07-31 21:35:02"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:04"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:04"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:04"}
+{"level":"info","message":"GET /login.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:04"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:04"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:04"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:04"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:04"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:04"}
+{"level":"info","message":"GET /dashboard-init.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:04"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:04"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:04"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-07-31 21:35:39"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:51"}
+{"level":"info","message":"GET /style.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:51"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:51"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:51"}
+{"level":"info","message":"GET /home.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:51"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:51"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:52"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:53"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:53"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:53"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:53"}
+{"level":"info","message":"GET /dashboard-init.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:53"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:53"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:35:53"}
+{"level":"info","message":"POST /api/auth/logout - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:02"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:04"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:04"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:04"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:04"}
+{"level":"info","message":"GET /dashboard-init.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:04"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:04"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:04"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:04"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:04"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:04"}
+{"level":"info","message":"GET /login.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:04"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:04"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:19"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:19"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-07-31 21:36:19"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-07-31 21:36:19"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:20"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:20"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:20"}
+{"level":"info","message":"GET /dashboard-init.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:20"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:20"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:20"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:20"}
+{"level":"info","message":"POST /api/auth/logout - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:45"}
+{"level":"info","message":"GET /dashboard.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:46"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:47"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:47"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:47"}
+{"level":"info","message":"GET /dashboard-init.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:47"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:47"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:47"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:47"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:47"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:47"}
+{"level":"info","message":"GET /login.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:47"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:47"}
+{"level":"info","message":"GET /signup.html - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:49"}
+{"level":"info","message":"GET /sign.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:49"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:49"}
+{"level":"info","message":"GET /signup.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:36:49"}
+{"level":"info","message":"POST /api/auth/register - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:00"}
+{"level":"info","message":"New user registered: Niran (niranjan@123gmail.com)","service":"devquery-backend","timestamp":"2025-07-31 21:38:00"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:02"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:02"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:02"}
+{"level":"info","message":"GET /login.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:02"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:02"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:02"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:02"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:02"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:02"}
+{"level":"info","message":"GET /dashboard-init.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:02"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:02"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:02"}
+{"level":"info","message":"POST /api/auth/logout - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:28"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:30"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:30"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:30"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:30"}
+{"level":"info","message":"GET /dashboard-init.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:30"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:30"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:30"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:30"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:30"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:30"}
+{"level":"info","message":"GET /login.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:30"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-07-31 21:38:30"}
