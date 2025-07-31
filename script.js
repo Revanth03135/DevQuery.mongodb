@@ -1,27 +1,13 @@
 document.getElementById("loginForm").addEventListener("submit", function (e) {
-  e.preventDefault();
+    e.preventDefault(); // Stop form from submitting normally
 
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
 
-  // Basic validation
-  if (!email || !password) {
-    alert("Please fill in all fields");
-    return;
-  }
+  // For now, just show in console
+  console.log("Email:", email);
+  console.log("Password:", password);
 
-  // Simple authentication simulation
-  if (email && password.length >= 6) {
-    // Store user session (in real app, this would be handled by backend)
-    localStorage.setItem('devquery_user', JSON.stringify({
-      email: email,
-      name: email.split('@')[0],
-      loginTime: new Date().toISOString()
-    }));
-    
-    // Redirect to dashboard
-    window.location.href = 'dashboard.html';
-  } else {
-    alert("Invalid credentials. Password must be at least 6 characters.");
-  }
+  // You can now connect to backend using fetch() or show an alert
+  alert("Login submitted!");
 });

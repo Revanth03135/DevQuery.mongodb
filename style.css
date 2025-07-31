@@ -52,6 +52,10 @@ body {
   color: #5a39c7;
 }
 
+.nav-links .active {
+  color: #5a39c7;
+}
+
 /* Hero Section */
 .hero {
   text-align: center;
@@ -241,6 +245,119 @@ footer {
   .feature-card {
     padding: 30px 20px;
   }
+}
+
+@media (max-width: 480px) {
+  .hero h1 {
+    font-size: 1.8rem;
+  }
+  
+  .hero p {
+    font-size: 1rem;
+  }
+  
+  .features h2 {
+    font-size: 1.7rem;
+  }
+  
+  .feature-card h3 {
+    font-size: 1.1rem;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 15px 20px;
+    gap: 20px;
+  }
+  
+  .nav-links {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .hero {
+    padding: 60px 20px;
+  }
+  
+  .hero h1 {
+    font-size: 2.2rem;
+  }
+  
+  .hero p {
+    font-size: 1.1rem;
+  }
+  
+  .cta-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .cta-button {
+    width: 200px;
+    justify-content: center;
+  }
+  
+  .features {
+    padding: 60px 20px;
+  }
+  
+  .features h2 {
+    font-size: 2rem;
+  }
+  
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .feature-card {
+    padding: 30px 20px;
+  }
+}
+
+/* Docs section styles */
+.docs-preview {
+  padding: 60px 40px;
+  background-color: #f5f5fa;
+}
+
+.docs-preview h2 {
+  font-size: 28px;
+  color: #5a39c7;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.doc-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(90, 57, 199, 0.05);
+  padding: 24px;
+  transition: transform 0.2s;
+}
+
+.doc-card h3 {
+  color: #5a39c7;
+  margin-bottom: 12px;
+}
+
+.doc-card p {
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.doc-card:hover {
+  transform: translateY(-5px);
 }
 
 @media (max-width: 480px) {
