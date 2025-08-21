@@ -9,6 +9,7 @@ require('dotenv').config();
 const authRoutes = require('./src/routes/authRoutes');
 const databaseRoutes = require('./src/routes/databaseRoutes');
 const adminRoutes = require('./src/routes/adminRoutes');
+const analyticsRoutes = require('./src/routes/analyticsRoutes');
 const logger = require('./src/utils/logger');
 const DatabaseConnectionManager = require('./src/utils/DatabaseConnectionManager');
 
@@ -62,6 +63,7 @@ app.use(express.static(path.join(__dirname, '..')));
 app.use('/api/auth', authRoutes);
 app.use('/api/database', databaseRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Serve frontend pages
 app.get('/', (req, res) => {
