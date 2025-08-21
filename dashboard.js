@@ -635,7 +635,13 @@ LIMIT 100;`;
         this.showSavedQueries();
         break;
       case '#analytics':
-        this.showAnalytics();
+        window.location.href = 'analytics.html';
+        break;
+      default:
+        // If it's a direct link to another page, navigate
+        if (section && section.endsWith('.html')) {
+          window.location.href = section;
+        }
         break;
     }
   }

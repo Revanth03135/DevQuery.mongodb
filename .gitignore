@@ -1,0 +1,50 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.env
+.env.local
+*.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.egg-info/
+*.pkl
+
+# VS Code
+.vscode/
+.history/
+
+# OS/Editor
+.DS_Store
+Thumbs.db
+
+# Build/Dist
+dist/
+build/
+*.tgz
+
+# Static/Generated
+static/*.map
+static/*.tmp
+
+# Database/Secrets
+*.sqlite
+*.db
+*.bak
+
+# Logs
+logs/
+*.log
+
+# Jupyter
+*.ipynb_checkpoints
+
+# Misc
+*.swp
+*.swo

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DevQuery - Analytics</title>
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+  <div class="analytics-container">
+    <div class="analytics-header-row">
+      <h1 class="analytics-title">Analytics</h1>
+      <div class="analytics-samples-card">
+        <span class="analytics-samples-label">Try:</span>
+        <button class="sample-btn" data-sample="last month users">last month users</button>
+        <button class="sample-btn" data-sample="sales by region">sales by region</button>
+        <button class="sample-btn" data-sample="top 10 products">top 10 products</button>
+        <button class="sample-btn" data-sample="active users today">active users today</button>
+      </div>
+    </div>
+    <div class="analytics-controls-row">
+      <div class="analytics-controls">
+        <input type="text" id="nlQueryInput" placeholder="e.g. Last month users, Sales by region, Top 10 products" />
+        <button id="nlQueryBtn" class="btn btn-primary">Generate</button>
+        <button id="refreshBtn" class="btn">Refresh</button>
+        <select id="chartType">
+          <option value="line">Line</option>
+          <option value="bar">Bar</option>
+          <option value="pie">Pie</option>
+          <option value="doughnut">Doughnut</option>
+          <option value="area">Area</option>
+        </select>
+      </div>
+    </div>
+    <main class="analytics-main">
+      <div class="chart-card">
+        <canvas id="analyticsChart" width="900" height="420"></canvas>
+      </div>
+      <div id="chartInfo" class="chart-info"></div>
+    </main>
+  </div>
+
+  <script src="static/chart.umd.js"></script>
+  <script src="api-client.js"></script>
+  <script src="analytics.js"></script>
+</body>
+</html>

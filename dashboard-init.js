@@ -24,4 +24,11 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
             });
     }
+
+            // Chart.js check (CSP-safe local stub)
+            if (typeof Chart === 'undefined') {
+                console.warn('Chart not available: charts will not render. Consider adding Chart.js to static/chart.umd.js');
+            } else if (Chart && Chart.prototype && Chart.prototype.update && Chart.prototype.destroy) {
+                console.info('Chart is available (may be stub).');
+            }
 });
