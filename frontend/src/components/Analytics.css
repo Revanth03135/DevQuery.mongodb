@@ -1,0 +1,328 @@
+/* Analytics.css - Exact match to original dashboard.css analytics styles */
+
+:root {
+  --primary-color: #5a39c7;
+  --primary-hover: #472d9d;
+  --secondary-color: #6c757d;
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+  --info-color: #17a2b8;
+  --light-color: #f8f9fa;
+  --dark-color: #343a40;
+  --sidebar-width: 280px;
+  --header-height: 80px;
+  --border-radius: 8px;
+  --box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
+.analytics-container {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  padding: 32px 36px 36px 36px;
+  animation: fadeInUp 0.7s cubic-bezier(.23,1.01,.32,1) both;
+}
+
+.analytics-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.analytics-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #222;
+  margin: 0 0 0 2px;
+  letter-spacing: 1px;
+  padding-top: 2px;
+  animation: fadeInLeft 0.8s cubic-bezier(.23,1.01,.32,1) both;
+}
+
+.analytics-samples-card {
+  background: #f7f7fa;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  padding: 18px 22px 18px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 170px;
+  max-width: 220px;
+  margin-left: 24px;
+  margin-top: 2px;
+  animation: fadeInRight 0.8s cubic-bezier(.23,1.01,.32,1) both;
+}
+
+.analytics-samples-label {
+  font-size: 1.08rem;
+  color: #888;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.sample-btn {
+  background: #ffffff;
+  border: 1px solid #ddd;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+  color: #555;
+  white-space: nowrap;
+}
+
+.sample-btn:hover {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  transform: translateY(-1px);
+}
+
+.analytics-controls-row {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.analytics-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+#nlQueryInput {
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  font-size: 1rem;
+  transition: box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 8px 14px;
+  min-width: 260px;
+  max-width: 340px;
+}
+
+#nlQueryInput:focus {
+  outline: none;
+  box-shadow: 0 4px 16px rgba(0,123,255,0.12);
+  border-color: #007bff;
+}
+
+.analytics-controls select, 
+.analytics-controls button {
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  font-size: 1rem;
+  padding: 8px 16px;
+  background: #a867c9;
+  transition: background 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.analytics-controls button.btn-primary {
+  background: linear-gradient(90deg,#007bff 0%,#00c6ff 100%);
+  color: #fff;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0,123,255,0.08);
+}
+
+.analytics-controls button.btn-primary:hover {
+  box-shadow: 0 4px 16px rgba(0,123,255,0.15);
+  transform: translateY(-1px);
+}
+
+.analytics-controls button:hover,
+.analytics-controls select:hover {
+  background: #a495b0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.analytics-main {
+  display: grid;
+  gap: 18px;
+}
+
+.chart-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 420px;
+  animation: fadeIn 1.2s cubic-bezier(.23,1.01,.32,1) both;
+}
+
+#analyticsChart {
+  max-width: 100%;
+  height: auto;
+}
+
+.chart-info {
+  margin-top: 18px;
+  font-size: 1.08rem;
+  color: #444;
+  background: #f7f7fa;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  animation: fadeIn 1.3s cubic-bezier(.23,1.01,.32,1) both;
+}
+
+.chart-info pre {
+  background: #f4f6fa;
+  border-radius: 6px;
+  padding: 12px;
+  margin: 8px 0;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.9rem;
+  overflow-x: auto;
+  border: 1px solid #e8ebf0;
+}
+
+.chart-info b {
+  color: #333;
+  font-weight: 600;
+}
+
+/* Button Styles */
+.btn {
+  padding: 8px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #f7f7f7;
+  color: var(--dark-color);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: #eeeeee;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg,#007bff 0%,#00c6ff 100%);
+  border-color: transparent;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(90deg,#0056b3 0%,#0099cc 100%);
+  color: white;
+}
+
+.btn-primary:disabled {
+  background: linear-gradient(90deg,#007bff 0%,#00c6ff 100%);
+  color: white;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .analytics-container {
+    padding: 20px;
+  }
+
+  .analytics-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .analytics-title {
+    font-size: 2rem;
+  }
+
+  .analytics-samples-card {
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .analytics-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  #nlQueryInput {
+    min-width: auto;
+    max-width: none;
+    width: 100%;
+  }
+
+  .chart-card {
+    padding: 16px;
+    min-height: 300px;
+  }
+
+  .chart-info {
+    padding: 12px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .analytics-samples-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .sample-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .analytics-controls select,
+  .analytics-controls button {
+    width: 100%;
+  }
+}

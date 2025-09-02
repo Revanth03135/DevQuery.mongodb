@@ -39,6 +39,8 @@ app.use(cors({
     'http://localhost:5000', 
     'http://127.0.0.1:5000',
     'http://127.0.0.1:3000',
+    'http://localhost:5173', // React dev server
+    'http://localhost:5174', // Alternative React dev server
     'null' // Allow file:// protocol for local development
   ],
   credentials: true,

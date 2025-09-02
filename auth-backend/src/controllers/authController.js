@@ -33,6 +33,7 @@ const register = async (req, res) => {
         id: user.id,
         username: user.username,
         email: user.email,
+        name: user.fullName || user.username,
         subscriptionTier: user.subscription_tier
       }
     });
@@ -93,7 +94,13 @@ const login = async (req, res) => {
       success: true,
       message: "Login successful",
       token: userResult.accessToken,
-      user: userResult.user,
+      user: {
+        id: userResult.user.userId,
+        username: userResult.user.username,
+        email: userResult.user.email,
+        name: userResult.user.username, // Will be updated when we have full_name
+        subscriptionTier: userResult.user.subscriptionTier
+      },
       sessionId: userResult.sessionId,
       isAdmin: false
     });

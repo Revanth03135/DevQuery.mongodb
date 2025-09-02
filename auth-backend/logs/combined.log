@@ -1245,3 +1245,258 @@
 {"level":"info","message":"POST /api/analytics/nlquery - ::1","service":"devquery-backend","timestamp":"2025-08-21 15:44:20"}
 {"level":"info","message":"POST /api/analytics/nlquery - ::1","service":"devquery-backend","timestamp":"2025-08-21 15:44:23"}
 {"level":"info","message":"POST /api/analytics/nlquery - ::1","service":"devquery-backend","timestamp":"2025-08-21 15:45:07"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-08-30 21:54:01"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-08-30 22:12:07"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-08-30 22:57:50"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:37"}
+{"level":"info","message":"GET /style.css - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:37"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:37"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:37"}
+{"level":"info","message":"GET /home.js - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:37"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:37"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:38"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:39"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:39"}
+{"level":"info","message":"GET /static/chart.umd.js - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:39"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:39"}
+{"level":"info","message":"GET /dashboard-init.js - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:39"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:39"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:39"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:39"}
+{"level":"info","message":"POST /api/auth/logout - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:42"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:43"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:43"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:43"}
+{"level":"info","message":"GET /static/chart.umd.js - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:43"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:43"}
+{"level":"info","message":"GET /dashboard-init.js - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:43"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:43"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:43"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:43"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:43"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:43"}
+{"level":"info","message":"GET /login.js - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:43"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:43"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:43"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:52"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:52"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-30 22:59:52"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-30 22:59:52"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:53"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:53"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:53"}
+{"level":"info","message":"GET /static/chart.umd.js - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:53"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:53"}
+{"level":"info","message":"GET /dashboard-init.js - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:53"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:53"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-08-30 22:59:54"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-08-30 23:03:28"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-08-30 23:04:52"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-08-30 23:16:20"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-30 23:17:39"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-30 23:17:40"}
+{"level":"info","message":"POST /api/database/connections/undefined/generate-sql - ::1","service":"devquery-backend","timestamp":"2025-08-30 23:18:11"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 00:38:20"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 00:38:20"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-08-31 00:38:25"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-08-31 14:51:14"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 14:51:19"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 14:51:19"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 14:51:47"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 14:51:47"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 14:58:07"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 14:58:07"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 14:58:36"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 14:58:36"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 14:58:43"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 14:58:44"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 14:58:49"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 14:58:49"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-08-31 15:01:14"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:01:53"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 15:01:54"}
+{"level":"info","message":"POST /api/database/connections/undefined/generate-sql - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:02:18"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:02:31"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:02:32"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:09:55"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 15:09:56"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:09:57"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:09:57"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:11:35"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 15:11:35"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:11:35"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:11:35"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:11:58"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:11:58"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:12:11"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 15:12:11"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:12:11"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:12:11"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:13:17"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:13:17"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:16:28"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:16:28"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:17:05"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:17:05"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:17:40"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 15:17:41"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:17:41"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:17:41"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:18:17"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:18:17"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-08-31 15:20:44"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-08-31 15:37:34"}
+{"level":"info","message":"GET /home - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:38"}
+{"level":"info","message":"GET /style.css - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:38"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:38"}
+{"level":"info","message":"GET /home.js - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:38"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:38"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:38"}
+{"level":"info","message":"GET /favicon.ico - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:38"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:46"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:46"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:46"}
+{"level":"info","message":"GET /static/chart.umd.js - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:46"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:46"}
+{"level":"info","message":"GET /dashboard-init.js - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:46"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:46"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:46"}
+{"level":"info","message":"POST /api/auth/logout - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:49"}
+{"level":"info","message":"GET /dashboard - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:51"}
+{"level":"info","message":"GET /dashboard.css - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:51"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:51"}
+{"level":"info","message":"GET /static/chart.umd.js - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:51"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:51"}
+{"level":"info","message":"GET /dashboard-init.js - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:51"}
+{"level":"info","message":"GET /dashboard.js - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:51"}
+{"level":"info","message":"GET /login - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:51"}
+{"level":"info","message":"GET /health - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:51"}
+{"level":"info","message":"GET /styles.css - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:51"}
+{"level":"info","message":"GET /api-client.js - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:51"}
+{"level":"info","message":"GET /login.js - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:51"}
+{"level":"info","message":"GET /script.js - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:51"}
+{"level":"info","message":"GET /img1.png - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:37:51"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:56:32"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 15:56:33"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:56:33"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:56:33"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:56:46"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 15:56:46"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:03:15"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 16:03:15"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:03:15"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:03:15"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:03:25"}
+{"level":"error","message":"Authentication failed: jwt malformed","name":"JsonWebTokenError","service":"devquery-backend","stack":"JsonWebTokenError: jwt malformed\n    at module.exports [as verify] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\jsonwebtoken\\verify.js:70:17)\n    at authenticateUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\middleware\\auth.js:19:25)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at Function.handle (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n    at router (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:47:12)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)","timestamp":"2025-08-31 16:03:25"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:03:25"}
+{"level":"error","message":"Authentication failed: jwt malformed","name":"JsonWebTokenError","service":"devquery-backend","stack":"JsonWebTokenError: jwt malformed\n    at module.exports [as verify] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\jsonwebtoken\\verify.js:70:17)\n    at authenticateUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\middleware\\auth.js:19:25)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at Function.handle (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n    at router (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:47:12)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)","timestamp":"2025-08-31 16:03:25"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:03:26"}
+{"level":"error","message":"Authentication failed: jwt malformed","name":"JsonWebTokenError","service":"devquery-backend","stack":"JsonWebTokenError: jwt malformed\n    at module.exports [as verify] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\jsonwebtoken\\verify.js:70:17)\n    at authenticateUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\middleware\\auth.js:19:25)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at Function.handle (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n    at router (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:47:12)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)","timestamp":"2025-08-31 16:03:26"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:03:26"}
+{"level":"error","message":"Authentication failed: jwt malformed","name":"JsonWebTokenError","service":"devquery-backend","stack":"JsonWebTokenError: jwt malformed\n    at module.exports [as verify] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\jsonwebtoken\\verify.js:70:17)\n    at authenticateUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\middleware\\auth.js:19:25)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at Function.handle (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n    at router (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:47:12)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)","timestamp":"2025-08-31 16:03:26"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:03:38"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 16:03:39"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:03:39"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:03:39"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:03:44"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:03:44"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:07:26"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 16:07:27"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:07:27"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:07:27"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:09:58"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:09:58"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:10:03"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 16:10:03"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:10:03"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:10:03"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:14:22"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:14:22"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:14:30"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 16:14:30"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:14:30"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:14:30"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:15:21"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:15:21"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:15:30"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 16:15:30"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:15:30"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:15:30"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:17:32"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 16:17:33"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:17:33"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:17:33"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:17:46"}
+{"level":"error","message":"Authentication failed: jwt malformed","name":"JsonWebTokenError","service":"devquery-backend","stack":"JsonWebTokenError: jwt malformed\n    at module.exports [as verify] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\jsonwebtoken\\verify.js:70:17)\n    at authenticateUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\middleware\\auth.js:19:25)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at Function.handle (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n    at router (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:47:12)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)","timestamp":"2025-08-31 16:17:46"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:17:46"}
+{"level":"error","message":"Authentication failed: jwt malformed","name":"JsonWebTokenError","service":"devquery-backend","stack":"JsonWebTokenError: jwt malformed\n    at module.exports [as verify] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\jsonwebtoken\\verify.js:70:17)\n    at authenticateUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\middleware\\auth.js:19:25)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at Function.handle (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n    at router (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:47:12)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)","timestamp":"2025-08-31 16:17:46"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:17:47"}
+{"level":"error","message":"Authentication failed: jwt malformed","name":"JsonWebTokenError","service":"devquery-backend","stack":"JsonWebTokenError: jwt malformed\n    at module.exports [as verify] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\jsonwebtoken\\verify.js:70:17)\n    at authenticateUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\middleware\\auth.js:19:25)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at Function.handle (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n    at router (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:47:12)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)","timestamp":"2025-08-31 16:17:47"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:17:47"}
+{"level":"error","message":"Authentication failed: jwt malformed","name":"JsonWebTokenError","service":"devquery-backend","stack":"JsonWebTokenError: jwt malformed\n    at module.exports [as verify] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\jsonwebtoken\\verify.js:70:17)\n    at authenticateUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\middleware\\auth.js:19:25)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at Function.handle (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n    at router (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:47:12)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)","timestamp":"2025-08-31 16:17:47"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:21:57"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 16:21:57"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:21:57"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:21:57"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:38:24"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:38:24"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:38:39"}
+{"level":"error","message":"Authentication failed: jwt malformed","name":"JsonWebTokenError","service":"devquery-backend","stack":"JsonWebTokenError: jwt malformed\n    at module.exports [as verify] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\jsonwebtoken\\verify.js:70:17)\n    at authenticateUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\middleware\\auth.js:19:25)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at Function.handle (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n    at router (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:47:12)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)","timestamp":"2025-08-31 16:38:39"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:38:39"}
+{"level":"error","message":"Authentication failed: jwt malformed","name":"JsonWebTokenError","service":"devquery-backend","stack":"JsonWebTokenError: jwt malformed\n    at module.exports [as verify] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\jsonwebtoken\\verify.js:70:17)\n    at authenticateUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\middleware\\auth.js:19:25)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at Function.handle (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n    at router (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:47:12)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)","timestamp":"2025-08-31 16:38:39"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-08-31 16:44:12"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-08-31 16:44:38"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-08-31 16:44:45"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-08-31 16:44:53"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-08-31 16:45:01"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:45:08"}
+{"level":"error","message":"Authentication failed: jwt malformed","name":"JsonWebTokenError","service":"devquery-backend","stack":"JsonWebTokenError: jwt malformed\n    at module.exports [as verify] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\jsonwebtoken\\verify.js:70:17)\n    at authenticateUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\middleware\\auth.js:19:25)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at Function.handle (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n    at router (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:47:12)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)","timestamp":"2025-08-31 16:45:08"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:48:35"}
+{"level":"error","message":"Authentication failed: jwt malformed","name":"JsonWebTokenError","service":"devquery-backend","stack":"JsonWebTokenError: jwt malformed\n    at module.exports [as verify] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\jsonwebtoken\\verify.js:70:17)\n    at authenticateUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\middleware\\auth.js:19:25)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at Function.handle (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:175:3)\n    at router (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\index.js:47:12)\n    at Layer.handle [as handle_request] (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\express\\lib\\router\\layer.js:95:5)","timestamp":"2025-08-31 16:48:35"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-08-31 16:49:56"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:53:03"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 16:53:04"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:53:04"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:53:04"}
+{"level":"info","message":"POST /api/auth/logout - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:53:07"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:53:07"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:53:07"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:53:18"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 16:53:18"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:53:18"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:53:18"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:53:45"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:53:45"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:53:47"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:53:47"}
+{"level":"info","message":"POST /api/auth/logout - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:53:49"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:53:49"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:53:49"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:54:10"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 16:54:10"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:54:10"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:54:10"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:54:43"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:54:43"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:54:46"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:54:46"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:54:48"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 16:54:48"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-08-31 21:40:43"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 21:40:50"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-08-31 21:40:50"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 21:41:38"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 21:41:38"}
+{"level":"info","message":"POST /api/auth/logout - ::1","service":"devquery-backend","timestamp":"2025-08-31 21:41:39"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 21:41:39"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 21:41:39"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-08-31 21:41:46"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-08-31 21:41:47"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 21:41:47"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-08-31 21:41:47"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-09-01 21:38:00"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-09-01 21:38:47"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-09-01 21:38:48"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-01 21:38:48"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-01 21:38:48"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-09-01 21:54:45"}

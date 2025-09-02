@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Test</title>
+</head>
+<body>
+    <h1>Backend Connection Test</h1>
+    <div id="result"></div>
+    
+    <script>
+        async function testBackend() {
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                const response = await fetch('http://localhost:5000/health');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <h2>Success!</h2>
+                    <p>Backend Status: ${data.status}</p>
+                    <p>Message: ${data.message}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h2>Error!</h2>
+                    <p>Failed to connect to backend: ${error.message}</p>
+                `;
+            }
+        }
+        
+        testBackend();
+    </script>
+</body>
+</html>

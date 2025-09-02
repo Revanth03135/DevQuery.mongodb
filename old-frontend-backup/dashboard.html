@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DevQuery - SQL Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">
+      <img src="img1.png" alt="DevQuery Logo" />
+      <span>DevQuery</span>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <ul>
+        <li class="active">
+          <a href="#sql-generator">
+            <i class="fas fa-database"></i>
+            <span>SQL Generator</span>
+          </a>
+        </li>
+        <li>
+          <a href="#query-history">
+            <i class="fas fa-history"></i>
+            <span>Query History</span>
+          </a>
+        </li>
+        <li>
+          <a href="#schema-explorer">
+            <i class="fas fa-sitemap"></i>
+            <span>Schema Explorer</span>
+          </a>
+        </li>
+        <li>
+          <a href="#saved-queries">
+            <i class="fas fa-bookmark"></i>
+            <span>Saved Queries</span>
+          </a>
+        </li>
+        <li>
+          <a href="analytics.html">
+            <i class="fas fa-chart-line"></i>
+            <span>Analytics</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    
+    <div class="user-profile">
+      <div class="user-avatar">
+        <i class="fas fa-user"></i>
+      </div>
+      <div class="user-info">
+        <span class="user-name">Revanth P</span>
+        <span class="user-role">Developer</span>
+      </div>
+      <button class="logout-btn" title="Logout">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <h1>SQL Query Generator</h1>
+        <p>Convert natural language to SQL queries with AI</p>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-secondary" id="connectDbBtn">
+          <i class="fas fa-plug"></i>
+          Connect Database
+        </button>
+        <div class="connection-status disconnected" id="connectionStatus">
+          <i class="fas fa-circle"></i>
+          <span>Disconnected</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Query Generator Section -->
+    <section class="query-generator" id="sql-generator">
+      <div class="input-section">
+        <div class="input-container">
+          <label for="naturalLanguageInput">Describe what you want to query:</label>
+          <div class="input-wrapper">
+            <textarea 
+              id="naturalLanguageInput" 
+              placeholder="e.g., Show me all customers who made purchases in the last 30 days"
+              rows="3"
+            ></textarea>
+            <button class="btn btn-primary" id="generateBtn">
+              <i class="fas fa-magic"></i>
+              Generate SQL
+            </button>
+          </div>
+        </div>
+        
+        <div class="quick-examples">
+          <span class="examples-label">Quick Examples:</span>
+          <div class="example-tags">
+            <button class="example-tag" data-example="Show all users who registered this month">Users this month</button>
+            <button class="example-tag" data-example="Find products with low inventory">Low inventory</button>
+            <button class="example-tag" data-example="Calculate average order value by region">Avg order by region</button>
+            <button class="example-tag" data-example="List top 10 customers by revenue">Top customers</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Section -->
+      <div class="results-section">
+        <div class="result-tabs">
+          <button class="tab-btn active" data-tab="sql">Generated SQL</button>
+          <button class="tab-btn" data-tab="results">Query Results</button>
+          <button class="tab-btn" data-tab="explanation">Explanation</button>
+        </div>
+
+        <div class="tab-content">
+          <!-- SQL Tab -->
+          <div class="tab-pane active" id="sql-tab">
+            <div class="sql-editor">
+              <div class="editor-header">
+                <span class="editor-title">SQL Query</span>
+                <div class="editor-actions">
+                  <button class="btn btn-sm" id="copyBtn" title="Copy to clipboard">
+                    <i class="fas fa-copy"></i>
+                  </button>
+                  <button class="btn btn-sm" id="saveBtn" title="Save query">
+                    <i class="fas fa-save"></i>
+                  </button>
+                  <button class="btn btn-sm" id="formatBtn" title="Format SQL">
+                    <i class="fas fa-code"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="code-editor" id="sqlEditor">
+                <pre><code class="sql-code" id="sqlCode">-- Your generated SQL will appear here
+SELECT * FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY);</code></pre>
+              </div>
+              <div class="editor-footer">
+                <button class="btn btn-success" id="executeBtn">
+                  <i class="fas fa-play"></i>
+                  Execute Query
+                </button>
+                <span class="query-info">
+                  <i class="fas fa-info-circle"></i>
+                  Estimated rows: <span id="estimatedRows">--</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Results Tab -->
+          <div class="tab-pane" id="results-tab">
+            <div class="results-container">
+              <div class="results-header">
+                <span class="results-title">Query Results</span>
+                <div class="results-actions">
+                  <button class="btn btn-sm" id="exportBtn">
+                    <i class="fas fa-download"></i>
+                    Export CSV
+                  </button>
+                  <span class="results-count">Showing <span id="rowCount">0</span> rows</span>
+                </div>
+              </div>
+              <div class="table-container" id="resultsTable">
+                <div class="no-results">
+                  <i class="fas fa-table"></i>
+                  <p>Execute a query to see results</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Explanation Tab -->
+          <div class="tab-pane" id="explanation-tab">
+            <div class="explanation-container">
+              <div class="explanation-header">
+                <i class="fas fa-lightbulb"></i>
+                <span>Query Explanation</span>
+              </div>
+              <div class="explanation-content" id="explanationContent">
+                <p>Generate a SQL query to see the explanation here.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Schema Explorer Sidebar -->
+    <div class="schema-sidebar" id="schemaSidebar">
+      <div class="schema-header">
+        <h3>Database Schema</h3>
+        <button class="close-schema" id="closeSchema">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="schema-search">
+        <input type="text" placeholder="Search tables..." id="schemaSearch">
+      </div>
+      
+      <div class="schema-content">
+        <div class="schema-tree" id="schemaTree">
+          <!-- Schema will be populated dynamically -->
+          <div class="loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>Loading schema...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Database Connection Modal -->
+  <div class="modal" id="dbModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Connect to Database</h3>
+        <button class="close-modal" id="closeModal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="dbConnectionForm">
+          <div class="form-group">
+            <label for="dbType">Database Type</label>
+            <select id="dbType" required>
+              <option value="">Select database type</option>
+              <option value="mysql">MySQL</option>
+              <option value="postgresql">PostgreSQL</option>
+              <option value="sqlite">SQLite</option>
+              <option value="mssql">SQL Server</option>
+              <option value="oracle">Oracle</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="dbHost">Host</label>
+            <input type="text" id="dbHost" placeholder="localhost" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="dbPort">Port</label>
+            <input type="number" id="dbPort" placeholder="3306">
+          </div>
+          
+          <div class="form-group">
+            <label for="dbName">Database Name</label>
+            <input type="text" id="dbName" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="dbUser">Username</label>
+            <input type="text" id="dbUser" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="dbPassword">Password</label>
+            <input type="password" id="dbPassword">
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="testConnection">
+              <i class="fas fa-check"></i>
+              Test Connection
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-plug"></i>
+              Connect
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Generating SQL query...</span>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="static/chart.umd.js"></script>
+  <script src="api-client.js"></script>
+  <script src="dashboard-init.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>
