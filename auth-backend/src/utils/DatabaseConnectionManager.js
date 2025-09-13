@@ -209,11 +209,22 @@ class DatabaseConnectionManager {
 
   // Create MongoDB connection
   async createMongoDBConnection(config) {
-    const url = `mongodb://${config.username ? `${config.username}:${config.password}@` : ''}${config.host}:${config.port || 27017}/${config.database}`;
-    const client = new MongoClient(url);
-    
+    let url, dbName;
+    if (config.connectionString) {
+      url = config.connectionString;
+      // Try to extract db name from connection string if not provided
+      // Handles both mongodb:// and mongodb+srv://
+      const match = url.match(/mongodb(?:\+srv)?:\/\/[^\/]+\/([^?]+)/);
+      dbName = match ? match[1] : undefined;
+    } else {
+      url = `mongodb://${config.username ? `${config.username}:${config.password}@` : ''}${config.host}:${config.port || 27017}/${config.database}`;
+      dbName = config.database;
+    }
+    // If dbName is still not found, fallback to 'test'
+    if (!dbName) dbName = 'test';
+    const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
     await client.connect();
-    const db = client.db(config.database);
+    const db = client.db(dbName);
 
     return {
       client,
@@ -248,7 +259,24 @@ class DatabaseConnectionManager {
 
   // Main connection factory
   async createConnection(config) {
-    switch (config.type.toLowerCase()) {
+    // If connectionString is present, parse and detect type
+    if (config.connectionString) {
+      const connStr = config.connectionString;
+      if (connStr.startsWith('mongodb://') || connStr.startsWith('mongodb+srv://')) {
+        return await this.createMongoDBConnection({ connectionString: connStr });
+      } else if (connStr.startsWith('postgres://') || connStr.startsWith('postgresql://')) {
+        return await this.createPostgreSQLConnection({ connectionString: connStr });
+      } else if (connStr.startsWith('mysql://')) {
+        return await this.createMySQLConnection({ connectionString: connStr });
+      } else if (connStr.startsWith('mssql://')) {
+        return await this.createSQLServerConnection({ connectionString: connStr });
+      } else if (connStr.startsWith('oracle://')) {
+        return await this.createOracleConnection({ connectionString: connStr });
+      } else {
+        throw new Error('Unsupported or invalid connection string');
+      }
+    }
+    switch (config.type && config.type.toLowerCase()) {
       case 'postgresql':
       case 'postgres':
         return await this.createPostgreSQLConnection(config);

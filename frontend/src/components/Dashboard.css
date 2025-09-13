@@ -1,3 +1,116 @@
+.chat-btn {
+  background: linear-gradient(90deg,#5a39c7 0%,#00c6ff 100%);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(90,57,199,0.08);
+  border: none;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.chat-btn:hover {
+  background: linear-gradient(90deg,#472d9d 0%,#00aaff 100%);
+  box-shadow: 0 4px 16px rgba(90,57,199,0.15);
+}
+
+.chat-drawer {
+  position: fixed;
+  top: 0;
+  right: -420px;
+  width: 400px;
+  height: 100vh;
+  background: #fff;
+  box-shadow: -2px 0 18px rgba(90,57,199,0.13);
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  transition: right 0.35s cubic-bezier(.23,1.01,.32,1);
+}
+.chat-drawer.open {
+  right: 0;
+}
+.chat-drawer-header {
+  padding: 18px 22px;
+  background: linear-gradient(90deg,#5a39c7 0%,#00c6ff 100%);
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.1rem;
+}
+.close-chat {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.3rem;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.close-chat:hover { opacity: 1; }
+.chat-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 18px 0 18px;
+  background: #f7f7fa;
+}
+.chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.chat-msg {
+  max-width: 80%;
+  padding: 10px 16px;
+  border-radius: 16px;
+  font-size: 1rem;
+  line-height: 1.5;
+  box-shadow: 0 2px 8px rgba(90,57,199,0.06);
+  animation: fadeIn 0.3s;
+}
+.chat-msg.user {
+  align-self: flex-end;
+  background: linear-gradient(90deg,#5a39c7 0%,#00c6ff 100%);
+  color: #fff;
+}
+.chat-msg.bot {
+  align-self: flex-start;
+  background: #fff;
+  color: #333;
+  border: 1px solid #e0e0e0;
+}
+.chat-drawer-footer {
+  display: flex;
+  gap: 10px;
+  padding: 16px 18px 18px 18px;
+  background: #f7f7fa;
+  border-top: 1px solid #e0e0e0;
+}
+.chat-input {
+  flex: 1;
+  border-radius: 12px;
+  border: 1.5px solid #e0e0e0;
+  font-size: 1rem;
+  padding: 10px 14px;
+  transition: box-shadow 0.2s;
+  outline: none;
+}
+.chat-input:focus {
+  border-color: #5a39c7;
+  box-shadow: 0 2px 8px rgba(90,57,199,0.08);
+}
+.chat-send {
+  padding: 0 18px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  background: linear-gradient(90deg,#5a39c7 0%,#00c6ff 100%);
+  color: #fff;
+  border: none;
+  transition: background 0.2s;
+}
+.chat-send:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 /* Dashboard.css - Styles for Dashboard React Component */
 
 :root {

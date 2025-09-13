@@ -5,6 +5,29 @@ import './Dashboard.css';
 import logoImg from '../assets/img1.png';
 
 function Dashboard({ user }) {
+  const [showChatDrawer, setShowChatDrawer] = useState(false);
+  // Chat drawer placeholder state
+  const [chatMessages, setChatMessages] = useState([
+    { sender: 'bot', text: 'Hi! I am your database assistant. Ask me anything about your data.' }
+  ]);
+  const [chatInput, setChatInput] = useState('');
+
+  const handleSendChat = (e) => {
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+    setChatMessages((msgs) => [
+      ...msgs,
+      { sender: 'user', text: chatInput }
+    ]);
+    setChatInput('');
+    // Placeholder: echo back
+    setTimeout(() => {
+      setChatMessages((msgs) => [
+        ...msgs,
+        { sender: 'bot', text: 'This is a placeholder. LLM integration coming soon!' }
+      ]);
+    }, 700);
+  };
   const [naturalLanguageInput, setNaturalLanguageInput] = useState('');
   const [generatedSQL, setGeneratedSQL] = useState('-- Your generated SQL will appear here\nSELECT * FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY);');
   const [queryResults, setQueryResults] = useState([]);
@@ -15,6 +38,7 @@ function Dashboard({ user }) {
   const [dbConnection, setDbConnection] = useState(null);
   const [showDbModal, setShowDbModal] = useState(false);
   const [dbConfig, setDbConfig] = useState({
+    connectionString: '',
     type: '',
     host: '',
     port: '',
@@ -260,14 +284,22 @@ LIMIT 100;`,
   };
 
   const handleTestConnection = async () => {
-    if (!dbConfig.type || !dbConfig.host || !dbConfig.database || !dbConfig.username) {
-      showNotification('Please fill in all required fields', 'warning');
+    // If connection string is provided, skip other required fields
+    if (!dbConfig.connectionString && (!dbConfig.type || !dbConfig.host || !dbConfig.database || !dbConfig.username)) {
+      showNotification('Please fill in all required fields or provide a connection string', 'warning');
       return;
     }
 
     setLoading(true);
     try {
-      const response = await api.post('/api/database/test-connection', dbConfig);
+      let payload;
+      if (dbConfig.connectionString) {
+        payload = { connectionString: dbConfig.connectionString };
+      } else {
+        payload = { ...dbConfig };
+        delete payload.connectionString;
+      }
+      const response = await api.post('/api/database/test-connection', payload);
 
       if (response.data.success) {
         showNotification('Connection test successful!', 'success');
@@ -284,25 +316,31 @@ LIMIT 100;`,
 
   const handleDbConnect = async (e) => {
     e.preventDefault();
-    
-    if (!dbConfig.type || !dbConfig.host || !dbConfig.database || !dbConfig.username) {
-      showNotification('Please fill in all required fields', 'warning');
+    if (!dbConfig.connectionString && (!dbConfig.type || !dbConfig.host || !dbConfig.database || !dbConfig.username)) {
+      showNotification('Please fill in all required fields or provide a connection string', 'warning');
       return;
     }
 
     setLoading(true);
 
     try {
-      const response = await api.post('/api/database/connect', dbConfig);
+      let payload;
+      if (dbConfig.connectionString) {
+        payload = { connectionString: dbConfig.connectionString };
+      } else {
+        payload = { ...dbConfig };
+        delete payload.connectionString;
+      }
+      const response = await api.post('/api/database/connect', payload);
 
       if (response.data.success) {
         setDbConnection(response.data.data);
         setConnectionStatus('connected');
         setShowDbModal(false);
         showNotification('Database connected successfully!', 'success');
-        
         // Reset form
         setDbConfig({
+          connectionString: '',
           type: '',
           host: '',
           port: '',
@@ -436,12 +474,45 @@ LIMIT 100;`,
       {/* Main Content */}
       <div className="main-content">
         {/* Header */}
-        <header className="header">
+  <header className="header">
           <div className="header-left">
             <h1>SQL Query Generator</h1>
             <p>Convert natural language to SQL queries with AI</p>
           </div>
           <div className="header-right">
+            <button className="btn btn-primary chat-btn" onClick={() => setShowChatDrawer(true)}>
+              <i className="fas fa-comments"></i>
+              Chat with DB
+            </button>
+      {/* Chat Drawer */}
+      <div className={`chat-drawer${showChatDrawer ? ' open' : ''}`}>
+        <div className="chat-drawer-header">
+          <span><i className="fas fa-robot"></i> Database Chat Assistant</span>
+          <button className="close-chat" onClick={() => setShowChatDrawer(false)} title="Close">
+            <i className="fas fa-times"></i>
+          </button>
+        </div>
+        <div className="chat-drawer-body">
+          <div className="chat-messages">
+            {chatMessages.map((msg, idx) => (
+              <div key={idx} className={`chat-msg ${msg.sender}`}>{msg.text}</div>
+            ))}
+          </div>
+        </div>
+        <form className="chat-drawer-footer" onSubmit={handleSendChat} autoComplete="off">
+          <input
+            type="text"
+            className="chat-input"
+            placeholder="Ask about your data..."
+            value={chatInput}
+            onChange={e => setChatInput(e.target.value)}
+            autoFocus={showChatDrawer}
+          />
+          <button type="submit" className="btn btn-primary chat-send" disabled={!chatInput.trim()}>
+            <i className="fas fa-paper-plane"></i>
+          </button>
+        </form>
+      </div>
             <button className="btn btn-secondary" onClick={handleConnectDatabase}>
               <i className="fas fa-plug"></i>
               Connect Database
@@ -640,12 +711,25 @@ LIMIT 100;`,
             <div className="modal-body">
               <form onSubmit={handleDbConnect}>
                 <div className="form-group">
+                  <label htmlFor="dbConnectionString">Connection String (optional)</label>
+                  <input
+                    type="text"
+                    id="dbConnectionString"
+                    placeholder="e.g. mongodb+srv://user:pass@host/db"
+                    value={dbConfig.connectionString}
+                    onChange={e => handleDbConfigChange('connectionString', e.target.value)}
+                  />
+                  <small style={{ color: '#888' }}>If provided, all other fields are optional.</small>
+                </div>
+
+                <div className="form-group">
                   <label htmlFor="dbType">Database Type *</label>
-                  <select 
-                    id="dbType" 
+                  <select
+                    id="dbType"
                     value={dbConfig.type}
                     onChange={(e) => handleDbConfigChange('type', e.target.value)}
-                    required
+                    required={!dbConfig.connectionString}
+                    disabled={!!dbConfig.connectionString}
                   >
                     <option value="">Select database type</option>
                     <option value="mysql">MySQL</option>
@@ -655,62 +739,67 @@ LIMIT 100;`,
                     <option value="oracle">Oracle</option>
                   </select>
                 </div>
-                
+
                 <div className="form-group">
                   <label htmlFor="dbHost">Host *</label>
-                  <input 
-                    type="text" 
-                    id="dbHost" 
-                    placeholder="localhost" 
+                  <input
+                    type="text"
+                    id="dbHost"
+                    placeholder="localhost"
                     value={dbConfig.host}
                     onChange={(e) => handleDbConfigChange('host', e.target.value)}
-                    required 
+                    required={!dbConfig.connectionString}
+                    disabled={!!dbConfig.connectionString}
                   />
                 </div>
-                
+
                 <div className="form-group">
                   <label htmlFor="dbPort">Port</label>
-                  <input 
-                    type="number" 
-                    id="dbPort" 
+                  <input
+                    type="number"
+                    id="dbPort"
                     placeholder="3306"
                     value={dbConfig.port}
                     onChange={(e) => handleDbConfigChange('port', e.target.value)}
+                    disabled={!!dbConfig.connectionString}
                   />
                 </div>
-                
+
                 <div className="form-group">
                   <label htmlFor="dbName">Database Name *</label>
-                  <input 
-                    type="text" 
-                    id="dbName" 
+                  <input
+                    type="text"
+                    id="dbName"
                     placeholder="my_database"
                     value={dbConfig.database}
                     onChange={(e) => handleDbConfigChange('database', e.target.value)}
-                    required 
+                    required={!dbConfig.connectionString}
+                    disabled={!!dbConfig.connectionString}
                   />
                 </div>
-                
+
                 <div className="form-group">
                   <label htmlFor="dbUser">Username *</label>
-                  <input 
-                    type="text" 
-                    id="dbUser" 
+                  <input
+                    type="text"
+                    id="dbUser"
                     placeholder="username"
                     value={dbConfig.username}
                     onChange={(e) => handleDbConfigChange('username', e.target.value)}
-                    required 
+                    required={!dbConfig.connectionString}
+                    disabled={!!dbConfig.connectionString}
                   />
                 </div>
-                
+
                 <div className="form-group">
                   <label htmlFor="dbPassword">Password</label>
-                  <input 
-                    type="password" 
+                  <input
+                    type="password"
                     id="dbPassword"
                     placeholder="password"
                     value={dbConfig.password}
                     onChange={(e) => handleDbConfigChange('password', e.target.value)}
+                    disabled={!!dbConfig.connectionString}
                   />
                 </div>
                 

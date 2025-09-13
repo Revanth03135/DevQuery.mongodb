@@ -9,21 +9,17 @@ class DatabaseController {
   // Connect to database
   static async connect(req, res) {
     try {
-      const { type, host, port, database, username, password, ssl, connectionName } = req.body;
-      
-      const dbConfig = {
-        type,
-        host,
-        port,
-        database,
-        username,
-        password,
-        ssl
-      };
+      const { connectionString, type, host, port, database, username, password, ssl, connectionName } = req.body;
+      let dbConfig;
+      if (connectionString) {
+        dbConfig = { connectionString };
+      } else {
+        dbConfig = { type, host, port, database, username, password, ssl };
+      }
 
       // Connect to database
       const connectionResult = await dbManager.connect(req.user.userId, dbConfig);
-      
+
       // Track connection in PostgreSQL
       await userManager.trackConnection({
         connectionId: connectionResult.connectionId,
@@ -58,17 +54,13 @@ class DatabaseController {
   // Test database connection
   static async testConnection(req, res) {
     try {
-      const { type, host, port, database, username, password, ssl } = req.body;
-      
-      const dbConfig = {
-        type,
-        host,
-        port,
-        database,
-        username,
-        password,
-        ssl
-      };
+      const { connectionString, type, host, port, database, username, password, ssl } = req.body;
+      let dbConfig;
+      if (connectionString) {
+        dbConfig = { connectionString };
+      } else {
+        dbConfig = { type, host, port, database, username, password, ssl };
+      }
 
       // Create temporary connection for testing
       const connection = await dbManager.createConnection(dbConfig);

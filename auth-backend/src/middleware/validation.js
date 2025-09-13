@@ -43,26 +43,45 @@ const validateUserLogin = (req, res, next) => {
 
 // Database connection validation
 const validateDatabaseConnection = (req, res, next) => {
+  // If connectionString is present, skip other required fields
   const schema = Joi.object({
-    type: Joi.string().valid('postgresql', 'postgres', 'mysql', 'sqlite', 'sqlserver', 'mssql', 'oracle', 'mongodb', 'mongo').required(),
-    host: Joi.string().when('type', {
-      is: 'sqlite',
+    // Accept any string for connectionString, especially for MongoDB URIs
+    connectionString: Joi.string().pattern(/^mongodb(\+srv)?:\/\//).optional(),
+    type: Joi.string().valid('postgresql', 'postgres', 'mysql', 'sqlite', 'sqlserver', 'mssql', 'oracle', 'mongodb', 'mongo').when('connectionString', {
+      is: Joi.exist(),
       then: Joi.optional(),
       otherwise: Joi.required()
     }),
-    port: Joi.number().integer().min(1).max(65535).when('type', {
-      is: 'sqlite',
+    host: Joi.string().when('connectionString', {
+      is: Joi.exist(),
+      then: Joi.optional(),
+      otherwise: Joi.when('type', {
+        is: 'sqlite',
+        then: Joi.optional(),
+        otherwise: Joi.required()
+      })
+    }),
+    port: Joi.number().integer().min(1).max(65535).when('connectionString', {
+      is: Joi.exist(),
       then: Joi.optional(),
       otherwise: Joi.optional()
     }),
-    database: Joi.string().required(),
-    username: Joi.string().when('type', {
-      is: 'sqlite',
+    database: Joi.string().when('connectionString', {
+      is: Joi.exist(),
       then: Joi.optional(),
       otherwise: Joi.required()
     }),
-    password: Joi.string().when('type', {
-      is: 'sqlite',
+    username: Joi.string().when('connectionString', {
+      is: Joi.exist(),
+      then: Joi.optional(),
+      otherwise: Joi.when('type', {
+        is: 'sqlite',
+        then: Joi.optional(),
+        otherwise: Joi.required()
+      })
+    }),
+    password: Joi.string().when('connectionString', {
+      is: Joi.exist(),
       then: Joi.optional(),
       otherwise: Joi.optional()
     }),

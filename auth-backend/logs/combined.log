@@ -1500,3 +1500,133 @@
 {"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-01 21:38:48"}
 {"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-01 21:38:48"}
 {"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-09-01 21:54:45"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-09-12 21:09:09"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-09-12 21:09:45"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-09-12 21:17:29"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-09-12 21:22:04"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-09-12 21:41:00"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-09-12 21:41:26"}
+{"level":"info","message":"Admin login failed, trying user login","service":"devquery-backend","timestamp":"2025-09-12 21:41:26"}
+{"level":"error","message":"Login error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string","service":"devquery-backend","stack":"Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg-pool\\index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.loginUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:148:20)\n    at async login (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\controllers\\authController.js:88:24)","timestamp":"2025-09-12 21:41:26"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-09-12 21:41:33"}
+{"level":"info","message":"Admin login failed, trying user login","service":"devquery-backend","timestamp":"2025-09-12 21:41:33"}
+{"level":"error","message":"Login error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string","service":"devquery-backend","stack":"Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg-pool\\index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.loginUser (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:148:20)\n    at async login (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\controllers\\authController.js:88:24)","timestamp":"2025-09-12 21:41:33"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-09-12 22:03:22"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-09-12 22:18:00"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-09-12 22:18:42"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-09-12 22:18:42"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-12 22:18:42"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-12 22:18:42"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-09-12 22:19:18"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-09-13 14:25:14"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 14:26:15"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 14:26:15"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 14:26:16"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 14:26:16"}
+{"level":"info","message":"POST /api/auth/logout - ::1","service":"devquery-backend","timestamp":"2025-09-13 14:26:35"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 14:26:35"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 14:26:35"}
+{"level":"info","message":"POST /api/auth/login - ::1","service":"devquery-backend","timestamp":"2025-09-13 14:26:41"}
+{"level":"info","message":"Admin logged in: admin","service":"devquery-backend","timestamp":"2025-09-13 14:26:41"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 14:26:41"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 14:26:41"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-09-13 14:45:31"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-09-13 14:55:19"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 14:55:50"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 14:55:50"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 14:55:50"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 14:55:50"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 14:55:50"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:01:08"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:01:08"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:09:12"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:09:12"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:09:48"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:09:48"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:30:37"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:30:37"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:31:41"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:31:41"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:31:42"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:31:42"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:32:57"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:32:57"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:33:00"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:33:00"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:33:13"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:34:38"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:39:56"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:41:20"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:46:52"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:47:05"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:47:07"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:47:08"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:47:41"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:47:51"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:47:51"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:47:51"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:47:51"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:47:51"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:48:09"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:48:19"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:49:01"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:49:03"}
+{"level":"info","message":"POST /api/database/connect - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:49:04"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:50:12"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:50:13"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:53:40"}
+{"level":"info","message":"POST /api/database/connect - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:53:52"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:54:17"}
+{"code":"28P01","file":"auth.c","length":99,"level":"error","line":"324","message":"Database connection test failed: password authentication failed for user \"dev\"","name":"error","routine":"auth_failed","service":"devquery-backend","severity":"FATAL","stack":"error: password authentication failed for user \"dev\"\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg-pool\\index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async DatabaseConnectionManager.createPostgreSQLConnection (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\utils\\DatabaseConnectionManager.js:50:20)\n    at async DatabaseConnectionManager.createConnection (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\utils\\DatabaseConnectionManager.js:254:16)\n    at async testConnection (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\controllers\\databaseController.js:74:26)","timestamp":"2025-09-13 15:54:17"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:54:28"}
+{"code":"28P01","file":"auth.c","length":99,"level":"error","line":"324","message":"Database connection test failed: password authentication failed for user \"dev\"","name":"error","routine":"auth_failed","service":"devquery-backend","severity":"FATAL","stack":"error: password authentication failed for user \"dev\"\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg-pool\\index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async DatabaseConnectionManager.createPostgreSQLConnection (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\utils\\DatabaseConnectionManager.js:50:20)\n    at async DatabaseConnectionManager.createConnection (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\utils\\DatabaseConnectionManager.js:254:16)\n    at async testConnection (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\controllers\\databaseController.js:74:26)","timestamp":"2025-09-13 15:54:28"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:54:38"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:54:44"}
+{"level":"info","message":"POST /api/database/connect - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:55:11"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:55:11"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:55:12"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:55:12"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:55:12"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:56:12"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:56:31"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:56:42"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:56:49"}
+{"level":"info","message":"DevQuery API server running on port 5000","service":"devquery-backend","timestamp":"2025-09-13 15:57:22"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:57:27"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:57:27"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:57:27"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:57:27"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:57:27"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:57:32"}
+{"level":"info","message":"POST /api/database/connect - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:57:33"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:57:34"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:57:35"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:57:50"}
+{"level":"info","message":"GET /api/auth/validate - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:57:50"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:57:50"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:57:50"}
+{"level":"info","message":"GET /api/database/connections - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:57:50"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:58:10"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 15:58:41"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 16:00:52"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 16:00:58"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 16:00:59"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 16:00:59"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 16:00:59"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 16:00:59"}
+{"level":"info","message":"POST /api/database/connect - ::1","service":"devquery-backend","timestamp":"2025-09-13 16:01:00"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 16:01:01"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 16:01:02"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 16:01:02"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 16:01:02"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 16:01:02"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 16:01:02"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 16:01:02"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 16:01:24"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 16:01:32"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 16:01:33"}
+{"level":"info","message":"POST /api/database/test-connection - ::1","service":"devquery-backend","timestamp":"2025-09-13 16:01:43"}
+{"level":"info","message":"POST /api/database/connect - ::1","service":"devquery-backend","timestamp":"2025-09-13 16:01:44"}
+{"level":"info","message":"New database connection created for user 1, type: postgresql","service":"devquery-backend","timestamp":"2025-09-13 16:01:44"}
+{"code":"42P01","file":"parse_relation.c","length":124,"level":"error","line":"1452","message":"Connection tracking failed: relation \"user_database_connections\" does not exist","name":"error","position":"22","routine":"parserOpenTable","service":"devquery-backend","severity":"ERROR","stack":"error: relation \"user_database_connections\" does not exist\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.trackConnection (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:391:7)\n    at async connect (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\controllers\\databaseController.js:24:7)","timestamp":"2025-09-13 16:01:44"}
+{"code":"42P01","file":"parse_relation.c","length":124,"level":"error","line":"1452","message":"Database connection failed: relation \"user_database_connections\" does not exist","name":"error","position":"22","routine":"parserOpenTable","service":"devquery-backend","severity":"ERROR","stack":"error: relation \"user_database_connections\" does not exist\n    at C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\node_modules\\pg\\lib\\client.js:545:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async UserManager.trackConnection (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\models\\UserManager.js:391:7)\n    at async connect (C:\\Users\\shiva\\DevLab\\DevQuery\\auth-backend\\src\\controllers\\databaseController.js:24:7)","timestamp":"2025-09-13 16:01:44"}
