@@ -20,16 +20,23 @@ function Signup({ setUser }) {
     });
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
+      // The 'formData' object with name, email, and password is sent
       const response = await api.post('/api/auth/register', formData);
-      if (response.data.success) {
-        localStorage.setItem('token', response.data.token);
-        setUser(response.data.user);
+
+      // FIX: Check for the actual data returned by the backend
+      if (response.data && response.data.token) {
+        // Save the entire user object (which includes the token)
+        localStorage.setItem('user', JSON.stringify(response.data));
+        
+        // This function will update your global state
+        setUser(response.data); 
+        
         navigate('/dashboard');
       }
     } catch (err) {

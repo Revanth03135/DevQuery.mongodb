@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../utils/api';
-import './Auth.css';
+import { useUser } from '../context/UserContext';
+import '../components/Auth.css';
 
-function Login({ setUser }) {
+function Login() {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -11,6 +11,13 @@ function Login({ setUser }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { user, login } = useUser();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
 
   const handleChange = (e) => {
     setFormData({
@@ -23,16 +30,10 @@ function Login({ setUser }) {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
-      const response = await api.post('/api/auth/login', formData);
-      if (response.data.success) {
-        localStorage.setItem('token', response.data.token);
-        setUser(response.data.user);
-        navigate('/dashboard');
-      }
+      await login(formData.email, formData.password);
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
@@ -42,7 +43,7 @@ function Login({ setUser }) {
     <div className="login-page">
       <div className="login-container">
         <form id="loginForm" onSubmit={handleSubmit}>
-          <h2>Login to DevQuery</h2>
+          <h2>Log In</h2>
 
           {error && <div className="error-message">{error}</div>}
 
@@ -71,7 +72,7 @@ function Login({ setUser }) {
           </button>
 
           <p className="signup-link">
-            Don't have an account?{' '}
+            Don't have an account?
             <Link to="/signup">Sign Up</Link>
           </p>
         </form>

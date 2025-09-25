@@ -15,7 +15,11 @@ function App() {
   useEffect(() => {
     // Check if user is logged in
     const token = localStorage.getItem('token');
-    if (token) {
+    if (token) {    useEffect(() => {
+      if (user && window.location.pathname !== '/dashboard') {
+        navigate('/dashboard');
+      }
+    }, [user, navigate]);
       // Validate token with backend
       api.get('/api/auth/validate')
       .then(response => {
