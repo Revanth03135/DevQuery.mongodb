@@ -5,8 +5,7 @@ import './Auth.css';
 
 function Signup({ setUser }) {
   const [formData, setFormData] = useState({
-    username: '',
-    fullName: '',
+    name: '',
     email: '',
     password: ''
   });
@@ -48,24 +47,14 @@ function Signup({ setUser }) {
 
           {error && <div className="error-message">{error}</div>}
 
-          <label htmlFor="username">Username</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            required
-          />
-
-          <label htmlFor="name">Full Name</label>
-          <input
-            type="text"
-            id="name"
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleChange}
-            required
+          <label htmlFor="name">Name</label> {/* Changed label */}
+              <input
+                type="text"
+                id="name" 
+                name="name"               // <-- Fixed: Changed to "name"
+                value={formData.name}      // <-- Fixed: Changed to formData.name
+                onChange={handleChange}
+                required
           />
 
           <label htmlFor="email">Email</label>
