@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import '../components/Auth.css';
@@ -11,13 +11,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { user, login } = useUser();
-
-  useEffect(() => {
-    if (user) {
-      navigate('/dashboard');
-    }
-  }, [user, navigate]);
+  const { login } = useUser();
 
   const handleChange = (e) => {
     setFormData({
@@ -32,8 +26,9 @@ function Login() {
     setError('');
     try {
       await login(formData.email, formData.password);
+      navigate('/dashboard'); // Only redirect after successful login
     } catch (err) {
-      setError(err.message || 'Login failed. Please check your credentials.');
+      setError(err.response?.data?.message || err.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
