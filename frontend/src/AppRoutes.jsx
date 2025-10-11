@@ -46,7 +46,7 @@ function AppRoutes() {
       <Route path="/home" element={<Home user={user} />} />
       <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" replace />} />
       <Route path="/signup" element={!user ? <Signup /> : <Navigate to="/dashboard" replace />} />
-      <Route path="/dashboard" element={user ? <Dashboard user={user} /> : <Navigate to="/login" replace />} />
+      <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/login" replace />} />
       <Route path="/analytics" element={user ? <Analytics user={user} /> : <Navigate to="/login" replace />} />
     </Routes>
   );

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../utils/api';
+import api from '../utils/api'; // Make sure this import is correct (default export)
 import './Auth.css';
 
-function Signup({ setUser }) {
+function Signup() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -11,6 +11,10 @@ function Signup({ setUser }) {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  // 1. Add state for our simple success message
+  const [successMessage, setSuccessMessage] = useState('');
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -20,25 +24,23 @@ function Signup({ setUser }) {
     });
   };
 
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccessMessage(''); // Clear old messages
 
     try {
-      // The 'formData' object with name, email, and password is sent
-      const response = await api.post('/api/auth/register', formData);
+      await api.post('/api/auth/register', formData);
 
-      // FIX: Check for the actual data returned by the backend
-      if (response.data && response.data.token) {
-        // Save the entire user object (which includes the token)
-        localStorage.setItem('user', JSON.stringify(response.data));
-        
-        // This function will update your global state
-        setUser(response.data); 
-        
-        navigate('/dashboard');
-      }
+      // 2. Set the success message text
+      setSuccessMessage('User created successfully!');
+
+      // Redirect after 2 seconds
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
     } finally {
@@ -52,16 +54,20 @@ const handleSubmit = async (e) => {
         <form id="signupForm" onSubmit={handleSubmit}>
           <h2>Create Account</h2>
 
+          {/* 3. Display the green message here when it exists */}
+          {successMessage && <p className="success-text">{successMessage}</p>}
+          
           {error && <div className="error-message">{error}</div>}
 
-          <label htmlFor="name">Name</label> {/* Changed label */}
-              <input
-                type="text"
-                id="name" 
-                name="name"               // <-- Fixed: Changed to "name"
-                value={formData.name}      // <-- Fixed: Changed to formData.name
-                onChange={handleChange}
-                required
+          <label htmlFor="name">Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            disabled={!!successMessage} // Optional: disable form on success
           />
 
           <label htmlFor="email">Email</label>
@@ -72,6 +78,7 @@ const handleSubmit = async (e) => {
             value={formData.email}
             onChange={handleChange}
             required
+            disabled={!!successMessage} // Optional: disable form on success
           />
 
           <label htmlFor="password">Password</label>
@@ -82,9 +89,10 @@ const handleSubmit = async (e) => {
             value={formData.password}
             onChange={handleChange}
             required
+            disabled={!!successMessage} // Optional: disable form on success
           />
 
-          <button type="submit" disabled={loading}>
+          <button type="submit" disabled={loading || !!successMessage}>
             {loading ? 'Creating Account...' : 'Sign Up'}
           </button>
 

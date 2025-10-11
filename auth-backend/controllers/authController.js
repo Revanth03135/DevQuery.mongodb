@@ -35,5 +35,10 @@ const loginUser = async (req, res) => {
     res.status(401).json({ message: 'Invalid email or password' });
   }
 };
+const logoutUser = (req, res) => {
+  // If you were using HttpOnly cookies, you would clear them here.
+  // For now, just confirming the logout is perfect.
+  res.status(200).json({ message: 'Logout successful' });
+};
 
-module.exports = { registerUser, loginUser };
+module.exports = { registerUser, loginUser, logoutUser };

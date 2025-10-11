@@ -3,8 +3,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/api';
 import './Dashboard.css';
 import logoImg from '../assets/img1.png';
+import { useUser } from '../context/UserContext';
+function Dashboard() {
+  const { user, logout } = useUser();
 
-function Dashboard({ user }) {
+ 
   const [showChatDrawer, setShowChatDrawer] = useState(false);
   // Chat drawer placeholder state
   const [chatMessages, setChatMessages] = useState([
@@ -368,6 +371,7 @@ LIMIT 100;`,
     } finally {
       // Always clear local storage and redirect
       localStorage.removeItem('token');
+      logout();
       navigate('/login');
     }
   };

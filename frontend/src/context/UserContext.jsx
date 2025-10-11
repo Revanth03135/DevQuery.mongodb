@@ -42,11 +42,20 @@ export function UserProvider({ children }) {
     return response.data;
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => { // Make it async
+  try {
+    // This is the new part: tell the backend we are logging out.
+    await api.post('/api/auth/logout');
+  } catch (error) {
+    // Log the error, but don't stop the user from being logged out on the frontend.
+    console.error("Logout API call failed, but logging out on client.", error);
+  } finally {
+    // Your existing code is perfect for cleaning up the frontend.
     localStorage.removeItem('user');
     delete api.defaults.headers.common['Authorization'];
     setUser(null);
-  }, []);
+  }
+}, []);
 
   const value = {
     user,
