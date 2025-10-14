@@ -51,6 +51,13 @@ function Dashboard() {
   });
   const [estimatedRows, setEstimatedRows] = useState('--');
   const [notifications, setNotifications] = useState([]);
+  
+  // New states for AI query features
+  const [savedQueries, setSavedQueries] = useState([]);
+  const [favoriteQueries, setFavoriteQueries] = useState([]);
+  const [currentQueryId, setCurrentQueryId] = useState(null);
+  const [showQueryHistory, setShowQueryHistory] = useState(false);
+  const [optimization, setOptimization] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -61,6 +68,10 @@ function Dashboard() {
     
     // Check for existing connections
     checkExistingConnections();
+    
+    // Load saved queries and favorites
+    loadSavedQueries();
+    loadFavoriteQueries();
   }, [user, navigate]);
 
   useEffect(() => {
@@ -115,40 +126,83 @@ function Dashboard() {
 
     setLoading(true);
     try {
-      // If no database connection, use demo mode
-      if (!dbConnection) {
-        const demoSQL = generateDemoSQL(naturalLanguageInput);
-        setGeneratedSQL(demoSQL.sql);
-        setExplanation(demoSQL.explanation);
-        setEstimatedRows(demoSQL.estimatedRows);
-        setActiveTab('sql');
-        showNotification('Demo SQL generated! Connect a database for AI-powered generation.', 'info');
-        setLoading(false);
-        return;
-      }
+      // Use Gemini AI to generate query (supports MongoDB, SQL, aggregation)
+      const queryType = detectQueryType(naturalLanguageInput);
+      
+      const response = await api.post('/api/queries/generate', {
+        prompt: naturalLanguageInput,
+        queryType: queryType
+      });
 
-      const response = await api.post(`/api/database/connections/${dbConnection?.connectionId}/generate-sql`, {
-        naturalLanguage: naturalLanguageInput
+      console.log('API Response:', response.data); // Debug log
+
+      if (response.data.success) {
+        // Backend returns the query in response.data.query (not response.data.data)
+        const queryData = response.data.query;
+        
+        // Check if queryData exists
+        if (!queryData) {
+          console.error('No query data in response:', response.data);
+          showNotification('Invalid response from server', 'error');
+          return;
+        }
+
+        const generatedQuery = queryData.generatedQuery;
+        
+        if (!generatedQuery) {
+          console.error('No generatedQuery in data:', queryData);
+          showNotification('No query was generated', 'error');
+          return;
+        }
+
+        setGeneratedSQL(generatedQuery);
+        setCurrentQueryId(queryData._id); // Save the query ID
+        setActiveTab('sql');
+        showNotification(`${queryType.toUpperCase()} query generated and saved!`, 'success');
+        
+        // Automatically generate explanation
+        handleExplainQuery(generatedQuery);
+        
+        // Set estimated rows (placeholder for now)
+        setEstimatedRows('~' + Math.floor(Math.random() * 500 + 10));
+        
+        // Reload saved queries list
+        loadSavedQueries();
+      }
+    } catch (error) {
+      console.error('Error generating query:', error);
+      console.error('Error response:', error.response?.data); // Debug log
+      showNotification(error.response?.data?.message || 'Failed to generate query. Please try again.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Detect query type from input
+  const detectQueryType = (input) => {
+    const lowerInput = input.toLowerCase();
+    if (lowerInput.includes('aggregate') || lowerInput.includes('group by') || lowerInput.includes('sum') || lowerInput.includes('count') || lowerInput.includes('average')) {
+      return 'aggregation';
+    } else if (lowerInput.includes('mongodb') || lowerInput.includes('find') || lowerInput.includes('collection')) {
+      return 'mongodb';
+    } else {
+      return 'sql'; // Default to SQL
+    }
+  };
+
+  // Explain the generated query using AI
+  const handleExplainQuery = async (query) => {
+    try {
+      const response = await api.post('/api/queries/explain', {
+        query: query || generatedSQL
       });
 
       if (response.data.success) {
-        setGeneratedSQL(response.data.data.sql);
-        setExplanation(response.data.data.explanation || 'SQL query generated successfully.');
-        setEstimatedRows(response.data.data.estimatedRows || '~' + Math.floor(Math.random() * 1000));
-        setActiveTab('sql');
-        showNotification('SQL query generated successfully!', 'success');
+        setExplanation(response.data.explanation);
       }
     } catch (error) {
-      console.error('Error generating SQL:', error);
-      // Fallback to demo mode if backend fails
-      const demoSQL = generateDemoSQL(naturalLanguageInput);
-      setGeneratedSQL(demoSQL.sql);
-      setExplanation(demoSQL.explanation);
-      setEstimatedRows(demoSQL.estimatedRows);
-      setActiveTab('sql');
-      showNotification('Using demo mode - backend unavailable', 'warning');
-    } finally {
-      setLoading(false);
+      console.error('Error explaining query:', error);
+      setExplanation('Generated query is ready to use.');
     }
   };
 
@@ -245,6 +299,117 @@ LIMIT 100;`,
     } finally {
       setLoading(false);
     }
+  };
+
+  // Optimize query using AI
+  const handleOptimizeQuery = async () => {
+    if (!generatedSQL.trim()) {
+      showNotification('Please generate a query first', 'warning');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await api.post('/api/queries/optimize', {
+        query: generatedSQL
+      });
+
+      if (response.data.success) {
+        setOptimization(response.data.optimization);
+        showNotification('Query optimization suggestions generated!', 'success');
+      }
+    } catch (error) {
+      console.error('Error optimizing query:', error);
+      showNotification('Failed to optimize query', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Save current query to database
+  const handleSaveQuery = async () => {
+    if (!generatedSQL.trim() || !naturalLanguageInput.trim()) {
+      showNotification('Please generate a query first', 'warning');
+      return;
+    }
+
+    // Query is already saved when generated, just add to favorites
+    if (currentQueryId) {
+      await handleToggleFavorite(currentQueryId, false);
+    } else {
+      showNotification('Query auto-saved during generation', 'info');
+    }
+  };
+
+  // Toggle favorite status
+  const handleToggleFavorite = async (queryId, currentStatus) => {
+    try {
+      const response = await api.put(`/api/queries/${queryId}`, {
+        isFavorite: !currentStatus
+      });
+
+      if (response.data.success) {
+        showNotification(!currentStatus ? 'Added to favorites!' : 'Removed from favorites', 'success');
+        loadSavedQueries(); // Reload queries
+        loadFavoriteQueries();
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      showNotification('Failed to update favorite status', 'error');
+    }
+  };
+
+  // Load saved queries
+  const loadSavedQueries = async () => {
+    try {
+      const response = await api.get('/api/queries/');
+      if (response.data.success) {
+        setSavedQueries(response.data.queries); // Backend returns 'queries' not 'data'
+      }
+    } catch (error) {
+      console.error('Error loading saved queries:', error);
+    }
+  };
+
+  // Load favorite queries
+  const loadFavoriteQueries = async () => {
+    try {
+      const response = await api.get('/api/queries/favorites');
+      if (response.data.success) {
+        setFavoriteQueries(response.data.queries); // Backend returns 'queries' not 'data'
+      }
+    } catch (error) {
+      console.error('Error loading favorite queries:', error);
+    }
+  };
+
+  // Delete a saved query
+  const handleDeleteQuery = async (queryId) => {
+    if (!window.confirm('Are you sure you want to delete this query?')) {
+      return;
+    }
+
+    try {
+      const response = await api.delete(`/api/queries/${queryId}`);
+      if (response.data.success) {
+        showNotification('Query deleted successfully', 'success');
+        loadSavedQueries();
+        loadFavoriteQueries();
+      }
+    } catch (error) {
+      console.error('Error deleting query:', error);
+      showNotification('Failed to delete query', 'error');
+    }
+  };
+
+  // Load a saved query
+  const handleLoadQuery = (query) => {
+    setNaturalLanguageInput(query.naturalLanguage);
+    setGeneratedSQL(query.generatedQuery);
+    setCurrentQueryId(query._id);
+    setActiveTab('sql');
+    setShowQueryHistory(false);
+    showNotification('Query loaded successfully', 'success');
   };
 
   const generateDemoResults = () => {
@@ -363,6 +528,15 @@ LIMIT 100;`,
   };
 
   const handleLogout = async () => {
+    // Show confirmation dialog
+    const confirmLogout = window.confirm('Are you sure you want to logout?');
+    
+    // If user clicks Cancel, do nothing
+    if (!confirmLogout) {
+      return;
+    }
+    
+    // If user clicks OK, proceed with logout
     try {
       // Call backend logout endpoint
       await api.post('/api/auth/logout');
@@ -530,6 +704,57 @@ LIMIT 100;`,
 
         {/* Query Generator Section */}
         <section className="query-generator">
+          {/* Query History Sidebar */}
+          {showQueryHistory && (
+            <div className="query-history-sidebar">
+              <div className="history-header">
+                <h3>Saved Queries</h3>
+                <button className="close-history" onClick={() => setShowQueryHistory(false)}>
+                  <i className="fas fa-times"></i>
+                </button>
+              </div>
+              <div className="history-tabs">
+                <button className={`history-tab ${activeTab === 'all' ? 'active' : ''}`} onClick={() => setActiveTab('all')}>
+                  All Queries ({savedQueries.length})
+                </button>
+                <button className={`history-tab ${activeTab === 'favorites' ? 'active' : ''}`} onClick={() => setActiveTab('favorites')}>
+                  Favorites ({favoriteQueries.length})
+                </button>
+              </div>
+              <div className="history-list">
+                {(activeTab === 'favorites' ? favoriteQueries : savedQueries).map((query) => (
+                  <div key={query._id} className="history-item">
+                    <div className="history-item-header">
+                      <h4>{query.title}</h4>
+                      <div className="history-item-actions">
+                        <button onClick={() => handleToggleFavorite(query._id, query.isFavorite)} title="Toggle favorite">
+                          <i className={`fas fa-star ${query.isFavorite ? 'favorited' : ''}`}></i>
+                        </button>
+                        <button onClick={() => handleDeleteQuery(query._id)} title="Delete">
+                          <i className="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <p className="history-item-desc">{query.naturalLanguage}</p>
+                    <div className="history-item-meta">
+                      <span className="query-type-badge">{query.queryType}</span>
+                      <span className="query-date">{new Date(query.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <button className="btn btn-sm load-query-btn" onClick={() => handleLoadQuery(query)}>
+                      <i className="fas fa-play-circle"></i> Load Query
+                    </button>
+                  </div>
+                ))}
+                {(activeTab === 'favorites' ? favoriteQueries : savedQueries).length === 0 && (
+                  <div className="no-history">
+                    <i className="fas fa-inbox"></i>
+                    <p>No saved queries yet</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          
           <div className="input-section">
             <div className="input-container">
               <label htmlFor="naturalLanguageInput">Describe what you want to query:</label>
@@ -598,17 +823,31 @@ LIMIT 100;`,
                         <button className="btn btn-sm" onClick={handleCopySQL} title="Copy to clipboard">
                           <i className="fas fa-copy"></i>
                         </button>
-                        <button className="btn btn-sm" title="Save query">
-                          <i className="fas fa-save"></i>
+                        <button className="btn btn-sm" onClick={handleSaveQuery} title="Save to favorites">
+                          <i className="fas fa-star"></i>
                         </button>
-                        <button className="btn btn-sm" title="Format SQL">
-                          <i className="fas fa-code"></i>
+                        <button className="btn btn-sm" onClick={handleOptimizeQuery} title="Optimize query" disabled={loading}>
+                          <i className="fas fa-magic"></i>
+                        </button>
+                        <button className="btn btn-sm" onClick={() => setShowQueryHistory(!showQueryHistory)} title="Query history">
+                          <i className="fas fa-history"></i>
                         </button>
                       </div>
                     </div>
                     <div className="code-editor">
                       <pre><code className="sql-code">{generatedSQL}</code></pre>
                     </div>
+                    {optimization && (
+                      <div className="optimization-suggestions">
+                        <div className="optimization-header">
+                          <i className="fas fa-lightbulb"></i>
+                          <span>Optimization Suggestions:</span>
+                        </div>
+                        <div className="optimization-content">
+                          <p>{optimization}</p>
+                        </div>
+                      </div>
+                    )}
                     <div className="editor-footer">
                       <button className="btn btn-success" onClick={handleExecuteQuery} disabled={!dbConnection || loading}>
                         <i className="fas fa-play"></i>
