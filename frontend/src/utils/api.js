@@ -12,13 +12,9 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    // This is the logic you correctly updated
-    const userJSON = localStorage.getItem('user');
-    if (userJSON) {
-      const user = JSON.parse(userJSON);
-      if (user.token) {
-        config.headers.Authorization = `Bearer ${user.token}`;
-      }
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -27,20 +23,24 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle auth errors (You can add this back too!)
+// Response interceptor to handle auth errors
 api.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
     if (error.response?.status === 401) {
-      // Token is invalid or expired
-      localStorage.removeItem('user'); // Changed from 'token' to 'user'
-      window.location.href = '/login';
+      // Check if this is a login request - don't redirect during login
+      const isLoginRequest = error.config?.url?.includes('/auth/login');
+      
+      if (!isLoginRequest) {
+        // Token is invalid or expired (not during login attempt)
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
 );
 
-// THIS IS THE MISSING LINE THAT FIXES THE ERROR
 export default api;

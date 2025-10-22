@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { ArrowDown, ArrowUp, Activity, Clock } from 'lucide-react';
+import { ArrowDown, ArrowUp, Activity, Clock, Search } from 'lucide-react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { useNavigate } from 'react-router-dom';
@@ -21,6 +21,13 @@ import {
   DoughnutController
 } from 'chart.js';
 import './Analytics.css';
+
+const SAMPLE_QUERIES = [
+  { label: 'Monthly signups', value: 'last month users' },
+  { label: 'Sales by region', value: 'sales by region' },
+  { label: 'Top products', value: 'top 10 products' },
+  { label: 'Today’s active users', value: 'active users today' }
+];
 
 ChartJS.register(
   CategoryScale, 
@@ -609,190 +616,207 @@ function Analytics({ user, setUser }) {
     }
   };
 
-  return (
-    <div className="analytics-container">
-      <div className="analytics-header-row">
-        <div className="analytics-title-wrap">
-          <h1 className="analytics-title gradient-text">Analytics</h1>
-          <div className="title-underline" />
-        </div>
-        <div className="analytics-samples-card">
-          <span className="analytics-samples-label">Try:</span>
-          <button 
-            className="sample-btn" 
-            data-sample="last month users"
-            onClick={() => handleSampleClick('last month users')}
-          >
-            last month users
-          </button>
-          <button 
-            className="sample-btn" 
-            data-sample="sales by region"
-            onClick={() => handleSampleClick('sales by region')}
-          >
-            sales by region
-          </button>
-          <button 
-            className="sample-btn" 
-            data-sample="top 10 products"
-            onClick={() => handleSampleClick('top 10 products')}
-          >
-            top 10 products
-          </button>
-          <button 
-            className="sample-btn" 
-            data-sample="active users today"
-            onClick={() => handleSampleClick('active users today')}
-          >
-            active users today
-          </button>
-        </div>
-      </div>
+  const clampPercent = (value) => Math.max(0, Math.min(100, value));
+  const maxValue = metrics.max || 0;
 
-      {/* Animated hero band - data stream equalizer */}
-      <div className="analytics-hero">
-        <div className="hero-label">
-          <span className="dot" /> Live Data Stream
+  const metricItems = [
+    {
+      key: 'min',
+      label: 'Minimum',
+      icon: ArrowDown,
+      tone: 'min',
+      value: metrics.min,
+      percent: maxValue ? clampPercent((metrics.min / maxValue) * 100) : 0,
+      delay: 0
+    },
+    {
+      key: 'mean',
+      label: 'Average',
+      icon: Activity,
+      tone: 'mean',
+      value: metrics.mean,
+      percent: maxValue ? clampPercent((metrics.mean / maxValue) * 100) : 0,
+      delay: 60
+    },
+    {
+      key: 'max',
+      label: 'Maximum',
+      icon: ArrowUp,
+      tone: 'max',
+      value: metrics.max,
+      percent: maxValue ? 100 : 0,
+      delay: 120
+    }
+  ];
+
+  const lastUpdatedLabel = metrics.lastUpdated || '—';
+
+  return (
+    <div className="analytics-page">
+      <section className="analytics-hero">
+        <div className="analytics-hero__content">
+          <div className="hero-copy">
+            <span className="hero-eyebrow">Insights workspace</span>
+            <h1>Analytics Control Center</h1>
+            <p>Ask questions in natural language and watch them turn into beautiful, interactive visuals. Perfect for status meetings, deep dives, or quick checks before shipping.</p>
+            <div className="hero-actions">
+              <button
+                type="button"
+                className="btn hero-btn"
+                onClick={() => {
+                  if (nlQueryInput.trim()) {
+                    handleNLQuery();
+                  } else {
+                    handleSampleClick('last month users');
+                  }
+                }}
+              >
+                Generate latest insight
+              </button>
+              <div className="hero-metric">
+                <Clock size={16} />
+                <span>{lastUpdatedLabel === '—' ? 'Not run yet' : `Updated ${lastUpdatedLabel}`}</span>
+              </div>
+            </div>
+          </div>
+          <div className="hero-visual">
+            <div className="hero-visual__ring">
+              {metricItems.map(({ key, label, value }) => (
+                <div key={key} className="ring-stat">
+                  <span className="ring-label">{label}</span>
+                  <strong>{value ?? 0}</strong>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-        <div className="equalizer">
-          {Array.from({ length: 48 }).map((_, i) => (
-            <span
-              className="equalizer-bar"
-              key={i}
-              style={{ ['--delay']: `${(i % 12) * 80}ms`, ['--h']: `${30 + ((i * 17) % 60)}%` }}
+        <div className="analytics-chip-group">
+          <span className="chip-label">Popular queries</span>
+          <div className="chip-tray">
+            {SAMPLE_QUERIES.map((sample) => (
+              <button
+                key={sample.value}
+                type="button"
+                className="chip"
+                onClick={() => handleSampleClick(sample.value)}
+              >
+                {sample.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="analytics-toolbar">
+        <div className="toolbar-input">
+          <label htmlFor="nlQueryInput" className="sr-only">Describe your insight</label>
+          <div className="input-shell">
+            <Search size={16} />
+            <input
+              type="text"
+              id="nlQueryInput"
+              value={nlQueryInput}
+              onChange={(e) => setNlQueryInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleNLQuery()}
+              placeholder="E.g. Monthly retention by plan, Revenue by region, Active users today"
             />
-          ))}
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={handleNLQuery}
+            >
+              Generate
+            </button>
+          </div>
         </div>
-      </div>
-      
-      <div className="analytics-controls-row">
-        <div className="analytics-controls">
-          <input 
-            type="text" 
-            id="nlQueryInput"
-            value={nlQueryInput}
-            onChange={(e) => setNlQueryInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleNLQuery()}
-            placeholder="e.g. Last month users, Sales by region, Top 10 products" 
-          />
-          <button 
-            id="nlQueryBtn" 
-            className="btn btn-primary"
-            onClick={handleNLQuery}
-          >
-            Generate
-          </button>
-          <button 
-            id="refreshBtn" 
-            className="btn"
+        <div className="toolbar-controls">
+          <button
+            type="button"
+            className="btn btn-ghost"
             onClick={handleRefresh}
           >
-            Refresh
+            Refresh insight
           </button>
-          <select 
-            id="chartType"
-            value={chartType}
-            onChange={handleChartTypeChange}
-          >
-            <option value="line">Line</option>
-            <option value="bar">Bar</option>
-            <option value="pie">Pie</option>
-            <option value="doughnut">Doughnut</option>
-            <option value="area">Area</option>
-          </select>
-
-          <div className="controls-3d">
-            <label className="switch">
-              <input type="checkbox" checked={use3D} onChange={handle3DToggle} />
-              <span className="slider" />
-            </label>
-            <span className="switch-label">3D</span>
-            <select 
-              id="threeType"
-              value={threeChartType}
-              onChange={handleThreeTypeChange}
-              disabled={!use3D}
-            >
-              <option value="bar">3D Bars</option>
-              <option value="scatter">3D Scatter</option>
-              <option value="line">3D Line</option>
+          <div className="control-select">
+            <label htmlFor="chartType">Chart</label>
+            <select id="chartType" value={chartType} onChange={handleChartTypeChange}>
+              <option value="line">Line</option>
+              <option value="bar">Bar</option>
+              <option value="pie">Pie</option>
+              <option value="doughnut">Doughnut</option>
+              <option value="area">Area</option>
             </select>
           </div>
-        </div>
-      </div>
-      
-      <main className="analytics-main">
-        <div className="metrics-row">
-          {(() => {
-            const max = metrics.max || 0;
-            const minPct = max ? Math.max(0, Math.min(100, (metrics.min / max) * 100)) : 0;
-            const meanPct = max ? Math.max(0, Math.min(100, (metrics.mean / max) * 100)) : 0;
-            const maxPct = max ? 100 : 0;
-            return (
-              <>
-                <div className="metric-card fade-in" style={{ animationDelay: '0ms' }}>
-                  <div className="metric-header">
-                    <div className="metric-icon min"><ArrowDown size={18} /></div>
-                    <div className="metric-label">Min</div>
-                  </div>
-                  <div className="metric-value">{metrics.min}</div>
-                  <div className="metric-progress"><div className="metric-progress-fill" style={{ ['--w']: `${minPct}%` }} /></div>
-                </div>
-                <div className="metric-card fade-in" style={{ animationDelay: '60ms' }}>
-                  <div className="metric-header">
-                    <div className="metric-icon mean"><Activity size={18} /></div>
-                    <div className="metric-label">Mean</div>
-                  </div>
-                  <div className="metric-value">{metrics.mean}</div>
-                  <div className="metric-progress"><div className="metric-progress-fill" style={{ ['--w']: `${meanPct}%` }} /></div>
-                </div>
-                <div className="metric-card fade-in" style={{ animationDelay: '120ms' }}>
-                  <div className="metric-header">
-                    <div className="metric-icon max"><ArrowUp size={18} /></div>
-                    <div className="metric-label">Max</div>
-                  </div>
-                  <div className="metric-value">{metrics.max}</div>
-                  <div className="metric-progress"><div className="metric-progress-fill" style={{ ['--w']: `${maxPct}%` }} /></div>
-                </div>
-                <div className="metric-card fade-in" style={{ animationDelay: '180ms' }}>
-                  <div className="metric-header">
-                    <div className="metric-icon time"><Clock size={18} /></div>
-                    <div className="metric-label">Last Update</div>
-                  </div>
-                  <div className="metric-value small">{metrics.lastUpdated || '-'}</div>
-                </div>
-              </>
-            );
-          })()}
-        </div>
-
-        <div className={`grid-2 ${use3D ? 'two-cols' : 'one-col'}`}>
-          <div className="chart-card">
-            <canvas 
-              id="analyticsChart" 
-              ref={chartCanvasRef}
-            ></canvas>
-          </div>
-          {use3D && (
-            <div className="chart-card three-card">
-              <div className="three-container" ref={threeContainerRef} />
-              {hover.visible && (
-                <div 
-                  className="three-tooltip"
-                  style={{ left: hover.x + 12, top: hover.y + 12 }}
-                >
-                  {hover.text}
-                </div>
-              )}
+          <div className="control-select">
+            <label htmlFor="threeType">3D mode</label>
+            <div className="toggle-stack">
+              <label className="switch">
+                <input type="checkbox" checked={use3D} onChange={handle3DToggle} />
+                <span className="slider" />
+              </label>
+              <select
+                id="threeType"
+                value={threeChartType}
+                onChange={handleThreeTypeChange}
+                disabled={!use3D}
+              >
+                <option value="bar">3D Bars</option>
+                <option value="scatter">3D Scatter</option>
+                <option value="line">3D Line</option>
+              </select>
             </div>
-          )}
+          </div>
         </div>
-        <div id="chartInfo" className="chart-info">
-          {chartInfo && (
-            <div dangerouslySetInnerHTML={{ __html: chartInfo }} />
-          )}
+      </section>
+
+      <section className="analytics-metrics">
+        {metricItems.map(({ key, label, icon: Icon, tone, value, percent, delay }) => (
+          <article key={key} className={`metric-card metric-${tone}`} style={{ animationDelay: `${delay}ms` }}>
+            <header>
+              <span className="metric-icon"><Icon size={18} /></span>
+              <span className="metric-label">{label}</span>
+            </header>
+            <strong className="metric-value">{Number.isFinite(value) ? value : 0}</strong>
+            <div className="metric-progress">
+              <div className="metric-progress-fill" style={{ ['--w']: `${percent}%` }} />
+            </div>
+          </article>
+        ))}
+        <article className="metric-card metric-time" style={{ animationDelay: '180ms' }}>
+          <header>
+            <span className="metric-icon"><Clock size={18} /></span>
+            <span className="metric-label">Last run</span>
+          </header>
+          <strong className="metric-value small">{lastUpdatedLabel}</strong>
+          <p className="metric-note">We store recent runs so you can refresh without retyping.</p>
+        </article>
+      </section>
+
+      <section className={`analytics-charts ${use3D ? 'with-3d' : ''}`}>
+        <div className="chart-card primary">
+          <canvas id="analyticsChart" ref={chartCanvasRef}></canvas>
         </div>
-      </main>
+        {use3D && (
+          <div className="chart-card secondary">
+            <div className="three-container" ref={threeContainerRef} />
+            {hover.visible && (
+              <div className="three-tooltip" style={{ left: hover.x + 12, top: hover.y + 12 }}>
+                {hover.text}
+              </div>
+            )}
+          </div>
+        )}
+      </section>
+
+      <section id="chartInfo" className="analytics-footnote">
+        {chartInfo ? (
+          <div className="footnote-card" dangerouslySetInnerHTML={{ __html: chartInfo }} />
+        ) : (
+          <div className="footnote-card placeholder">
+            <p>Generate an insight to preview the SQL we used behind the scenes.</p>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

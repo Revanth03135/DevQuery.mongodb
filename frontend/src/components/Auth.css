@@ -41,11 +41,26 @@
 .error-message {
   background-color: #fee;
   color: #d33;
-  padding: 10px;
-  border-radius: 4px;
+  padding: 12px 15px;
+  border-radius: 6px;
   margin-bottom: 16px;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-left: 4px solid #d33;
+  animation: slideInError 0.3s ease-out;
+  box-shadow: 0 2px 8px rgba(221, 51, 51, 0.15);
+}
+
+@keyframes slideInError {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Labels and Inputs */
@@ -106,11 +121,4 @@
 
 .signup-link a:hover {
   text-decoration: underline;
-}
-
-.success-text {
-  color: #28a745; /* A nice green color */
-  text-align: center;
-  font-weight: bold;
-  margin-bottom: 1rem;
 }

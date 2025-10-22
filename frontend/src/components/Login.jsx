@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useUser } from '../context/UserContext';
-import '../components/Auth.css';
+import api from '../utils/api';
+import './Auth.css';
 
-function Login() {
+function Login({ setUser }) {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -11,7 +11,6 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { login } = useUser();
 
   const handleChange = (e) => {
     setFormData({
@@ -24,11 +23,42 @@ function Login() {
     e.preventDefault();
     setLoading(true);
     setError('');
+
     try {
-      await login(formData.email, formData.password);
-      navigate('/dashboard'); // Only redirect after successful login
+      const response = await api.post('/api/auth/login', formData);
+      if (response.data.success) {
+        localStorage.setItem('token', response.data.token);
+        setUser(response.data.user);
+        // Small delay to ensure state is updated before navigation
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 500);
+      } else {
+        // Handle non-success responses
+        const errorMsg = response.data?.message || 'Invalid credentials';
+        setError(errorMsg);
+        console.error('Login failed:', errorMsg);
+      }
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Login failed. Please check your credentials.');
+      // Handle different error types
+      let errorMessage = 'Invalid credentials';
+      
+      if (err.response?.status === 401) {
+        errorMessage = 'Invalid credentials';
+      } else if (err.response?.status === 400) {
+        errorMessage = err.response?.data?.message || 'Invalid email or password';
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
+      console.error('Login error:', err.response?.data || err.message);
+      
+      // Keep error visible for 5 seconds minimum, then allow it to be dismissed
+      setLoading(false);
+      return;
     } finally {
       setLoading(false);
     }
@@ -38,9 +68,13 @@ function Login() {
     <div className="login-page">
       <div className="login-container">
         <form id="loginForm" onSubmit={handleSubmit}>
-          <h2>Log In</h2>
+          <h2>Login to DevQuery</h2>
 
-          {error && <div className="error-message">{error}</div>}
+          {error && (
+            <div className="error-message" role="alert">
+              ⚠️ {error}
+            </div>
+          )}
 
           <label htmlFor="email">Email</label>
           <input
@@ -67,7 +101,7 @@ function Login() {
           </button>
 
           <p className="signup-link">
-            Don't have an account?
+            Don't have an account?{' '}
             <Link to="/signup">Sign Up</Link>
           </p>
         </form>

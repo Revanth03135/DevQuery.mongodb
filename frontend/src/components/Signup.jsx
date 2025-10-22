@@ -1,20 +1,17 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../utils/api'; // Make sure this import is correct (default export)
+import api from '../utils/api';
 import './Auth.css';
 
-function Signup() {
+function Signup({ setUser }) {
   const [formData, setFormData] = useState({
-    name: '',
+    username: '',
+    fullName: '',
     email: '',
     password: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  // 1. Add state for our simple success message
-  const [successMessage, setSuccessMessage] = useState('');
-
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -28,21 +25,37 @@ function Signup() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setSuccessMessage(''); // Clear old messages
+
+    // Validate form before sending
+    if (!formData.email || !formData.email.includes('@')) {
+      setError('Please enter a valid email address');
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.password || formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.username && !formData.fullName) {
+      setError('Please enter either a username or full name');
+      setLoading(false);
+      return;
+    }
 
     try {
-      await api.post('/api/auth/register', formData);
-
-      // 2. Set the success message text
-      setSuccessMessage('User created successfully!');
-
-      // Redirect after 2 seconds
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
-
+      const response = await api.post('/api/auth/register', formData);
+      if (response.data.success) {
+        localStorage.setItem('token', response.data.token);
+        setUser(response.data.user);
+        navigate('/dashboard');
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      const errorMessage = err.response?.data?.details || err.response?.data?.message || 'Registration failed';
+      setError(errorMessage);
+      console.error('Registration error details:', err.response?.data);
     } finally {
       setLoading(false);
     }
@@ -54,20 +67,26 @@ function Signup() {
         <form id="signupForm" onSubmit={handleSubmit}>
           <h2>Create Account</h2>
 
-          {/* 3. Display the green message here when it exists */}
-          {successMessage && <p className="success-text">{successMessage}</p>}
-          
           {error && <div className="error-message">{error}</div>}
 
-          <label htmlFor="name">Name</label>
+          <label htmlFor="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            required
+          />
+
+          <label htmlFor="name">Full Name</label>
           <input
             type="text"
             id="name"
-            name="name"
-            value={formData.name}
+            name="fullName"
+            value={formData.fullName}
             onChange={handleChange}
             required
-            disabled={!!successMessage} // Optional: disable form on success
           />
 
           <label htmlFor="email">Email</label>
@@ -78,7 +97,6 @@ function Signup() {
             value={formData.email}
             onChange={handleChange}
             required
-            disabled={!!successMessage} // Optional: disable form on success
           />
 
           <label htmlFor="password">Password</label>
@@ -89,10 +107,9 @@ function Signup() {
             value={formData.password}
             onChange={handleChange}
             required
-            disabled={!!successMessage} // Optional: disable form on success
           />
 
-          <button type="submit" disabled={loading || !!successMessage}>
+          <button type="submit" disabled={loading || !formData.email || !formData.password || (!formData.username && !formData.fullName)}>
             {loading ? 'Creating Account...' : 'Sign Up'}
           </button>
 

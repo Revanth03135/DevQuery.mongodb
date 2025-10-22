@@ -1,44 +1,232 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo, Fragment } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/api';
 import './Dashboard.css';
 import logoImg from '../assets/img1.png';
-import { useUser } from '../context/UserContext';
-function Dashboard() {
-  const { user, logout } = useUser();
+import useNotifications from './useNotifications';
+import useSQLDrawer from './useSQLDrawer';
+import WhitelistManager from './WhitelistManager';
 
- 
-  const [showChatDrawer, setShowChatDrawer] = useState(false);
-  // Chat drawer placeholder state
-  const [chatMessages, setChatMessages] = useState([
-    { sender: 'bot', text: 'Hi! I am your database assistant. Ask me anything about your data.' }
+const normalizeSearchValue = (value) => {
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'string') return value.toLowerCase();
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value).toLowerCase();
+  try {
+    return JSON.stringify(value).toLowerCase();
+  } catch (error) {
+    return '';
+  }
+};
+
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+function Dashboard({ user }) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [showWhitelistModal, setShowWhitelistModal] = useState(false);
+  const {
+    showSQLDrawer,
+    dragEnabled,
+    isDragging,
+    isResizing,
+    isFullscreen,
+    drawerPos,
+    drawerSize,
+    dispatch: drawerDispatch,
+    dragRef
+  } = useSQLDrawer();
+  // Chat assistant state
+  const [chatMessages, setChatMessages] = useState(() => [
+    {
+      sender: 'bot',
+      type: 'text',
+      text: 'Hi! I am your database assistant. Ask me anything about your data.',
+      timestamp: new Date().toISOString()
+    }
   ]);
   const [chatInput, setChatInput] = useState('');
+  const [assistantLoading, setAssistantLoading] = useState(false);
+  const chatMessagesContainerRef = useRef(null);
 
-  const handleSendChat = (e) => {
-    e.preventDefault();
-    if (!chatInput.trim()) return;
-    setChatMessages((msgs) => [
-      ...msgs,
-      { sender: 'user', text: chatInput }
-    ]);
-    setChatInput('');
-    // Placeholder: echo back
-    setTimeout(() => {
+  const applyQueryResults = (rows = [], columns = [], metadata = null) => {
+    const normalizedRows = Array.isArray(rows) ? rows : [];
+    let normalizedColumns = Array.isArray(columns) ? columns : [];
+
+    if (!normalizedColumns.length && normalizedRows.length) {
+      const collected = new Set();
+      normalizedRows.forEach((row) => {
+        Object.keys(row || {}).forEach((key) => collected.add(key));
+      });
+      normalizedColumns = Array.from(collected);
+    }
+
+    setQueryResults(normalizedRows);
+    setQueryResultColumns(normalizedColumns);
+
+    if (metadata) {
+      const meta = { ...metadata };
+      meta.rowCount = meta.rowCount ?? normalizedRows.length;
+      if (meta.cautions && !Array.isArray(meta.cautions)) {
+        meta.cautions = [meta.cautions];
+      }
+      if (!meta.cautions) {
+        meta.cautions = [];
+      }
+      setQueryMetadata(meta);
+    } else {
+      setQueryMetadata(null);
+    }
+
+    setActiveTab('results');
+  };
+
+    const handleSendChat = async (e) => {
+      e.preventDefault();
+      if (!chatInput.trim() || assistantLoading) return;
+
+      const userMessage = chatInput.trim();
+      const timestamp = new Date().toISOString();
+
+      // Check for display mode keywords
+      const showKeywords = ['show', 'display', 'popup', 'window', 'open'];
+      const inlineKeywords = ['here', 'in chat', 'inline'];
+      
+      const messageLower = userMessage.toLowerCase();
+      const shouldPopup = showKeywords.some(keyword => messageLower.includes(keyword)) && 
+                         !inlineKeywords.some(keyword => messageLower.includes(keyword));
+      const shouldInline = inlineKeywords.some(keyword => messageLower.includes(keyword));
+
       setChatMessages((msgs) => [
         ...msgs,
-        { sender: 'bot', text: 'This is a placeholder. LLM integration coming soon!' }
+        { sender: 'user', type: 'text', text: userMessage, timestamp }
       ]);
-    }, 700);
-  };
+      setChatInput('');
+      setAssistantLoading(true);
+
+      try {
+        const payload = {
+          message: userMessage,
+          connectionId: dbConnection?.connectionId || undefined,
+          options: { runQuery: true }
+        };
+
+        const response = await api.post('/api/assistant/chat', payload);
+
+        const assistantMessages = Array.isArray(response.data?.data?.messages)
+          ? response.data.data.messages
+              .map((msg) => {
+                if (!msg?.content) return null;
+                const role = msg.role === 'assistant' ? 'bot' : msg.role === 'user' ? 'user' : 'system';
+                return {
+                  sender: role,
+                  type: msg.type || 'text',
+                  text: msg.content,
+                  timestamp: msg.timestamp || new Date().toISOString()
+                };
+              })
+              .filter(Boolean)
+          : [];
+
+        if (assistantMessages.length) {
+          setChatMessages((msgs) => [...msgs, ...assistantMessages]);
+        }
+
+        const result = response.data?.data?.result;
+        if (result) {
+          if (result.sql) {
+            setGeneratedSQL(result.sql);
+          }
+          if (result.explanation) {
+            setExplanation(result.explanation);
+          }
+
+          const cautions = Array.isArray(result.cautions) ? result.cautions : [];
+
+          if (Array.isArray(result.rows) || Array.isArray(result.columns)) {
+            applyQueryResults(result.rows || [], result.columns || [], {
+              rowCount: result.rowCount,
+              executionTime: result.executionTime,
+              provider: result.provider || 'assistant',
+              model: result.model || null,
+              confidence: result.confidence || null,
+              intent: result.intent,
+              cautions
+            });
+
+            // Determine where to display results
+            if (shouldPopup) {
+              setModalMode('popup');
+              setShowResultsModal(true);
+              showNotification('Results displayed in popup window.', 'success');
+            } else if (shouldInline) {
+              // Add results table to chat
+              setChatMessages((msgs) => [
+                ...msgs,
+                {
+                  sender: 'bot',
+                  type: 'results',
+                  text: JSON.stringify({ rows: result.rows || [], columns: result.columns || [] }),
+                  timestamp: new Date().toISOString()
+                }
+              ]);
+              showNotification('Results displayed in chat.', 'success');
+            } else {
+              // Default: show popup
+              setModalMode('popup');
+              setShowResultsModal(true);
+              showNotification('Results displayed automatically.', 'success');
+            }
+          } else if (result.sql) {
+            setQueryMetadata((prev) => ({
+              ...(prev || {}),
+              rowCount: prev?.rowCount ?? 0,
+              provider: result.provider || 'assistant',
+              model: result.model || null,
+              confidence: result.confidence || null,
+              cautions
+            }));
+            showNotification('Assistant generated SQL. Review before executing.', 'info');
+          }
+        }
+      } catch (error) {
+        const errorCode = error.response?.data?.code;
+        const errorMessage = error.response?.data?.message || 'The assistant could not respond.';
+        const fallbackText =
+          errorCode === 'AI_CONFIG_MISSING'
+            ? 'AI assistant is not configured yet. Set GEMINI_API_KEY on the backend to enable automated SQL.'
+            : `⚠️ ${errorMessage}`;
+
+        setChatMessages((msgs) => [
+          ...msgs,
+          {
+            sender: 'bot',
+            type: 'note',
+            text: fallbackText,
+            timestamp: new Date().toISOString()
+          }
+        ]);
+
+        if (errorCode === 'AI_CONFIG_MISSING') {
+          showNotification('Configure GEMINI_API_KEY to unlock AI automation.', 'warning');
+        } else {
+          showNotification('Assistant response failed.', 'error');
+        }
+      } finally {
+        setAssistantLoading(false);
+      }
+    };
   const [naturalLanguageInput, setNaturalLanguageInput] = useState('');
   const [generatedSQL, setGeneratedSQL] = useState('-- Your generated SQL will appear here\nSELECT * FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY);');
   const [queryResults, setQueryResults] = useState([]);
+  const [queryResultColumns, setQueryResultColumns] = useState([]);
+  const [queryMetadata, setQueryMetadata] = useState(null);
   const [explanation, setExplanation] = useState('Generate a SQL query to see the explanation here.');
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('sql');
+  const [showResultsModal, setShowResultsModal] = useState(false);
+  const [modalMode, setModalMode] = useState('popup'); // 'popup' or 'inline'
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
   const [dbConnection, setDbConnection] = useState(null);
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [showDbModal, setShowDbModal] = useState(false);
   const [dbConfig, setDbConfig] = useState({
     connectionString: '',
@@ -50,8 +238,132 @@ function Dashboard() {
     password: ''
   });
   const [estimatedRows, setEstimatedRows] = useState('--');
-  const [notifications, setNotifications] = useState([]);
+  const { notifications, showNotification, removeNotification, getNotificationIcon } = useNotifications();
+  const [schemaData, setSchemaData] = useState({ tables: [], loading: false, error: null });
+  const [schemaSearch, setSchemaSearch] = useState('');
+  const [selectedTable, setSelectedTable] = useState(null);
+  const [schemaViewMode, setSchemaViewMode] = useState('tables');
+  const [isSchemaCollapsed, setIsSchemaCollapsed] = useState(false);
   const navigate = useNavigate();
+
+  const searchTokens = useMemo(() => {
+    const tokens = (schemaSearch || '')
+      .trim()
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(Boolean);
+    return Array.from(new Set(tokens));
+  }, [schemaSearch]);
+
+  const searchTokenSet = useMemo(() => new Set(searchTokens), [searchTokens]);
+
+  const highlightPattern = useMemo(() => {
+    if (!searchTokens.length) return null;
+    const escaped = searchTokens.map((token) => escapeRegExp(token));
+    return new RegExp(`(${escaped.join('|')})`, 'gi');
+  }, [searchTokens]);
+
+  const filteredTables = useMemo(() => {
+    const tables = schemaData.tables || [];
+    if (!searchTokens.length) {
+      return tables;
+    }
+
+    return tables.filter((table) => {
+      const tableName = normalizeSearchValue(table?.name);
+      const columns = Array.isArray(table?.columns) ? table.columns : [];
+
+      return searchTokens.every((token) => {
+        if (tableName.includes(token)) return true;
+
+        return columns.some((col) => {
+          const columnName = normalizeSearchValue(col?.name);
+          const columnType = normalizeSearchValue(col?.type);
+          const columnDefault = normalizeSearchValue(col?.defaultValue);
+          const columnSample = normalizeSearchValue(col?.sample);
+
+          return (
+            columnName.includes(token) ||
+            columnType.includes(token) ||
+            columnDefault.includes(token) ||
+            columnSample.includes(token)
+          );
+        });
+      });
+    });
+  }, [schemaData.tables, searchTokens]);
+
+  const visibleColumns = useMemo(() => {
+    if (!selectedTable) return [];
+    const columns = Array.isArray(selectedTable.columns) ? selectedTable.columns : [];
+    if (!searchTokens.length) return columns;
+
+    const tableName = normalizeSearchValue(selectedTable.name);
+    return columns.filter((column) => {
+      const columnName = normalizeSearchValue(column?.name);
+      const columnType = normalizeSearchValue(column?.type);
+      const columnDefault = normalizeSearchValue(column?.defaultValue);
+      const columnSample = normalizeSearchValue(column?.sample);
+
+      return searchTokens.every((token) =>
+        tableName.includes(token) ||
+        columnName.includes(token) ||
+        columnType.includes(token) ||
+        columnDefault.includes(token) ||
+        columnSample.includes(token)
+      );
+    });
+  }, [selectedTable, searchTokens]);
+
+  const totalColumns = Array.isArray(selectedTable?.columns) ? selectedTable.columns.length : 0;
+  const hasSearch = searchTokens.length > 0;
+
+  const countMatchingColumns = (table) => {
+    const columns = Array.isArray(table?.columns) ? table.columns : [];
+    if (!searchTokens.length) return columns.length;
+
+    const tableName = normalizeSearchValue(table?.name);
+    const tableMatchesAll = searchTokens.every((token) => tableName.includes(token));
+    if (tableMatchesAll) return columns.length;
+
+    return columns.filter((column) => {
+      const columnName = normalizeSearchValue(column?.name);
+      const columnType = normalizeSearchValue(column?.type);
+      const columnDefault = normalizeSearchValue(column?.defaultValue);
+      const columnSample = normalizeSearchValue(column?.sample);
+
+      return searchTokens.every((token) =>
+        tableName.includes(token) ||
+        columnName.includes(token) ||
+        columnType.includes(token) ||
+        columnDefault.includes(token) ||
+        columnSample.includes(token)
+      );
+    }).length;
+  };
+
+  const renderHighlight = (value, emptyPlaceholder = '—') => {
+    if (value === null || value === undefined || value === '') {
+      return emptyPlaceholder;
+    }
+
+    const str = value.toString();
+    if (!highlightPattern) return str;
+
+    const parts = str.split(highlightPattern);
+    return parts.map((part, index) => {
+      if (!part) return null;
+      const lower = part.toLowerCase();
+      if (searchTokenSet.has(lower)) {
+        return <mark key={`highlight-${index}`}>{part}</mark>;
+      }
+      return <Fragment key={`text-${index}`}>{part}</Fragment>;
+    });
+  };
+
+  const columnCountLabel = hasSearch
+    ? `Showing ${visibleColumns.length} of ${totalColumns} columns`
+    : `${totalColumns} column${totalColumns === 1 ? '' : 's'}`;
 
   useEffect(() => {
     if (!user) {
@@ -59,9 +371,33 @@ function Dashboard() {
       return;
     }
     
+    const cachedSchema = localStorage.getItem('devquery.schema');
+    if (cachedSchema) {
+      try {
+        const parsed = JSON.parse(cachedSchema);
+        setSchemaData(prev => ({ ...prev, tables: parsed.tables || [] }));
+      } catch (e) {
+        console.warn('Failed to parse cached schema', e);
+      }
+    }
+
     // Check for existing connections
     checkExistingConnections();
   }, [user, navigate]);
+
+  useEffect(() => {
+    if (!filteredTables.length) {
+      if (selectedTable) {
+        setSelectedTable(null);
+      }
+      return;
+    }
+
+    const stillVisible = filteredTables.some((table) => table.name === selectedTable?.name);
+    if (!stillVisible) {
+      setSelectedTable(filteredTables[0]);
+    }
+  }, [filteredTables, selectedTable]);
 
   useEffect(() => {
     // Add keyboard shortcuts
@@ -91,16 +427,119 @@ function Dashboard() {
     };
   }, []);
 
+  const normalizeConnection = (connection) => {
+    if (!connection) return null;
+    const type = connection.dbType || connection.type || 'db';
+    return {
+      connectionId: connection.connectionId,
+      type,
+      dbType: type,
+      database: connection.database,
+      host: connection.host,
+      connectionName: connection.connectionName || `${type.toUpperCase()}_${connection.database || connection.host || 'connection'}`
+    };
+  };
+
+  const fetchSchema = async (connectionId) => {
+    if (!connectionId) return;
+    setSchemaData(prev => ({ ...prev, loading: true, error: null }));
+    try {
+      const response = await api.get(`/api/database/connections/${connectionId}/schema`);
+
+      if (!response.data?.success) {
+        throw new Error(response.data?.message || 'Failed to fetch schema');
+      }
+
+      const tables = transformSchemaResponse(response.data.data);
+      setSchemaData(prev => ({ ...prev, tables, loading: false }));
+      localStorage.setItem('devquery.schema', JSON.stringify({ tables }));
+    } catch (error) {
+      console.error('Schema fetch error:', error);
+      setSchemaData(prev => ({ ...prev, loading: false, error: error.message || 'Failed to fetch schema' }));
+      showNotification('Schema explorer unavailable. Check console for details.', 'warning');
+    }
+  };
+
+  const transformSchemaResponse = (data) => {
+    if (!data) return [];
+
+    if (Array.isArray(data) && data.length && data[0].table_name && !data[0].columns) {
+      const grouped = data.reduce((acc, item) => {
+        const tableName = item.table_name;
+        if (!acc[tableName]) {
+          acc[tableName] = [];
+        }
+        acc[tableName].push({
+          name: item.column_name,
+          type: item.data_type,
+          nullable: item.is_nullable === 'YES' || item.nullable === 'Y',
+          defaultValue: item.column_default
+        });
+        return acc;
+      }, {});
+
+      return Object.entries(grouped).map(([table, columns]) => ({
+        name: table,
+        columns
+      }));
+    }
+
+    if (Array.isArray(data) && data.length && data[0].columns) {
+      return data.map((table) => ({
+        name: table.table_name || table.name,
+        columns: (table.columns || []).map((column) => ({
+          name: column.name || column.column_name,
+          type: column.type || column.data_type,
+          nullable: column.nullable ?? column.is_nullable === 'YES',
+          defaultValue: column.defaultValue || column.column_default,
+          sample: column.sample
+        }))
+      }));
+    }
+
+    if (data.collections) {
+      return Object.entries(data.collections).map(([name, info]) => ({
+        name,
+        columns: (info.fields || []).map((field) => ({
+          name: field.name,
+          type: field.type,
+          nullable: field.optional,
+          defaultValue: field.defaultValue || null,
+          sample: field.sample
+        }))
+      }));
+    }
+
+    return [];
+  };
+
   const checkExistingConnections = async () => {
     try {
       const response = await api.get('/api/database/connections');
 
-      if (response.data.success && response.data.data?.connections?.length > 0) {
-        const activeConnection = response.data.data.connections.find(conn => conn.status === 'connected');
-        if (activeConnection) {
-          setDbConnection(activeConnection);
-          setConnectionStatus('connected');
-        }
+      if (!response.data?.success) {
+        return;
+      }
+
+      const payload = response.data.data;
+      const connections = Array.isArray(payload)
+        ? payload
+        : Array.isArray(payload?.connections)
+          ? payload.connections
+          : [];
+
+      if (connections.length === 0) {
+        setConnectionStatus('disconnected');
+        setDbConnection(null);
+        return;
+      }
+
+      const activeConnection = connections.find((conn) => conn.connected || conn.status === 'connected') || connections[0];
+      if (activeConnection) {
+        const normalizedConnection = normalizeConnection(activeConnection);
+        setDbConnection(normalizedConnection);
+        setConnectionStatus('connected');
+        await fetchSchema(normalizedConnection.connectionId);
       }
     } catch (error) {
       console.error('Error checking connections:', error);
@@ -128,15 +567,25 @@ function Dashboard() {
       }
 
       const response = await api.post(`/api/database/connections/${dbConnection?.connectionId}/generate-sql`, {
-        naturalLanguage: naturalLanguageInput
+        description: naturalLanguageInput
       });
 
       if (response.data.success) {
-        setGeneratedSQL(response.data.data.sql);
-        setExplanation(response.data.data.explanation || 'SQL query generated successfully.');
-        setEstimatedRows(response.data.data.estimatedRows || '~' + Math.floor(Math.random() * 1000));
+        const payload = response.data.data || {};
+        setGeneratedSQL(payload.sql || '--');
+        setExplanation(payload.explanation || 'SQL query generated successfully.');
+        setEstimatedRows(payload.estimatedRows || '—');
         setActiveTab('sql');
-        showNotification('SQL query generated successfully!', 'success');
+
+        if (Array.isArray(payload.cautions) && payload.cautions.length) {
+          showNotification(payload.cautions[0], 'warning');
+        }
+
+        if (payload.provider === 'mock' || payload.isFallback) {
+          showNotification('SQL generated using fallback template. Configure Gemini for AI-powered results.', 'warning');
+        } else {
+          showNotification('SQL query generated successfully!', 'success');
+        }
       }
     } catch (error) {
       console.error('Error generating SQL:', error);
@@ -222,8 +671,11 @@ LIMIT 100;`,
     // If no database connection, show demo results
     if (!dbConnection) {
       const demoResults = generateDemoResults();
-      setQueryResults(demoResults);
-      setActiveTab('results');
+      applyQueryResults(demoResults.rows, demoResults.columns, {
+        rowCount: demoResults.rows.length,
+        provider: 'demo',
+        intent: 'demo'
+      });
       showNotification('Demo results displayed! Connect a database for real data.', 'info');
       return;
     }
@@ -231,12 +683,17 @@ LIMIT 100;`,
     setLoading(true);
     try {
       const response = await api.post(`/api/database/connections/${dbConnection.connectionId}/query`, {
-        sql: generatedSQL
+        query: generatedSQL
       });
 
       if (response.data.success) {
-        setQueryResults(response.data.data.results || []);
-        setActiveTab('results');
+        const payload = response.data.data || {};
+        applyQueryResults(payload.rows || [], payload.columns || [], {
+          rowCount: payload.rowCount,
+          executionTime: payload.executionTime,
+          provider: payload.provider || 'manual',
+          intent: payload.intent || 'manual_execute'
+        });
         showNotification('Query executed successfully!', 'success');
       }
     } catch (error) {
@@ -248,10 +705,9 @@ LIMIT 100;`,
   };
 
   const generateDemoResults = () => {
-    // Generate mock results based on current SQL
     const columns = ['id', 'name', 'email', 'created_at', 'status'];
     const rows = [];
-    
+
     for (let i = 1; i <= 15; i++) {
       rows.push({
         id: i,
@@ -261,8 +717,8 @@ LIMIT 100;`,
         status: Math.random() > 0.5 ? 'Active' : 'Inactive'
       });
     }
-    
-    return rows;
+
+    return { rows, columns };
   };
 
   const handleCopySQL = () => {
@@ -275,8 +731,175 @@ LIMIT 100;`,
       });
   };
 
+  const handleCopyResults = () => {
+    if (!queryResults.length) {
+      showNotification('No results to copy', 'warning');
+      return;
+    }
+
+    const payload = {
+      columns: queryResultColumns,
+      rows: queryResults
+    };
+
+    navigator.clipboard.writeText(JSON.stringify(payload, null, 2))
+      .then(() => showNotification('Results copied', 'success'))
+      .catch(() => showNotification('Failed to copy results', 'error'));
+  };
+
+  const handleExportResults = () => {
+    const columns = queryResultColumns.length
+      ? queryResultColumns
+      : queryResults[0]
+        ? Object.keys(queryResults[0])
+        : [];
+
+    if (!columns.length) {
+      showNotification('No results to export', 'warning');
+      return;
+    }
+
+    const csvRows = [columns.join(',')];
+    queryResults.forEach((row) => {
+      const cells = columns.map((column) => {
+        const raw = row?.[column];
+        if (raw === null || raw === undefined) {
+          return '""';
+        }
+        const value = typeof raw === 'object'
+          ? JSON.stringify(raw)
+          : String(raw);
+        return `"${value.replace(/"/g, '""')}"`;
+      });
+      csvRows.push(cells.join(','));
+    });
+
+    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'results.csv';
+    anchor.click();
+    URL.revokeObjectURL(url);
+    showNotification('Results exported as CSV', 'success');
+  };
+
+  const handleSaveSQL = () => {
+    try {
+      const existing = JSON.parse(localStorage.getItem('savedQueries') || '[]');
+      const entry = { sql: generatedSQL, explanation, createdAt: new Date().toISOString() };
+      existing.unshift(entry);
+      localStorage.setItem('savedQueries', JSON.stringify(existing.slice(0, 50)));
+      showNotification('Query saved locally', 'success');
+    } catch (e) {
+      showNotification('Failed to save query', 'error');
+    }
+  };
+
+  const handleFormatSQL = () => {
+    // Very simple formatting: add newlines before common clauses and collapse multiple spaces
+    let formatted = generatedSQL.replace(/\s+/g, ' ');
+    formatted = formatted.replace(/\s+(FROM|WHERE|GROUP BY|ORDER BY|LIMIT|JOIN|ON|HAVING)\s+/ig, '\n$1 ');
+    setGeneratedSQL(formatted);
+    showNotification('SQL formatted', 'success');
+  };
+
   const handleConnectDatabase = () => {
     setShowDbModal(true);
+  };
+
+  const handleRefreshSchema = async () => {
+    if (!dbConnection?.connectionId) {
+      showNotification('Connect a database first to explore the schema.', 'warning');
+      return;
+    }
+    await fetchSchema(dbConnection.connectionId);
+  };
+
+  const formatDefaultValue = (value) => {
+    if (value === null || value === undefined) return '—';
+    if (typeof value === 'object') {
+      try {
+        return JSON.stringify(value);
+      } catch (error) {
+        return '[object]';
+      }
+    }
+    return String(value);
+  };
+
+  const formatResultValue = (value) => {
+    if (value === null || value === undefined) {
+      return '—';
+    }
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+    if (typeof value === 'object') {
+      try {
+        return JSON.stringify(value);
+      } catch (error) {
+        return '[object]';
+      }
+    }
+    return String(value);
+  };
+
+  const handleGenerateDescribe = async (tableName) => {
+    if (!dbConnection?.connectionId || !tableName) return;
+    try {
+      setLoading(true);
+      const response = await api.post(`/api/database/connections/${dbConnection.connectionId}/generate-sql`, {
+        description: `Describe the table ${tableName} and suggest a useful query.`
+      });
+
+      if (response.data?.success) {
+        const { sql, explanation } = response.data.data;
+        setGeneratedSQL(sql);
+        setExplanation(explanation || `Description for table ${tableName}`);
+        setActiveTab('sql');
+        showNotification(`Generated description and query for ${tableName}`, 'success');
+      }
+    } catch (error) {
+      console.error('Error generating table summary:', error);
+      showNotification('Failed to generate table summary.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCopySchema = (table) => {
+    if (!table) return;
+    const payload = {
+      table: table.name,
+      columns: table.columns
+    };
+    navigator.clipboard.writeText(JSON.stringify(payload, null, 2))
+      .then(() => showNotification('Schema copied to clipboard', 'success'))
+      .catch(() => showNotification('Failed to copy schema', 'error'));
+  };
+
+  const handleGenerateColumnInsight = async (tableName, column) => {
+    if (!dbConnection?.connectionId || !tableName || !column) return;
+    try {
+      setLoading(true);
+      const response = await api.post(`/api/database/connections/${dbConnection.connectionId}/generate-sql`, {
+        description: `Provide insights or useful query for column ${column.name} in table ${tableName}.`
+      });
+
+      if (response.data?.success) {
+        const { sql, explanation } = response.data.data;
+        setGeneratedSQL(sql);
+        setExplanation(explanation || `Insight for ${tableName}.${column.name}`);
+        setActiveTab('sql');
+        showNotification(`Insight generated for ${column.name}`, 'success');
+      }
+    } catch (error) {
+      console.error('Error generating column insight:', error);
+      showNotification('Failed to generate column insight.', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDbConfigChange = (field, value) => {
@@ -307,11 +930,12 @@ LIMIT 100;`,
       if (response.data.success) {
         showNotification('Connection test successful!', 'success');
       } else {
-        showNotification('Connection test failed: ' + response.data.message, 'error');
+        showNotification('Connection test failed: ' + (response.data.message || 'Unknown error'), 'error');
       }
     } catch (error) {
       console.error('Error testing connection:', error);
-      showNotification('Connection test failed. Please check your configuration.', 'error');
+      const errorMessage = error.response?.data?.message || error.message || 'Connection test failed. Please check your configuration.';
+      showNotification(errorMessage, 'error');
     } finally {
       setLoading(false);
     }
@@ -337,8 +961,16 @@ LIMIT 100;`,
       const response = await api.post('/api/database/connect', payload);
 
       if (response.data.success) {
-        setDbConnection(response.data.data);
-        setConnectionStatus('connected');
+        const normalized = normalizeConnection(response.data.data);
+        if (normalized) {
+          setDbConnection(normalized);
+          setConnectionStatus('connected');
+          setSchemaSearch('');
+          setIsSchemaCollapsed(false);
+          await fetchSchema(normalized.connectionId);
+        } else {
+          showNotification('Connected, but failed to read connection details from the response.', 'warning');
+        }
         setShowDbModal(false);
         showNotification('Database connected successfully!', 'success');
         // Reset form
@@ -352,13 +984,46 @@ LIMIT 100;`,
           password: ''
         });
       } else {
-        showNotification('Failed to connect: ' + response.data.message, 'error');
+        showNotification('Failed to connect: ' + (response.data.message || 'Unknown error'), 'error');
       }
     } catch (error) {
       console.error('Error connecting to database:', error);
-      showNotification('Failed to connect to database. Please check your configuration.', 'error');
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to connect to database. Please check your configuration.';
+      showNotification(errorMessage, 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDisconnectDatabase = async () => {
+    if (!dbConnection?.connectionId) {
+      showNotification('No active database connection to disconnect', 'warning');
+      return;
+    }
+
+    setIsDisconnecting(true);
+    try {
+      const response = await api.delete(`/api/database/connections/${dbConnection.connectionId}`);
+
+      if (response.data?.success) {
+        showNotification(response.data.message || 'Database disconnected successfully.', 'info');
+  setDbConnection(null);
+  setConnectionStatus('disconnected');
+  setSchemaData(prev => ({ ...prev, tables: [], loading: false, error: null }));
+        setSchemaSearch('');
+        setSelectedTable(null);
+        setIsSchemaCollapsed(false);
+        localStorage.removeItem('devquery.schema');
+        await checkExistingConnections();
+      } else {
+        showNotification(response.data?.message || 'Failed to disconnect from database.', 'error');
+      }
+    } catch (error) {
+      console.error('Error disconnecting database:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to disconnect from database.';
+      showNotification(errorMessage, 'error');
+    } finally {
+      setIsDisconnecting(false);
     }
   };
 
@@ -371,34 +1036,8 @@ LIMIT 100;`,
     } finally {
       // Always clear local storage and redirect
       localStorage.removeItem('token');
-      logout();
       navigate('/login');
     }
-  };
-
-  const showNotification = (message, type = 'info') => {
-    const id = Date.now();
-    const notification = { id, message, type };
-    setNotifications(prev => [...prev, notification]);
-    
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-      setNotifications(prev => prev.filter(n => n.id !== id));
-    }, 5000);
-  };
-
-  const removeNotification = (id) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
-  };
-
-  const getNotificationIcon = (type) => {
-    const icons = {
-      success: 'check-circle',
-      error: 'exclamation-circle',
-      warning: 'exclamation-triangle',
-      info: 'info-circle'
-    };
-    return icons[type] || 'info-circle';
   };
 
   const quickExamples = [
@@ -417,10 +1056,16 @@ LIMIT 100;`,
     }
   };
 
+  useEffect(() => {
+    if (chatMessagesContainerRef.current) {
+      chatMessagesContainerRef.current.scrollTop = chatMessagesContainerRef.current.scrollHeight;
+    }
+  }, [chatMessages, assistantLoading]);
+
   return (
-    <div className="dashboard">
+    <div className={`dashboard${isSidebarOpen ? '' : ' sidebar-closed'}`}>
       {/* Sidebar */}
-      <div className="sidebar">
+      <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
         <div className="logo">
           <img src={logoImg} alt="DevQuery Logo" />
           <span>DevQuery</span>
@@ -476,215 +1121,597 @@ LIMIT 100;`,
       </div>
 
       {/* Main Content */}
-      <div className="main-content">
-        {/* Header */}
-  <header className="header">
+      <div className="main-content chat-fullscreen">
+        <header className="header">
           <div className="header-left">
-            <h1>SQL Query Generator</h1>
-            <p>Convert natural language to SQL queries with AI</p>
+            <button
+              type="button"
+              className="btn icon-btn sidebar-toggle"
+              onClick={() => setIsSidebarOpen(prev => !prev)}
+              title={isSidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
+              aria-label="Toggle sidebar"
+            >
+              <i className="fas fa-bars"></i>
+            </button>
+            <h1>Database Chat</h1>
+            <p>Ask questions about your data — chat is the primary interface.</p>
           </div>
           <div className="header-right">
-            <button className="btn btn-primary chat-btn" onClick={() => setShowChatDrawer(true)}>
-              <i className="fas fa-comments"></i>
-              Chat with DB
+            <button className="btn btn-secondary" onClick={() => drawerDispatch({ type: 'OPEN_DRAWER' })}>
+              <i className="fas fa-database"></i>
+              SQL Generator
             </button>
-      {/* Chat Drawer */}
-      <div className={`chat-drawer${showChatDrawer ? ' open' : ''}`}>
-        <div className="chat-drawer-header">
-          <span><i className="fas fa-robot"></i> Database Chat Assistant</span>
-          <button className="close-chat" onClick={() => setShowChatDrawer(false)} title="Close">
-            <i className="fas fa-times"></i>
-          </button>
-        </div>
-        <div className="chat-drawer-body">
-          <div className="chat-messages">
-            {chatMessages.map((msg, idx) => (
-              <div key={idx} className={`chat-msg ${msg.sender}`}>{msg.text}</div>
-            ))}
-          </div>
-        </div>
-        <form className="chat-drawer-footer" onSubmit={handleSendChat} autoComplete="off">
-          <input
-            type="text"
-            className="chat-input"
-            placeholder="Ask about your data..."
-            value={chatInput}
-            onChange={e => setChatInput(e.target.value)}
-            autoFocus={showChatDrawer}
-          />
-          <button type="submit" className="btn btn-primary chat-send" disabled={!chatInput.trim()}>
-            <i className="fas fa-paper-plane"></i>
-          </button>
-        </form>
-      </div>
-            <button className="btn btn-secondary" onClick={handleConnectDatabase}>
-              <i className="fas fa-plug"></i>
-              Connect Database
+            <button 
+              className="btn btn-secondary" 
+              onClick={() => setShowWhitelistModal(true)}
+              title="Manage AI whitelist permissions"
+            >
+              <i className="fas fa-lock"></i>
+              🔐 Whitelist
             </button>
-            <div className={`connection-status ${connectionStatus}`}>
+            <div
+              className={`connection-status ${connectionStatus}`}
+              title={connectionStatus === 'connected'
+                ? `${dbConnection?.dbType?.toUpperCase() || 'DB'}${dbConnection?.database ? ` • ${dbConnection.database}` : ''}`
+                : 'No active database connection'}
+            >
               <i className="fas fa-circle"></i>
-              <span>{connectionStatus === 'connected' ? 'Connected' : 'Disconnected'}</span>
+              <span>
+                {connectionStatus === 'connected'
+                  ? (dbConnection?.connectionName || 'Connected')
+                  : 'Disconnected'}
+              </span>
             </div>
+            {connectionStatus === 'connected' ? (
+              <button
+                className="btn btn-outline-danger"
+                onClick={handleDisconnectDatabase}
+                disabled={isDisconnecting}
+              >
+                <i className="fas fa-unlink"></i>
+                {isDisconnecting ? 'Disconnecting...' : 'Disconnect'}
+              </button>
+            ) : (
+              <button className="btn btn-primary" onClick={handleConnectDatabase}>
+                <i className="fas fa-plug"></i>
+                Connect Database
+              </button>
+            )}
           </div>
         </header>
 
-        {/* Query Generator Section */}
-        <section className="query-generator">
-          <div className="input-section">
-            <div className="input-container">
-              <label htmlFor="naturalLanguageInput">Describe what you want to query:</label>
-              <div className="input-wrapper">
-                <textarea
-                  id="naturalLanguageInput"
-                  value={naturalLanguageInput}
-                  onChange={(e) => setNaturalLanguageInput(e.target.value)}
-                  placeholder="e.g., Show me all customers who made purchases in the last 30 days"
-                  rows="3"
-                />
-                <button className="btn btn-primary" onClick={handleGenerateSQL} disabled={loading}>
-                  <i className="fas fa-magic"></i>
-                  {loading ? 'Generating...' : 'Generate SQL'}
+        {/* Fullscreen Chatbox */}
+        <div className="chat-main fullscreen">
+          <div className="chat-messages-main" ref={chatMessagesContainerRef}>
+            {chatMessages.map((msg, idx) => {
+              const key = `${msg.timestamp || idx}-${idx}`;
+              const typeClass = msg.type ? ` ${msg.type}` : '';
+              
+              // Handle results type for inline display
+              if (msg.type === 'results') {
+                try {
+                  const data = JSON.parse(msg.text);
+                  const cols = data.columns || [];
+                  const rows = data.rows || [];
+                  
+                  return (
+                    <div key={key} className={`chat-msg ${msg.sender}${typeClass}`}>
+                      <div className="chat-results-table">
+                        {cols.length > 0 ? (
+                          <table>
+                            <thead>
+                              <tr>
+                                {cols.map((col) => (
+                                  <th key={col}>{col}</th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {rows.length > 0 ? (
+                                rows.map((row, rowIdx) => (
+                                  <tr key={rowIdx}>
+                                    {cols.map((col) => (
+                                      <td key={col}>{formatResultValue(row?.[col])}</td>
+                                    ))}
+                                  </tr>
+                                ))
+                              ) : (
+                                <tr>
+                                  <td colSpan={cols.length}>No rows returned.</td>
+                                </tr>
+                              )}
+                            </tbody>
+                          </table>
+                        ) : (
+                          <p>No results available.</p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                } catch (e) {
+                  return (
+                    <div key={key} className={`chat-msg ${msg.sender}${typeClass}`}>
+                      <span>{msg.text}</span>
+                    </div>
+                  );
+                }
+              }
+              
+              return (
+                <div key={key} className={`chat-msg ${msg.sender}${typeClass}`}>
+                  {msg.type === 'sql' ? <pre>{msg.text}</pre> : <span>{msg.text}</span>}
+                </div>
+              );
+            })}
+            {assistantLoading && (
+              <div className="chat-msg bot chat-typing">
+                <span>Thinking</span>
+                <div className="typing-dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            )}
+          </div>
+          <form className="chat-footer-main" onSubmit={handleSendChat} autoComplete="off">
+            <input
+              id="mainChatInput"
+              type="text"
+              className="chat-input-main"
+              placeholder="Ask about your data..."
+              value={chatInput}
+              onChange={e => setChatInput(e.target.value)}
+              autoFocus
+              disabled={assistantLoading}
+            />
+            <button type="submit" className="btn btn-primary chat-send-main" disabled={!chatInput.trim() || assistantLoading}>
+              <i className="fas fa-paper-plane"></i>
+            </button>
+          </form>
+        </div>
+
+        {isSchemaCollapsed ? (
+          <div id="schema-explorer" className="schema-collapsed-card">
+            <div className="schema-collapsed-content">
+              <div className="schema-collapsed-info">
+                <span className="schema-collapsed-icon">
+                  <i className="fas fa-sitemap"></i>
+                </span>
+                <div>
+                  <h3>Schema Explorer hidden</h3>
+                  <p>Reopen to browse tables, columns, and AI insights.</p>
+                </div>
+              </div>
+              <div className="schema-collapsed-actions">
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={handleRefreshSchema}
+                  disabled={schemaData.loading || !dbConnection}
+                >
+                  <i className={`fas ${schemaData.loading ? 'fa-spinner fa-spin' : 'fa-sync-alt'}`}></i>
+                  {schemaData.loading ? 'Refreshing...' : 'Refresh Schema'}
+                </button>
+                <button type="button" className="btn btn-primary" onClick={() => setIsSchemaCollapsed(false)}>
+                  <i className="fas fa-eye"></i>
+                  Show Explorer
                 </button>
               </div>
             </div>
-
-            <div className="quick-examples">
-              <span className="examples-label">Quick Examples:</span>
-              <div className="example-tags">
-                {quickExamples.map((example, index) => (
+          </div>
+        ) : (
+          <section id="schema-explorer" className="schema-explorer">
+            <div className="schema-explorer-header">
+              <div className="schema-title">
+                <h2>Schema Explorer</h2>
+                <p>Browse tables, inspect columns, and generate docs without leaving DevQuery.</p>
+              </div>
+              <div className="schema-toolbar">
+                <div className="schema-search">
+                  <i className="fas fa-search"></i>
+                  <input
+                    type="text"
+                    placeholder="Search tables or columns"
+                    value={schemaSearch}
+                    onChange={(e) => setSchemaSearch(e.target.value)}
+                  />
+                </div>
+                <div className="schema-view-toggle">
                   <button
-                    key={index}
-                    className="example-tag"
-                    onClick={() => handleExampleClick(example.text)}
+                    className={`btn btn-sm ${schemaViewMode === 'tables' ? 'active' : ''}`}
+                    onClick={() => setSchemaViewMode('tables')}
                   >
-                    {example.display}
+                    <i className="fas fa-table"></i>
+                    Tables
                   </button>
-                ))}
+                  <button
+                    className={`btn btn-sm ${schemaViewMode === 'erd' ? 'active' : ''}`}
+                    onClick={() => setSchemaViewMode('erd')}
+                    disabled
+                    title="ERD view coming soon"
+                  >
+                    <i className="fas fa-project-diagram"></i>
+                    ERD
+                  </button>
+                  <button
+                    className={`btn btn-sm ${schemaViewMode === 'docs' ? 'active' : ''}`}
+                    onClick={() => setSchemaViewMode('docs')}
+                    disabled
+                    title="Live documentation in development"
+                  >
+                    <i className="fas fa-file-alt"></i>
+                    Docs
+                  </button>
+                </div>
+                <div className="schema-toolbar-actions">
+                  <button
+                    type="button"
+                    className="btn btn-outline"
+                    onClick={handleRefreshSchema}
+                    disabled={schemaData.loading || !dbConnection}
+                  >
+                    <i className={`fas ${schemaData.loading ? 'fa-spinner fa-spin' : 'fa-sync-alt'}`}></i>
+                    {schemaData.loading ? 'Refreshing...' : 'Refresh Schema'}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost schema-collapse-btn"
+                    onClick={() => setIsSchemaCollapsed(true)}
+                    title="Hide schema explorer"
+                  >
+                    <i className="fas fa-eye-slash"></i>
+                    Hide
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Results Section */}
-          <div className="results-section">
-            <div className="result-tabs">
-              <button
-                className={`tab-btn ${activeTab === 'sql' ? 'active' : ''}`}
-                onClick={() => setActiveTab('sql')}
-              >
-                Generated SQL
-              </button>
-              <button
-                className={`tab-btn ${activeTab === 'results' ? 'active' : ''}`}
-                onClick={() => setActiveTab('results')}
-              >
-                Query Results
-              </button>
-              <button
-                className={`tab-btn ${activeTab === 'explanation' ? 'active' : ''}`}
-                onClick={() => setActiveTab('explanation')}
-              >
-                Explanation
-              </button>
-            </div>
+            <div className="schema-body">
+              <div className="schema-sidebar">
+                <div className="schema-connection-info">
+                  <div className="schema-connection-name">
+                    <i className="fas fa-plug"></i>
+                    <span>{connectionStatus === 'connected' ? (dbConnection?.connectionName || 'Active Connection') : 'Not Connected'}</span>
+                  </div>
+                  <small>{dbConnection ? `${dbConnection.dbType?.toUpperCase()}${dbConnection.database ? ` • ${dbConnection.database}` : ''}` : 'Connect to explore schema'}</small>
+                </div>
 
-            <div className="tab-content">
-              {/* SQL Tab */}
-              {activeTab === 'sql' && (
-                <div className="tab-pane active">
-                  <div className="sql-editor">
-                    <div className="editor-header">
-                      <span className="editor-title">SQL Query</span>
-                      <div className="editor-actions">
-                        <button className="btn btn-sm" onClick={handleCopySQL} title="Copy to clipboard">
+                {schemaData.loading && (
+                  <div className="schema-loading">
+                    <i className="fas fa-spinner fa-spin"></i>
+                    <span>Loading schema...</span>
+                  </div>
+                )}
+
+                {!schemaData.loading && schemaData.tables.length === 0 && (
+                  <div className="schema-empty">
+                    <i className="fas fa-database"></i>
+                    <p>No schema information available. {connectionStatus === 'connected' ? 'Try refreshing or run a query first.' : 'Connect a database to get started.'}</p>
+                  </div>
+                )}
+
+                {!schemaData.loading && schemaData.tables.length > 0 && filteredTables.length === 0 && (
+                  <div className="schema-empty schema-empty-compact">
+                    <i className="fas fa-search"></i>
+                    <p>No matches found. Try a different search term.</p>
+                  </div>
+                )}
+
+                {!schemaData.loading && filteredTables.length > 0 && (
+                  <div className="schema-table-list">
+                    {filteredTables.map((table, index) => {
+                      const totalColumnCount = Array.isArray(table?.columns) ? table.columns.length : 0;
+                      const matchCount = countMatchingColumns(table);
+                      const metaLabel = hasSearch
+                        ? `${matchCount} match${matchCount === 1 ? '' : 'es'}`
+                        : `${totalColumnCount} column${totalColumnCount === 1 ? '' : 's'}`;
+
+                      return (
+                        <button
+                          type="button"
+                          key={table.name || `table-${index}`}
+                          className={`schema-table-item ${selectedTable?.name === table.name ? 'active' : ''}`}
+                          onClick={() => setSelectedTable(table)}
+                        >
+                          <div className="schema-table-name">
+                            <span>{renderHighlight(table.name, table.name || '—')}</span>
+                          </div>
+                          <div className="schema-table-meta">{metaLabel}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              <div className="schema-details">
+                {selectedTable ? (
+                  <div className="schema-table-details">
+                    <div className="schema-table-header">
+                      <div className="schema-table-title">
+                        <h3>{renderHighlight(selectedTable.name, selectedTable.name || '—')}</h3>
+                        <span className="schema-column-count">{columnCountLabel}</span>
+                      </div>
+                      <div className="schema-table-actions">
+                        <button
+                          type="button"
+                          className="btn btn-sm"
+                          onClick={() => handleGenerateDescribe(selectedTable.name)}
+                          disabled={!dbConnection}
+                        >
+                          <i className="fas fa-magic"></i>
+                          Generate Summary
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-sm"
+                          onClick={() => handleCopySchema(selectedTable)}
+                        >
                           <i className="fas fa-copy"></i>
-                        </button>
-                        <button className="btn btn-sm" title="Save query">
-                          <i className="fas fa-save"></i>
-                        </button>
-                        <button className="btn btn-sm" title="Format SQL">
-                          <i className="fas fa-code"></i>
+                          Copy Schema Snapshot
                         </button>
                       </div>
                     </div>
-                    <div className="code-editor">
-                      <pre><code className="sql-code">{generatedSQL}</code></pre>
-                    </div>
-                    <div className="editor-footer">
-                      <button className="btn btn-success" onClick={handleExecuteQuery} disabled={!dbConnection || loading}>
-                        <i className="fas fa-play"></i>
-                        {loading ? 'Executing...' : 'Execute Query'}
-                      </button>
-                      <span className="query-info">
-                        <i className="fas fa-info-circle"></i>
-                        Estimated rows: <span>{estimatedRows}</span>
-                      </span>
+
+                    <div className="schema-columns">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Nullable</th>
+                            <th>Default / Sample</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {visibleColumns.length > 0 ? (
+                            visibleColumns.map((column, index) => {
+                              const columnKey = `${column.name || column.type || 'column'}-${index}`;
+                              const columnType = column.type || 'unknown';
+                              const defaultText = formatDefaultValue(column.defaultValue ?? column.sample);
+
+                              return (
+                                <tr key={columnKey}>
+                                  <td>
+                                    <div className="column-name">
+                                      <span>{renderHighlight(column.name, column.name || '—')}</span>
+                                      <button
+                                        type="button"
+                                        className="btn btn-ghost"
+                                        onClick={() => handleGenerateColumnInsight(selectedTable.name, column)}
+                                        disabled={!dbConnection}
+                                        title="Generate insights"
+                                      >
+                                        <i className="fas fa-lightbulb"></i>
+                                      </button>
+                                    </div>
+                                  </td>
+                                  <td>{renderHighlight(columnType, columnType)}</td>
+                                  <td>{column.nullable ? 'Yes' : 'No'}</td>
+                                  <td>
+                                    <code>{renderHighlight(defaultText, defaultText)}</code>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          ) : (
+                            <tr className="schema-empty-row">
+                              <td colSpan="4">
+                                {hasSearch
+                                  ? 'No columns match your search. Try a different keyword.'
+                                  : 'This table has no columns to display.'}
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div className="schema-placeholder">
+                    <i className="fas fa-table"></i>
+                    <p>{filteredTables.length === 0 ? 'No tables match your search. Clear the filter to explore everything.' : 'Select a table on the left to view its columns and insights.'}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
+      </div>
 
-              {/* Results Tab */}
-              {activeTab === 'results' && (
-                <div className="tab-pane active">
-                  <div className="results-container">
-                    <div className="results-header">
-                      <span className="results-title">Query Results</span>
-                      <div className="results-actions">
-                        <button className="btn btn-sm">
-                          <i className="fas fa-download"></i>
-                          Export CSV
-                        </button>
-                        <span className="results-count">Showing <span>{queryResults.length}</span> rows</span>
-                      </div>
+      {/* SQL Drawer (sliding window) */}
+      <div
+        className={`sql-drawer${showSQLDrawer ? ' open' : ''} ${dragEnabled ? 'drag-enabled' : ''} ${isFullscreen ? ' fullscreen' : ''}`}
+        style={{
+          right: showSQLDrawer ? `${drawerPos.right}px` : `-9999px`,
+          top: `${drawerPos.top}px`,
+          width: `${drawerSize.width}px`,
+          height: `${drawerSize.height}px`,
+        }}
+      >
+        <div
+          className="sql-drawer-header"
+          onDoubleClick={() => drawerDispatch({ type: 'TOGGLE_DRAG_ENABLED' })}
+          onPointerDown={(e) => {
+            // start dragging only when dragEnabled and left button
+            if (!dragEnabled) return;
+            if (e.button !== 0) return;
+            drawerDispatch({ type: 'SET_DRAGGING', payload: true });
+            dragRef.current.startX = e.clientX;
+            dragRef.current.startY = e.clientY;
+            dragRef.current.startRight = drawerPos.right;
+            dragRef.current.startTop = drawerPos.top;
+            e.currentTarget.setPointerCapture?.(e.pointerId);
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <h2 style={{ margin: 0 }}>SQL Query Generator</h2>
+            <button
+              type="button"
+              className="btn btn-sm"
+              onClick={() => {
+                const next = !isFullscreen;
+                drawerDispatch({ type: 'TOGGLE_FULLSCREEN', payload: next });
+              }}
+              title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+            >
+              <i className={`fas ${isFullscreen ? 'fa-compress' : 'fa-expand'}`}></i>
+            </button>
+          </div>
+          <div style={{ marginLeft: 'auto' }}>
+            <button
+              type="button"
+              className="close-sql"
+              onPointerDown={(e) => { e.stopPropagation(); }}
+                  onClick={() => drawerDispatch({ type: 'CLOSE_DRAWER' })}
+              title="Close"
+            >
+              <i className="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+        <div className="sql-drawer-body">
+          <div className="quick-examples">
+            <span className="examples-label">Quick Examples:</span>
+            {quickExamples.map((ex, i) => (
+              <button key={i} className="example-tag" onClick={() => handleExampleClick(ex.text)}>{ex.display}</button>
+            ))}
+          </div>
+
+          <div className="result-tabs">
+            <button className={`tab-btn ${activeTab === 'sql' ? 'active' : ''}`} onClick={() => setActiveTab('sql')}>Generated SQL</button>
+            <button className={`tab-btn ${activeTab === 'results' ? 'active' : ''}`} onClick={() => setActiveTab('results')}>Query Results</button>
+            <button className={`tab-btn ${activeTab === 'explanation' ? 'active' : ''}`} onClick={() => setActiveTab('explanation')}>Explanation</button>
+          </div>
+
+          <div className="tab-content">
+            {activeTab === 'sql' && (
+              <div className="sql-view">
+                <div className="sql-editor">
+                  <div className="editor-header">
+                    <div className="editor-title">Generated SQL</div>
+                    <div className="editor-actions">
+                      <span className="query-info">Estimated rows: {estimatedRows}</span>
+                      <button className="btn btn-success" onClick={handleExecuteQuery} disabled={!dbConnection || loading}>
+                        <i className="fas fa-play"></i>
+                        {loading ? 'Executing...' : 'Execute'}
+                      </button>
+                      <button className="btn btn-sm" onClick={handleCopySQL} title="Copy to clipboard">
+                        <i className="fas fa-copy"></i>
+                      </button>
+                      <button className="btn btn-sm" onClick={handleSaveSQL} title="Save query">
+                        <i className="fas fa-save"></i>
+                      </button>
+                      <button className="btn btn-sm" onClick={handleFormatSQL} title="Format SQL">
+                        <i className="fas fa-code"></i>
+                      </button>
                     </div>
-                    <div className="table-container">
-                      {queryResults.length > 0 ? (
-                        <table className="results-table">
-                          <thead>
-                            <tr>
-                              {Object.keys(queryResults[0]).map(key => (
-                                <th key={key}>{key}</th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {queryResults.map((row, index) => (
-                              <tr key={index}>
-                                {Object.values(row).map((value, i) => (
-                                  <td key={i}>{String(value)}</td>
-                                ))}
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      ) : (
-                        <div className="no-results">
-                          <i className="fas fa-table"></i>
-                          <p>Execute a query to see results</p>
-                        </div>
+                  </div>
+                  <div className="code-editor">
+                    <pre><code className="sql-code">{generatedSQL}</code></pre>
+                  </div>
+                </div>
+              </div>
+            )}
+            {activeTab === 'results' && (
+              <div className="results-view">
+                <div className="results-header">
+                  <div>
+                    <div className="results-title">Query Results</div>
+                    <div className="results-meta">
+                      <span className="results-count">{queryMetadata?.rowCount ?? queryResults.length} rows</span>
+                      {typeof queryMetadata?.executionTime === 'number' && (
+                        <span className="results-chip">Execution {queryMetadata.executionTime} ms</span>
+                      )}
+                      {queryMetadata?.provider && (
+                        <span className="results-chip">{queryMetadata.provider === 'assistant' ? 'Assistant' : queryMetadata.provider}</span>
+                      )}
+                      {queryMetadata?.model && (
+                        <span className="results-chip neutral">{queryMetadata.model}</span>
+                      )}
+                      {queryMetadata?.confidence && (
+                        <span className="results-chip neutral">Confidence: {queryMetadata.confidence}</span>
                       )}
                     </div>
                   </div>
-                </div>
-              )}
-
-              {/* Explanation Tab */}
-              {activeTab === 'explanation' && (
-                <div className="tab-pane active">
-                  <div className="explanation-container">
-                    <div className="explanation-header">
-                      <i className="fas fa-lightbulb"></i>
-                      <span>Query Explanation</span>
-                    </div>
-                    <div className="explanation-content">
-                      <p>{explanation}</p>
-                    </div>
+                  <div className="results-actions">
+                    <button className="btn btn-sm" onClick={handleCopyResults} disabled={!queryResults.length} title="Copy JSON">
+                      <i className="fas fa-copy"></i>
+                    </button>
+                    <button className="btn btn-sm" onClick={handleExportResults} disabled={!queryResults.length} title="Export CSV">
+                      <i className="fas fa-file-csv"></i>
+                    </button>
                   </div>
                 </div>
-              )}
-            </div>
+                {queryMetadata?.cautions?.length ? (
+                  <div className="results-alert">
+                    {queryMetadata.cautions.map((warning, idx) => (
+                      <span key={idx}>⚠️ {warning}</span>
+                    ))}
+                  </div>
+                ) : null}
+                <div className="table-container">
+                  {queryResultColumns.length ? (
+                    <table className="results-table">
+                      <thead>
+                        <tr>
+                          {queryResultColumns.map((column) => (
+                            <th key={column}>{column}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {queryResults.length ? (
+                          queryResults.map((row, index) => (
+                            <tr key={index}>
+                              {queryResultColumns.map((column) => (
+                                <td key={column}>{formatResultValue(row?.[column])}</td>
+                              ))}
+                            </tr>
+                          ))
+                        ) : (
+                          <tr className="empty-row">
+                            <td colSpan={queryResultColumns.length}>No rows returned for this query.</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <div className="no-results">
+                      <i className="fas fa-table"></i>
+                      <p>{queryMetadata?.intent === 'execute_query' ? 'Query executed but returned no rows.' : 'Execute a query to see results.'}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            {activeTab === 'explanation' && (
+              <div className="explanation-view">
+                <div className="explanation-header">
+                  <h4>Explanation</h4>
+                </div>
+                <div className="explanation-content">
+                  <p style={{ whiteSpace: 'pre-wrap' }}>{explanation}</p>
+                </div>
+              </div>
+            )}
           </div>
-        </section>
+        </div>
+        {/* Resizer handle */}
+        <div
+          className="sql-drawer-resizer"
+          onPointerDown={(e) => {
+            // left button only
+            if (e.button !== 0) return;
+            drawerDispatch({ type: 'SET_RESIZING', payload: true });
+            dragRef.current.startX = e.clientX;
+            dragRef.current.startY = e.clientY;
+            dragRef.current.startWidth = drawerSize.width;
+            dragRef.current.startHeight = drawerSize.height;
+            e.currentTarget.setPointerCapture?.(e.pointerId);
+          }}
+        />
       </div>
 
       {/* Loading Overlay */}
@@ -715,15 +1742,15 @@ LIMIT 100;`,
             <div className="modal-body">
               <form onSubmit={handleDbConnect}>
                 <div className="form-group">
-                  <label htmlFor="dbConnectionString">Connection String (optional)</label>
+                  <label htmlFor="dbConnectionString">Connection String (recommended for MongoDB)</label>
                   <input
                     type="text"
                     id="dbConnectionString"
-                    placeholder="e.g. mongodb+srv://user:pass@host/db"
+                    placeholder="e.g. mongodb+srv://Genesis:genesis@2025@genesis.2l3xrq4.mongodb.net/"
                     value={dbConfig.connectionString}
                     onChange={e => handleDbConfigChange('connectionString', e.target.value)}
                   />
-                  <small style={{ color: '#888' }}>If provided, all other fields are optional.</small>
+                  <small style={{ color: '#888' }}>If provided, all other fields are optional. Supports MongoDB, PostgreSQL, MySQL, etc.</small>
                 </div>
 
                 <div className="form-group">
@@ -736,6 +1763,7 @@ LIMIT 100;`,
                     disabled={!!dbConfig.connectionString}
                   >
                     <option value="">Select database type</option>
+                    <option value="mongodb">MongoDB</option>
                     <option value="mysql">MySQL</option>
                     <option value="postgresql">PostgreSQL</option>
                     <option value="sqlite">SQLite</option>
@@ -818,6 +1846,106 @@ LIMIT 100;`,
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Whitelist Manager Modal */}
+      <WhitelistManager 
+        isOpen={showWhitelistModal}
+        onClose={() => setShowWhitelistModal(false)}
+        connectionId={dbConnection?.connectionId}
+        dbSchema={schemaData.tables}
+        user={user}
+      />
+
+      {/* Results Modal/Popup */}
+      {showResultsModal && (
+        <div className="modal results-modal" onClick={(e) => {
+          if (e.target.className === 'modal results-modal') {
+            setShowResultsModal(false);
+          }
+        }}>
+          <div className="modal-content results-modal-content">
+            <div className="modal-header">
+              <h3>Query Results</h3>
+              <button className="close-modal" onClick={() => setShowResultsModal(false)}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            
+            <div className="modal-body results-modal-body">
+              <div className="results-header">
+                <div>
+                  <div className="results-title">Results</div>
+                  <div className="results-meta">
+                    <span className="results-count">{queryMetadata?.rowCount ?? queryResults.length} rows</span>
+                    {typeof queryMetadata?.executionTime === 'number' && (
+                      <span className="results-chip">Execution {queryMetadata.executionTime} ms</span>
+                    )}
+                    {queryMetadata?.provider && (
+                      <span className="results-chip">{queryMetadata.provider === 'assistant' ? 'Assistant' : queryMetadata.provider}</span>
+                    )}
+                    {queryMetadata?.model && (
+                      <span className="results-chip neutral">{queryMetadata.model}</span>
+                    )}
+                    {queryMetadata?.confidence && (
+                      <span className="results-chip neutral">Confidence: {queryMetadata.confidence}</span>
+                    )}
+                  </div>
+                </div>
+                <div className="results-actions">
+                  <button className="btn btn-sm" onClick={handleCopyResults} disabled={!queryResults.length} title="Copy JSON">
+                    <i className="fas fa-copy"></i> Copy
+                  </button>
+                  <button className="btn btn-sm" onClick={handleExportResults} disabled={!queryResults.length} title="Export CSV">
+                    <i className="fas fa-file-csv"></i> Export
+                  </button>
+                </div>
+              </div>
+
+              {queryMetadata?.cautions?.length ? (
+                <div className="results-alert">
+                  {queryMetadata.cautions.map((warning, idx) => (
+                    <span key={idx}>⚠️ {warning}</span>
+                  ))}
+                </div>
+              ) : null}
+
+              <div className="table-container">
+                {queryResultColumns.length ? (
+                  <table className="results-table">
+                    <thead>
+                      <tr>
+                        {queryResultColumns.map((column) => (
+                          <th key={column}>{column}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {queryResults.length ? (
+                        queryResults.map((row, index) => (
+                          <tr key={index}>
+                            {queryResultColumns.map((column) => (
+                              <td key={column}>{formatResultValue(row?.[column])}</td>
+                            ))}
+                          </tr>
+                        ))
+                      ) : (
+                        <tr className="empty-row">
+                          <td colSpan={queryResultColumns.length}>No rows returned for this query.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div className="no-results">
+                    <i className="fas fa-table"></i>
+                    <p>No results to display.</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
