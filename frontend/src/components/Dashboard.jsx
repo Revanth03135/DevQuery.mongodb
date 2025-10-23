@@ -6,6 +6,8 @@ import logoImg from '../assets/img1.png';
 import useNotifications from './useNotifications';
 import useSQLDrawer from './useSQLDrawer';
 import WhitelistManager from './WhitelistManager';
+import SavedQueries from './SavedQueries';
+import QueryHistory from './QueryHistory';
 
 const normalizeSearchValue = (value) => {
   if (value === null || value === undefined) return '';
@@ -23,6 +25,10 @@ const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 function Dashboard({ user }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [showWhitelistModal, setShowWhitelistModal] = useState(false);
+  const [showSavedQueriesModal, setShowSavedQueriesModal] = useState(false);
+  const [showQueryHistoryModal, setShowQueryHistoryModal] = useState(false);
+  const [showWriteConfirmation, setShowWriteConfirmation] = useState(false);
+  const [pendingWriteOperation, setPendingWriteOperation] = useState(null);
   const {
     showSQLDrawer,
     dragEnabled,
@@ -106,7 +112,12 @@ function Dashboard({ user }) {
         const payload = {
           message: userMessage,
           connectionId: dbConnection?.connectionId || undefined,
-          options: { runQuery: true }
+          options: { runQuery: true },
+          // Include chat history for context (last 10 messages for better context)
+          chatHistory: chatMessages.slice(-10).map(msg => ({
+            role: msg.sender === 'bot' ? 'assistant' : msg.sender === 'user' ? 'user' : 'system',
+            content: msg.text || msg.content || ''
+          }))
         };
 
         const response = await api.post('/api/assistant/chat', payload);
@@ -131,6 +142,21 @@ function Dashboard({ user }) {
         }
 
         const result = response.data?.data?.result;
+        const meta = response.data?.data?.meta;
+        
+        // Check if write operation requires confirmation
+        if (meta?.requiresConfirmation || result?.intent === 'require_confirmation') {
+          setPendingWriteOperation({
+            sql: result?.sql || '',
+            message: result?.explanation || 'Please review and confirm this database write operation.',
+            affectedTable: meta?.affectedTable || null,
+            affectedColumns: meta?.affectedColumns || [],
+            connectionId: dbConnection?.connectionId
+          });
+          setShowWriteConfirmation(true);
+          return;
+        }
+        
         if (result) {
           if (result.sql) {
             setGeneratedSQL(result.sql);
@@ -140,6 +166,14 @@ function Dashboard({ user }) {
           }
 
           const cautions = Array.isArray(result.cautions) ? result.cautions : [];
+
+          // Detect intent from user message and response
+          const messageLower = userMessage.toLowerCase();
+          const hasExplainKeywords = ['explain', 'how does', 'what does', 'why', 'understanding'];
+          const hasResultKeywords = ['show', 'result', 'display', 'fetch', 'get', 'retrieve', 'find', 'list', 'count', 'sum', 'average', 'select'];
+          
+          const wantsExplanation = hasExplainKeywords.some(kw => messageLower.includes(kw));
+          const wantsResults = hasResultKeywords.some(kw => messageLower.includes(kw));
 
           if (Array.isArray(result.rows) || Array.isArray(result.columns)) {
             applyQueryResults(result.rows || [], result.columns || [], {
@@ -152,8 +186,27 @@ function Dashboard({ user }) {
               cautions
             });
 
-            // Determine where to display results
-            if (shouldPopup) {
+            // Save automatic query execution to history
+            if (result.sql) {
+              saveQueryToHistory(
+                result.sql, 
+                result.executionTime || 0, 
+                result.rowCount || (result.rows || []).length, 
+                'success'
+              );
+            }
+
+            // Smart tab: If user asked for explanation + result, prioritize results popup
+            // but also show explanation below results
+            if (wantsExplanation && wantsResults) {
+              // User asked for both explanation and results
+              setModalMode('popup');
+              setShowResultsModal(true);
+              // Show explanation in a notification
+              if (result.explanation) {
+                showNotification(`📊 Results shown above. Explanation: ${result.explanation.substring(0, 100)}...`, 'info');
+              }
+            } else if (shouldPopup) {
               setModalMode('popup');
               setShowResultsModal(true);
               showNotification('Results displayed in popup window.', 'success');
@@ -176,6 +229,18 @@ function Dashboard({ user }) {
               showNotification('Results displayed automatically.', 'success');
             }
           } else if (result.sql) {
+            // Smart tab: Determine which tab to show based on user intent
+            if (wantsExplanation && result.explanation) {
+              setActiveTab('explanation');
+              showNotification('📖 Explanation displayed.', 'info');
+            } else if (wantsResults) {
+              // If results are wanted but no data, show SQL tab
+              setActiveTab('sql');
+            } else {
+              // Default: show SQL tab
+              setActiveTab('sql');
+            }
+            
             setQueryMetadata((prev) => ({
               ...(prev || {}),
               rowCount: prev?.rowCount ?? 0,
@@ -214,6 +279,141 @@ function Dashboard({ user }) {
         setAssistantLoading(false);
       }
     };
+
+  const handleConfirmWrite = async () => {
+    if (!pendingWriteOperation) return;
+
+    setAssistantLoading(true);
+    try {
+      const response = await api.post('/api/assistant/confirm-write', {
+        connectionId: pendingWriteOperation.connectionId,
+        sql: pendingWriteOperation.sql,
+        affectedTable: pendingWriteOperation.affectedTable,
+        affectedColumns: pendingWriteOperation.affectedColumns,
+        confirmed: true
+      });
+
+      const data = response.data;
+      
+      if (data.success && data.executed !== false) {
+        const result = data.data?.result || data.result;
+        const rowsAffected = result?.rowsAffected || result?.affectedRows || 0;
+        const executionTime = result?.executionTime || 0;
+        const insertId = result?.insertId || null;
+        const table = pendingWriteOperation.affectedTable || 'table';
+        const columns = pendingWriteOperation.affectedColumns || [];
+        
+        // Update Query Generator with the executed SQL
+        setGeneratedSQL(pendingWriteOperation.sql);
+        setExplanation(`Write operation executed on table '${table}'`);
+        
+        // Show results in popup with write operation details
+        const writeResultRows = [{
+          'Status': '✅ Success',
+          'Rows Affected': rowsAffected,
+          'Table': table,
+          'Execution Time': `${executionTime}ms`,
+          ...(insertId ? { 'Insert ID': insertId } : {})
+        }];
+        
+        const writeResultColumns = ['Status', 'Rows Affected', 'Table', 'Execution Time'];
+        if (insertId) writeResultColumns.push('Insert ID');
+        
+        applyQueryResults(writeResultRows, writeResultColumns, {
+          rowCount: 1,
+          executionTime,
+          provider: 'manual',
+          model: null,
+          confidence: null,
+          intent: 'write_executed',
+          cautions: []
+        });
+        
+        // Show results modal
+        setModalMode('popup');
+        setShowResultsModal(true);
+        
+        // Save write operation to history
+        saveQueryToHistory(
+          pendingWriteOperation.sql, 
+          executionTime, 
+          rowsAffected, 
+          'success'
+        );
+        
+        // Create detailed success message
+        let successMessage = `✅ Operation completed successfully!\n`;
+        successMessage += `• Rows affected: ${rowsAffected}\n`;
+        successMessage += `• Table: ${table}\n`;
+        if (columns.length > 0) {
+          successMessage += `• Columns: ${columns.join(', ')}\n`;
+        }
+        if (insertId) {
+          successMessage += `• Insert ID: ${insertId}\n`;
+        }
+        successMessage += `• Execution time: ${executionTime}ms`;
+        
+        setChatMessages(prev => [...prev, {
+          sender: 'bot',
+          type: 'text',
+          text: successMessage,
+          timestamp: new Date().toISOString()
+        }]);
+        
+        showNotification(`✅ ${rowsAffected} row(s) affected successfully!`, 'success');
+      } else if (data.executed === false) {
+        // Operation was not executed (likely cancelled or validation failed)
+        setChatMessages(prev => [...prev, {
+          sender: 'bot',
+          type: 'note',
+          text: `ℹ️ ${data.message || 'Write operation was not executed'}`,
+          timestamp: new Date().toISOString()
+        }]);
+      }
+      
+      setShowWriteConfirmation(false);
+      setPendingWriteOperation(null);
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Write operation failed';
+      
+      // Save failed write operation to history
+      saveQueryToHistory(
+        pendingWriteOperation.sql, 
+        0, 
+        0, 
+        'error', 
+        errorMessage
+      );
+      
+      setChatMessages(prev => [...prev, {
+        sender: 'bot',
+        type: 'note',
+        text: `❌ Error: ${errorMessage}`,
+        timestamp: new Date().toISOString()
+      }]);
+      
+      showNotification(`Write operation failed: ${errorMessage}`, 'error');
+      setShowWriteConfirmation(false);
+      setPendingWriteOperation(null);
+    } finally {
+      setAssistantLoading(false);
+    }
+  };
+
+  const handleCancelWrite = () => {
+    setShowWriteConfirmation(false);
+    setPendingWriteOperation(null);
+    
+    setChatMessages(prev => [...prev, {
+      sender: 'bot',
+      type: 'text',
+      text: '❌ Write operation cancelled by user.',
+      timestamp: new Date().toISOString()
+    }]);
+    
+    showNotification('Write operation cancelled', 'info');
+  };
+
   const [naturalLanguageInput, setNaturalLanguageInput] = useState('');
   const [generatedSQL, setGeneratedSQL] = useState('-- Your generated SQL will appear here\nSELECT * FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY);');
   const [queryResults, setQueryResults] = useState([]);
@@ -676,11 +876,13 @@ LIMIT 100;`,
         provider: 'demo',
         intent: 'demo'
       });
+      saveQueryToHistory(generatedSQL, 0, demoResults.rows.length, 'success');
       showNotification('Demo results displayed! Connect a database for real data.', 'info');
       return;
     }
 
     setLoading(true);
+    const startTime = performance.now();
     try {
       const response = await api.post(`/api/database/connections/${dbConnection.connectionId}/query`, {
         query: generatedSQL
@@ -688,16 +890,24 @@ LIMIT 100;`,
 
       if (response.data.success) {
         const payload = response.data.data || {};
+        const executionTime = performance.now() - startTime;
+        const resultCount = (payload.rows || []).length;
+        
         applyQueryResults(payload.rows || [], payload.columns || [], {
           rowCount: payload.rowCount,
-          executionTime: payload.executionTime,
+          executionTime: payload.executionTime || executionTime,
           provider: payload.provider || 'manual',
           intent: payload.intent || 'manual_execute'
         });
+        
+        // Save to query history
+        saveQueryToHistory(generatedSQL, executionTime, resultCount, 'success');
         showNotification('Query executed successfully!', 'success');
       }
     } catch (error) {
       console.error('Error executing query:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Unknown error';
+      saveQueryToHistory(generatedSQL, performance.now() - startTime, 0, 'error', errorMessage);
       showNotification('Failed to execute query. Please check your SQL syntax.', 'error');
     } finally {
       setLoading(false);
@@ -796,6 +1006,26 @@ LIMIT 100;`,
     }
   };
 
+  const saveQueryToHistory = (sql, executionTime = 0, resultCount = 0, status = 'success', errorMessage = null) => {
+    try {
+      const history = JSON.parse(localStorage.getItem('queryHistory') || '[]');
+      const entry = {
+        sql,
+        explanation,
+        executedAt: new Date().toISOString(),
+        executionTime,
+        resultCount,
+        status,
+        errorMessage
+      };
+      history.unshift(entry);
+      // Keep only last 100 queries
+      localStorage.setItem('queryHistory', JSON.stringify(history.slice(0, 100)));
+    } catch (e) {
+      console.error('Error saving query to history:', e);
+    }
+  };
+
   const handleFormatSQL = () => {
     // Very simple formatting: add newlines before common clauses and collapse multiple spaces
     let formatted = generatedSQL.replace(/\s+/g, ' ');
@@ -891,8 +1121,15 @@ LIMIT 100;`,
         const { sql, explanation } = response.data.data;
         setGeneratedSQL(sql);
         setExplanation(explanation || `Insight for ${tableName}.${column.name}`);
-        setActiveTab('sql');
-        showNotification(`Insight generated for ${column.name}`, 'success');
+        
+        // Smart display: Show explanation tab if available, otherwise show SQL
+        if (explanation) {
+          setActiveTab('explanation');
+          showNotification(`💡 Insight generated for ${column.name}. Check explanation tab!`, 'success');
+        } else {
+          setActiveTab('sql');
+          showNotification(`Insight generated for ${column.name}`, 'success');
+        }
       }
     } catch (error) {
       console.error('Error generating column insight:', error);
@@ -1027,6 +1264,20 @@ LIMIT 100;`,
     }
   };
 
+  const handleRefreshChat = () => {
+    // Reset chat to initial state
+    setChatMessages([
+      {
+        sender: 'bot',
+        type: 'text',
+        text: 'Hi! I am your database assistant. Ask me anything about your data.',
+        timestamp: new Date().toISOString()
+      }
+    ]);
+    setChatInput('');
+    showNotification('Chat cleared. Starting fresh conversation.', 'info');
+  };
+
   const handleLogout = async () => {
     try {
       // Call backend logout endpoint
@@ -1040,13 +1291,8 @@ LIMIT 100;`,
     }
   };
 
-  const quickExamples = [
-    { text: 'Show me all users who registered this month', display: 'Users this month' },
-    { text: 'Find products with low inventory', display: 'Low inventory' },
-    { text: 'Calculate average order value by region', display: 'Avg order by region' },
-    { text: 'List top 10 customers by revenue', display: 'Top customers' }
-  ];
-
+  // Quick examples removed - will be implemented differently
+  
   const handleExampleClick = (example) => {
     setNaturalLanguageInput(example);
     // Focus the textarea
@@ -1076,14 +1322,18 @@ LIMIT 100;`,
             <li className="active">
               <a href="#sql-generator">
                 <i className="fas fa-database"></i>
-                <span>SQL Generator</span>
+                <span>Query Generator</span>
               </a>
             </li>
             <li>
-              <a href="#query-history">
+              <button 
+                className="sidebar-btn"
+                onClick={() => setShowQueryHistoryModal(true)}
+                title="View query history from last 24 hours"
+              >
                 <i className="fas fa-history"></i>
                 <span>Query History</span>
-              </a>
+              </button>
             </li>
             <li>
               <a href="#schema-explorer">
@@ -1092,12 +1342,17 @@ LIMIT 100;`,
               </a>
             </li>
             <li>
-              <a href="#saved-queries">
+              <button 
+                className="sidebar-btn"
+                onClick={() => setShowSavedQueriesModal(true)}
+                title="View and manage saved queries"
+              >
                 <i className="fas fa-bookmark"></i>
                 <span>Saved Queries</span>
-              </a>
+              </button>
             </li>
-            <li>
+            {/* Analytics page hidden temporarily - changes needed before demo */}
+            <li style={{ display: 'none' }}>
               <Link to="/analytics">
                 <i className="fas fa-chart-line"></i>
                 <span>Analytics</span>
@@ -1134,12 +1389,11 @@ LIMIT 100;`,
               <i className="fas fa-bars"></i>
             </button>
             <h1>Database Chat</h1>
-            <p>Ask questions about your data — chat is the primary interface.</p>
           </div>
           <div className="header-right">
             <button className="btn btn-secondary" onClick={() => drawerDispatch({ type: 'OPEN_DRAWER' })}>
               <i className="fas fa-database"></i>
-              SQL Generator
+              Query Generator
             </button>
             <button 
               className="btn btn-secondary" 
@@ -1148,6 +1402,14 @@ LIMIT 100;`,
             >
               <i className="fas fa-lock"></i>
               🔐 Whitelist
+            </button>
+            <button 
+              className="btn btn-secondary" 
+              onClick={handleRefreshChat}
+              title="Clear chat history and start fresh"
+            >
+              <i className="fas fa-redo"></i>
+              Refresh Chat
             </button>
             <div
               className={`connection-status ${connectionStatus}`}
@@ -1572,13 +1834,8 @@ LIMIT 100;`,
           </div>
         </div>
         <div className="sql-drawer-body">
-          <div className="quick-examples">
-            <span className="examples-label">Quick Examples:</span>
-            {quickExamples.map((ex, i) => (
-              <button key={i} className="example-tag" onClick={() => handleExampleClick(ex.text)}>{ex.display}</button>
-            ))}
-          </div>
-
+          {/* Quick examples section removed - will be implemented differently */}
+          
           <div className="result-tabs">
             <button className={`tab-btn ${activeTab === 'sql' ? 'active' : ''}`} onClick={() => setActiveTab('sql')}>Generated SQL</button>
             <button className={`tab-btn ${activeTab === 'results' ? 'active' : ''}`} onClick={() => setActiveTab('results')}>Query Results</button>
@@ -1609,7 +1866,13 @@ LIMIT 100;`,
                     </div>
                   </div>
                   <div className="code-editor">
-                    <pre><code className="sql-code">{generatedSQL}</code></pre>
+                    <textarea
+                      className="sql-editor-textarea"
+                      value={generatedSQL}
+                      onChange={(e) => setGeneratedSQL(e.target.value)}
+                      placeholder="Your generated SQL will appear here..."
+                      spellCheck="false"
+                    />
                   </div>
                 </div>
               </div>
@@ -1859,6 +2122,100 @@ LIMIT 100;`,
         dbSchema={schemaData.tables}
         user={user}
       />
+
+      {/* Saved Queries Modal */}
+      <SavedQueries
+        isOpen={showSavedQueriesModal}
+        onClose={() => setShowSavedQueriesModal(false)}
+        onExecuteQuery={(sql) => {
+          setGeneratedSQL(sql);
+          handleExecuteQuery();
+        }}
+        showNotification={showNotification}
+      />
+
+      {/* Query History Modal */}
+      <QueryHistory
+        isOpen={showQueryHistoryModal}
+        onClose={() => setShowQueryHistoryModal(false)}
+        onExecuteQuery={(sql) => {
+          setGeneratedSQL(sql);
+          handleExecuteQuery();
+        }}
+        showNotification={showNotification}
+      />
+
+      {/* Write Confirmation Modal */}
+      {showWriteConfirmation && pendingWriteOperation && (
+        <div className="modal write-confirmation-modal" onClick={(e) => {
+          if (e.target.className === 'modal write-confirmation-modal') {
+            handleCancelWrite();
+          }
+        }}>
+          <div className="modal-content write-confirmation-content">
+            <div className="write-confirmation-header">
+              <h2>⚠️ Confirm Database Write Operation</h2>
+              <button className="close-btn" onClick={handleCancelWrite}>×</button>
+            </div>
+            
+            <div className="write-confirmation-body">
+              <div className="confirmation-message">
+                <p>{pendingWriteOperation.message}</p>
+              </div>
+              
+              <div className="sql-preview-section">
+                <h3>SQL Statement to Execute:</h3>
+                <div className="sql-preview-box">
+                  <pre><code>{pendingWriteOperation.sql}</code></pre>
+                </div>
+              </div>
+              
+              {pendingWriteOperation.affectedTable && (
+                <div className="operation-details">
+                  <div className="detail-item">
+                    <strong>Table:</strong> <span className="table-name">{pendingWriteOperation.affectedTable}</span>
+                  </div>
+                  {pendingWriteOperation.affectedColumns && pendingWriteOperation.affectedColumns.length > 0 && (
+                    <div className="detail-item">
+                      <strong>Columns:</strong> <span className="columns-list">{pendingWriteOperation.affectedColumns.join(', ')}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              <div className="confirmation-warning">
+                <i className="fas fa-exclamation-triangle"></i>
+                <p>This operation will modify your database. Please review carefully before confirming.</p>
+              </div>
+            </div>
+            
+            <div className="write-confirmation-footer">
+              <button 
+                className="btn btn-cancel" 
+                onClick={handleCancelWrite}
+                disabled={assistantLoading}
+              >
+                <i className="fas fa-times"></i> Cancel
+              </button>
+              <button 
+                className="btn btn-confirm" 
+                onClick={handleConfirmWrite}
+                disabled={assistantLoading}
+              >
+                {assistantLoading ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin"></i> Executing...
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-check"></i> Execute
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Results Modal/Popup */}
       {showResultsModal && (

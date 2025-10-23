@@ -415,11 +415,22 @@ class DatabaseConnectionManager {
 
       logger.info(`Query executed in ${executionTime}ms for connection ${connectionId}`);
 
+      // Determine row count based on query type
+      // For SELECT: result.rows.length
+      // For INSERT/UPDATE/DELETE: result.affectedRows (MySQL) or result.rowCount (PostgreSQL)
+      const rowCount = result.rows 
+        ? result.rows.length 
+        : result.affectedRows 
+        ? result.affectedRows 
+        : result.rowCount || 0;
+
       return {
         success: true,
         data: result,
         executionTime,
-        rowCount: result.rows ? result.rows.length : result.rowCount || 0
+        rowCount: rowCount,
+        affectedRows: result.affectedRows || result.rowCount || 0,
+        insertId: result.insertId || null
       };
     } catch (error) {
       logger.error(`Query execution failed for connection ${connectionId}:`, error);

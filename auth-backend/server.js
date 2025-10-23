@@ -12,6 +12,7 @@ const databaseRoutes = require('./src/routes/databaseRoutes');
 const adminRoutes = require('./src/routes/adminRoutes');
 const analyticsRoutes = require('./src/routes/analyticsRoutes');
 const assistantRoutes = require('./src/routes/assistantRoutes');
+const whitelistRoutes = require('./src/routes/whitelistRoutes');
 const logger = require('./src/utils/logger');
 const dbManager = require('./src/utils/dbManager');
 
@@ -61,6 +62,7 @@ app.use('/api/database', databaseRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/assistant', assistantRoutes);
+app.use('/api/whitelist', whitelistRoutes);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'home.html'));
@@ -84,6 +86,7 @@ app.get('/api', (req, res) => {
         'POST /api/auth/register': 'Register new user',
         'POST /api/auth/login': 'User login',
         'POST /api/auth/logout': 'Logout',
+        'POST /api/auth/re-authenticate': 'Re-authenticate user',
         'GET /api/auth/validate': 'Validate token'
       },
       database: {
@@ -94,6 +97,16 @@ app.get('/api', (req, res) => {
         'POST /api/database/connections/:id/query': 'Execute SQL query',
         'POST /api/database/connections/:id/generate-sql': 'Generate SQL from natural language',
         'DELETE /api/database/connections/:id': 'Disconnect from database'
+      },
+      whitelist: {
+        'GET /api/whitelist/:connectionId': 'Get whitelist configuration',
+        'POST /api/whitelist/:connectionId/enable': 'Enable/disable whitelist',
+        'POST /api/whitelist/:connectionId/table': 'Add table to whitelist',
+        'DELETE /api/whitelist/:connectionId/table/:tableName': 'Remove table from whitelist',
+        'POST /api/whitelist/:connectionId/table/:tableName/columns': 'Add columns to table',
+        'POST /api/whitelist/:connectionId/table/:tableName/columns/remove': 'Remove columns from table',
+        'GET /api/whitelist/:connectionId/export': 'Export whitelist configuration',
+        'POST /api/whitelist/:connectionId/import': 'Import whitelist configuration'
       },
       admin: {
         'GET /api/admin/users': 'Get all users',

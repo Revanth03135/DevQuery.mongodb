@@ -85,7 +85,7 @@ class AssistantController {
   }
 
   static async handleChat(req, res) {
-    const { message, connectionId, options = {} } = req.body;
+    const { message, connectionId, options = {}, chatHistory = [] } = req.body;
     const trimmedMessage = (message || '').trim();
 
     if (!trimmedMessage) {
@@ -113,6 +113,42 @@ class AssistantController {
           const schemaResult = await dbManager.getSchema(connectionId);
           schema = schemaResult.schema;
           
+          // Filter schema by whitelist if enabled
+          if (Array.isArray(schema)) {
+            const whitelistManager = WhitelistController.getManager();
+            const whitelist = whitelistManager.getWhitelist(connectionId);
+            
+            if (whitelist.enabled && Object.keys(whitelist.tables).length > 0) {
+              // Filter to only include whitelisted tables
+              schema = schema.filter(table => {
+                const tableName = table.table_name || table.name;
+                return Object.keys(whitelist.tables).includes(tableName);
+              }).map(table => {
+                const tableName = table.table_name || table.name;
+                const whitelistedTable = whitelist.tables[tableName];
+                
+                // If specific columns are whitelisted, filter columns
+                if (whitelistedTable && whitelistedTable.columns && Object.keys(whitelistedTable.columns).length > 0) {
+                  const allowedColumns = Object.keys(whitelistedTable.columns);
+                  return {
+                    ...table,
+                    columns: (table.columns || []).filter(col => 
+                      allowedColumns.includes(col.name || col.column_name)
+                    )
+                  };
+                }
+                
+                return table;
+              });
+              
+              logger.info(`Schema filtered by whitelist for connectionId ${connectionId}:`, {
+                originalTableCount: schemaResult.schema.length,
+                filteredTableCount: schema.length,
+                whitelistedTables: Object.keys(whitelist.tables)
+              });
+            }
+          }
+          
           // DEBUG: Log schema retrieval
           logger.info(`Schema retrieved for connectionId ${connectionId}:`, {
             success: schemaResult.success,
@@ -135,7 +171,8 @@ class AssistantController {
         message: trimmedMessage,
         schema,
         connection: connectionStatus,
-        runQuery
+        runQuery,
+        chatHistory
       });
     } catch (error) {
       if (error instanceof MissingGeminiKeyError) {
@@ -186,11 +223,25 @@ class AssistantController {
       );
 
       if (!isAllowed) {
+        // Get whitelist status to provide better error message
+        const whitelistManager = WhitelistController.getManager();
+        const whitelist = whitelistManager.getWhitelist(connectionId);
+        
+        let errorMessage;
+        if (whitelist.enabled && Object.keys(whitelist.tables).length === 0) {
+          errorMessage = `Whitelist is enabled but no tables are whitelisted. Please add '${affectedTable}' to the whitelist to perform write operations.`;
+        } else if (whitelist.enabled) {
+          const whitelistedTables = Object.keys(whitelist.tables).join(', ');
+          errorMessage = `Table '${affectedTable}' is not in the whitelist. Currently whitelisted tables: [${whitelistedTables}]. Please add '${affectedTable}' to the whitelist to perform write operations.`;
+        } else {
+          errorMessage = `Write operation on table '${affectedTable}' is not permitted.`;
+        }
+        
         messages.push(
           AssistantController.formatMessage(
             'assistant',
             'note',
-            `Write operation on table '${affectedTable}' is not permitted by the whitelist. Please review the whitelist configuration.`
+            errorMessage
           )
         );
         sanitizedSql = '';
@@ -255,20 +306,38 @@ class AssistantController {
 
     // Handle write operation confirmation - return early if requires confirmation
     if (requiresConfirmation) {
+      const confirmationMessage = interpretation.message || 
+        `I've prepared an INSERT statement to add the user. Please review and confirm to proceed.`;
+      
       const resultPayload = {
         intent: 'require_confirmation',
         sql: sanitizedSql,
-        explanation: interpretation.explanation || null,
+        explanation: interpretation.explanation || 'This operation will insert a new record into the database.',
         operationType: 'write',
         affectedTable: affectedTable,
         affectedColumns: affectedColumns,
         cautions: cautions,
         requiresUserApproval: true,
-        message: interpretation.message || 'This operation will modify your database. Please review and approve.',
+        message: confirmationMessage,
         provider: interpretation.provider,
         model: interpretation.model,
         confidence: interpretation.confidence || null
       };
+
+      // Add formatted message to messages array
+      messages.push(
+        AssistantController.formatMessage('assistant', 'text', confirmationMessage)
+      );
+      
+      if (sanitizedSql) {
+        messages.push(AssistantController.formatMessage('assistant', 'sql', sanitizedSql));
+      }
+
+      if (cautions.length) {
+        messages.push(
+          AssistantController.formatMessage('assistant', 'note', cautions.join(' '))
+        );
+      }
 
       return res.json({
         success: true,
@@ -426,16 +495,25 @@ class AssistantController {
 
     try {
       const execution = await dbManager.executeQuery(connectionId, sql);
-      const normalizedResult = DatabaseController.normalizeQueryResult(execution.data);
+      
+      // For write operations, use affectedRows directly from execution result
+      const affectedRows = execution.affectedRows || execution.rowCount || 0;
+      const insertId = execution.insertId || null;
 
-      logger.info(`Write operation executed on table '${affectedTable}' for connection ${connectionId}`);
+      logger.info(`Write operation executed on table '${affectedTable}' for connection ${connectionId}`, {
+        affectedRows,
+        insertId,
+        executionTime: execution.executionTime
+      });
 
       return res.json({
         success: true,
         executed: true,
         message: `Operation completed successfully`,
         result: {
-          rowsAffected: normalizedResult.rowCount || 0,
+          rowsAffected: affectedRows,
+          affectedRows: affectedRows,
+          insertId: insertId,
           executionTime: execution.executionTime
         }
       });

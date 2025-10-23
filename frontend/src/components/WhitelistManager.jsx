@@ -121,10 +121,11 @@ function WhitelistManager({ isOpen, onClose, connectionId, dbSchema, user }) {
       // Get columns for the selected table from schema
       const tableSchema = availableTables.find(t => t.name === newTableName);
       const columnsList = tableSchema?.columns || [];
+      const tableName = newTableName; // Store before reset
 
       const response = await api.post(`/api/whitelist/${connectionId}/table`, {
         userId: user?.id,
-        tableName: newTableName,
+        tableName: tableName,
         allowedColumns: columnsList // Allow all columns by default
       });
       
@@ -132,7 +133,7 @@ function WhitelistManager({ isOpen, onClose, connectionId, dbSchema, user }) {
         setWhitelistData(response.data.data);
         setNewTableName('');
         setShowAddTable(false);
-        setSuccess(`Table "${newTableName}" added to whitelist`);
+        setSuccess(`Table "${tableName}" added to whitelist`);
         setTimeout(() => setSuccess(''), 3000);
       }
     } catch (error) {
@@ -355,21 +356,34 @@ function WhitelistManager({ isOpen, onClose, connectionId, dbSchema, user }) {
                   <div className="tables-list">
                     {Object.entries(whitelistData.tables).map(([tableName, tableConfig]) => (
                       <div key={tableName} className="table-item">
-                        <button 
-                          className="table-header"
-                          onClick={() => setExpandedTable(expandedTable === tableName ? null : tableName)}
-                        >
-                          <span className="table-name">
-                            <i className="fas fa-database"></i>
-                            {tableName}
-                          </span>
-                          <div className="table-meta">
-                            <span className="column-count">
-                              {Object.keys(tableConfig.columns || {}).length} columns
+                        <div className="table-header-wrapper">
+                          <button 
+                            className="table-header"
+                            onClick={() => setExpandedTable(expandedTable === tableName ? null : tableName)}
+                          >
+                            <span className="table-name">
+                              <i className="fas fa-database"></i>
+                              {tableName}
                             </span>
-                            <i className={`fas fa-chevron-${expandedTable === tableName ? 'up' : 'down'}`}></i>
-                          </div>
-                        </button>
+                            <div className="table-meta">
+                              <span className="column-count">
+                                {Object.keys(tableConfig.columns || {}).length} columns
+                              </span>
+                              <i className={`fas fa-chevron-${expandedTable === tableName ? 'up' : 'down'}`}></i>
+                            </div>
+                          </button>
+                          <button
+                            className="btn-remove-table"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeTable(tableName);
+                            }}
+                            disabled={loading}
+                            title="Remove table from whitelist"
+                          >
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </div>
 
                         {expandedTable === tableName && (
                           <div className="table-details">

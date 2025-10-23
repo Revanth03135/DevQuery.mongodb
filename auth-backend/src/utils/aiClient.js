@@ -206,7 +206,7 @@ const normalizeStringArray = (value) => {
     .filter(Boolean);
 };
 
-const interpretChatIntent = async ({ message, schema, connection = {}, runQuery = true }) => {
+const interpretChatIntent = async ({ message, schema, connection = {}, runQuery = true, chatHistory = [] }) => {
   const trimmedMessage = (message || '').trim();
   if (!trimmedMessage) {
     return {
@@ -247,9 +247,19 @@ const interpretChatIntent = async ({ message, schema, connection = {}, runQuery 
     'You can handle both READ (SELECT) and WRITE (INSERT, UPDATE, DELETE) operations.',
     'Prefer adding LIMIT clauses when the query could return many rows.',
     'Only set intent "execute_query" or "execute_write" when you are confident the query is safe and the user provided enough detail.',
-    'For write operations, prefer "require_confirmation" to ask user approval first.',
+    'For write operations, ALWAYS use "require_confirmation" to ask user approval first.',
     'If the schema is missing or incomplete, explain assumptions and prefer "generate_sql" unless the intent is clear.',
     'If the user asks non-database questions, answer conversationally with intent "reply_only".',
+    '',
+    'IMPORTANT WHITELIST RULES:',
+    '- The schema below shows ONLY the tables you have access to (whitelisted tables)',
+    '- If a user asks about a table not in the schema, politely inform them you can only access the tables listed in your schema',
+    '- Do NOT try to query tables that are not shown in your schema - they are restricted',
+    '- When listing available tables, only mention tables from your schema',
+    '',
+    'IMPORTANT: You have access to conversation history. Use it to understand context.',
+    'If user refers to "above query", "previous query", "that table", etc., look in the history below.',
+    'When explaining follow-up questions, reference the context from earlier messages.',
     '',
     'IMPORTANT RULES FOR COLUMN QUERIES:',
     '- When user asks about a column (type, data type, format, etc.), extract the exact column name and table name',
@@ -258,7 +268,17 @@ const interpretChatIntent = async ({ message, schema, connection = {}, runQuery 
     '- Do not say "schema is unavailable" if schema is provided below',
     '- If user mentions a column name, search the schema to find which table it belongs to',
     '- Respond with the EXACT type shown in the schema (e.g., "varchar", "bigint", "text", etc.)',
-    '- Include nullable status (YES/NO) in your response'
+    '- Include nullable status (YES/NO) in your response',
+    '',
+    'IMPORTANT RULES FOR INSERT OPERATIONS:',
+    '- When user wants to add/create/insert data, carefully examine the table schema',
+    '- Match user provided values to the correct columns based on schema',
+    '- Handle data type conversions properly (text needs quotes, numbers do not)',
+    '- If user provides invalid data format (e.g., multiple @ in email), politely explain the error',
+    '- For INSERT operations, ALWAYS use "require_confirmation" intent',
+    '- Generate complete INSERT statements with proper column names and value formats',
+    '- If required columns are missing, ask user to provide them instead of assuming values',
+    '- Use proper escaping for string values (escape single quotes)'
   ].join('\n');
 
   const schemaSection = schemaSummary
@@ -267,9 +287,21 @@ const interpretChatIntent = async ({ message, schema, connection = {}, runQuery 
 
   const runCapability = runQuery && connection.connected ? 'true' : 'false';
 
+  // Format chat history for context
+  const chatHistorySection = Array.isArray(chatHistory) && chatHistory.length > 0
+    ? `Previous conversation (for context):\n${chatHistory
+        .map((msg) => {
+          const role = msg.role === 'assistant' ? 'Assistant' : 'User';
+          const content = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
+          return `${role}: ${content.substring(0, 200)}${content.length > 200 ? '...' : ''}`;
+        })
+        .join('\n')}`
+    : '';
+
   const userPrompt = [
     connectionDetails,
     schemaSection,
+    chatHistorySection,
     `Assistant capabilities: { canExecuteQuery: ${runCapability}, canExecuteWrite: ${runCapability} }`,
     'Return a JSON object with the following shape:',
     '{',
@@ -287,7 +319,7 @@ const interpretChatIntent = async ({ message, schema, connection = {}, runQuery 
     'User question:',
     trimmedMessage,
     'Remember: respond with JSON only. No Markdown, no commentary.'
-  ].join('\n\n');
+  ].filter(Boolean).join('\n\n');
 
   const response = await callGemini({ prompt: userPrompt, systemPrompt });
 
