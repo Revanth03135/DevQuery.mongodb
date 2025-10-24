@@ -283,7 +283,7 @@ cd auth-backend
 npm install
 
 # Create environment file
-cp .env.example .env  # Or create manually
+touch .env  # Create .env file manually
 ```
 
 ### 3. Configure Environment Variables
@@ -676,7 +676,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For questions, issues, or feature requests:
 
 - **GitHub Issues**: [Create an issue](https://github.com/Revanth03135/DevQuery.mongodb/issues)
-- **Documentation**: Check the `/ReadIt` directory for detailed guides
+- **Documentation**: Check the `ReadIt` directory for detailed guides
 - **Email**: Contact the maintainers
 
 ---
