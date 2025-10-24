@@ -1,157 +1,345 @@
-# DevQuery - NLP-Powered SQL Generator
+# DevQuery - AI-Powered Database Query Generator 🚀
 
-DevQuery is a modern web application that leverages Natural Language Processing (NLP) and AI to convert plain English descriptions into optimized SQL queries. It's designed to make database interactions more intuitive and accessible for developers and data analysts.
+DevQuery is a full-stack web application that leverages Google Gemini AI to convert natural language descriptions into optimized database queries (MongoDB and SQL). It's designed to make database interactions more intuitive and accessible for developers and data analysts.
 
-## Features
+![DevQuery Logo](frontend/public/img1.png)
 
-### 🤖 AI-Powered SQL Generation
-- Convert natural language descriptions to SQL queries
+## ✨ Features
+
+### 🤖 AI-Powered Query Generation
+- Convert natural language descriptions to MongoDB and SQL queries using Google Gemini AI
 - Support for complex queries with joins, aggregations, and filters
+- Automatic query type detection (MongoDB, SQL, Aggregation Pipeline)
 - Intelligent query optimization suggestions
 
-### 🗄️ Multi-Database Support
-- MySQL
-- PostgreSQL
-- SQLite
-- SQL Server
-- Oracle
-
 ### 📊 Query Management
-- Execute queries in real-time
 - Save and organize frequently used queries
-- Query history tracking
-- Export results to CSV
+- Query history tracking with timestamps
+- Favorites system for quick access
+- Tag-based organization
+- Export and share queries
 
-### 🔍 Schema Explorer
-- Visual database schema browser
-- Table and column information
-- Relationship mapping
+### 🔍 Query Analysis
+- AI-powered query explanations in plain English
+- Performance optimization recommendations
+- Execution tracking and analytics
 
-### 📈 Analytics & Insights
-- Query performance analysis
-- Usage patterns and statistics
-- Optimization recommendations
+### 🔐 User Authentication
+- Secure JWT-based authentication
+- User registration and login
+- Protected API endpoints
+- Session management
 
-## Project Structure
+### 📈 Analytics Dashboard
+- Query usage patterns and statistics
+- Performance metrics visualization
+- User activity tracking
+
+## 🏗️ Project Structure
 
 ```
-DevQuery/
-├── index.html          # Login page
-├── home.html           # Landing page
-├── dashboard.html      # Main application interface
-├── script.js           # Login functionality
-├── dashboard.js        # Main application logic
-├── styles.css          # Login page styles
-├── style.css           # Home page styles
-├── dashboard.css       # Dashboard styles
-├── img1.png           # Logo/branding
-└── README.md          # This file
+DevQuery.mongodb/
+├── auth-backend/                 # Node.js/Express Backend
+│   ├── config/
+│   │   └── db.js                # MongoDB connection configuration
+│   ├── controllers/
+│   │   ├── authController.js    # Authentication logic (login, signup)
+│   │   └── queryController.js   # Query CRUD operations and AI integration
+│   ├── middleware/
+│   │   └── authMiddleware.js    # JWT token verification
+│   ├── models/
+│   │   ├── Query.js             # Query schema (MongoDB)
+│   │   └── User.js              # User schema (MongoDB)
+│   ├── routes/
+│   │   ├── authRoutes.js        # Authentication endpoints
+│   │   └── queryRoutes.js       # Query management endpoints
+│   ├── services/
+│   │   └── geminiService.js     # Google Gemini AI integration
+│   ├── utils/
+│   │   └── generateToken.js     # JWT token generation utility
+│   ├── server.js                # Express server entry point
+│   ├── package.json             # Backend dependencies
+│   ├── .env                     # Environment variables (not in repo)
+│   ├── API_TESTING.md           # API testing guide
+│   ├── GEMINI_SETUP_GUIDE.md    # Detailed Gemini AI setup
+│   ├── POSTMAN_TEST_COLLECTION.md
+│   ├── QUICK_ENDPOINTS_REFERENCE.md
+│   └── TROUBLESHOOTING.md       # Common issues and solutions
+│
+├── frontend/                     # React + Vite Frontend
+│   ├── public/
+│   │   ├── img1.png             # Application logo
+│   │   └── vite.svg             # Vite logo
+│   ├── src/
+│   │   ├── assets/              # Static assets (images, icons)
+│   │   ├── components/
+│   │   │   ├── Analytics.jsx    # Analytics dashboard component
+│   │   │   ├── Dashboard.jsx    # Main query generation interface
+│   │   │   ├── Home.jsx         # Landing page
+│   │   │   ├── Login.jsx        # Login form
+│   │   │   └── Signup.jsx       # Registration form
+│   │   ├── context/
+│   │   │   └── UserContext.jsx  # User state management
+│   │   ├── utils/
+│   │   │   └── api.js           # Axios API client configuration
+│   │   ├── App.jsx              # Main app component
+│   │   ├── AppRoutes.jsx        # React Router configuration
+│   │   ├── main.jsx             # React app entry point
+│   │   └── index.css            # Global styles
+│   ├── index.html               # HTML entry point
+│   ├── package.json             # Frontend dependencies
+│   ├── vite.config.js           # Vite configuration
+│   └── eslint.config.js         # ESLint configuration
+│
+├── static/
+│   └── chart.umd.js             # Chart.js library
+│
+├── ANALYTICS_README.md          # Analytics feature documentation
+├── INTEGRATION_COMPLETE.md      # Frontend-backend integration guide
+├── INTEGRATION_FIX.md           # Integration troubleshooting
+├── .gitignore                   # Git ignore rules
+└── README.md                    # This file
 ```
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-- Modern web browser (Chrome, Firefox, Safari, Edge)
-- Local web server (optional, for development)
+
+- **Node.js** (v18.0.0 or higher)
+- **npm** or **yarn**
+- **MongoDB** (local installation or MongoDB Atlas account)
+- **Google Gemini API Key** ([Get it here](https://makersuite.google.com/app/apikey))
 
 ### Installation
 
-1. Clone or download the project files
-2. Open `home.html` in your web browser to see the landing page
-3. Navigate to the login page and use any email/password (demo mode)
-4. Access the main dashboard to start generating SQL queries
-
-### Development Setup
-
-For development with live reload:
+#### 1. Clone the Repository
 
 ```bash
-# Using Python's built-in server
-python -m http.server 8000
-
-# Using Node.js http-server
-npx http-server
-
-# Using PHP's built-in server
-php -S localhost:8000
+git clone https://github.com/Revanth03135/DevQuery.mongodb.git
+cd DevQuery.mongodb
 ```
 
-Then open `http://localhost:8000` in your browser.
+#### 2. Backend Setup
 
-## Usage
+```bash
+cd auth-backend
 
-### Quick Start
+# Install dependencies
+npm install
 
-1. **Login**: Use any email and password (6+ characters) on the login page
-2. **Connect Database**: Click "Connect Database" and enter your database credentials
-3. **Generate SQL**: Type a natural language description of what you want to query
-4. **Execute**: Review the generated SQL and click "Execute Query" to see results
+# Create .env file
+cat > .env << EOF
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/devquery
+# Or use MongoDB Atlas:
+# MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/devquery?retryWrites=true&w=majority
+JWT_SECRET=your_jwt_secret_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
+EOF
+
+# Start the backend server
+npm run dev
+```
+
+The backend will run on `http://localhost:5000`
+
+#### 3. Frontend Setup
+
+```bash
+cd ../frontend
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+```
+
+The frontend will run on `http://localhost:5173`
+
+### Environment Variables
+
+#### Backend (`auth-backend/.env`)
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `PORT` | Backend server port | `5000` |
+| `MONGODB_URI` | MongoDB connection string | `mongodb://localhost:27017/devquery` |
+| `JWT_SECRET` | Secret key for JWT tokens | `your_secret_key` |
+| `GEMINI_API_KEY` | Google Gemini API key | `AIzaSy...` |
+
+## 📖 Usage
+
+### Quick Start Guide
+
+1. **Register/Login**
+   - Navigate to `http://localhost:5173`
+   - Create a new account or login with existing credentials
+
+2. **Generate a Query**
+   - Go to the Dashboard
+   - Enter a natural language description (e.g., "Find all users who registered in the last 30 days")
+   - Click "Generate SQL"
+   - The AI will generate the appropriate database query
+
+3. **Manage Queries**
+   - View generated query in the editor
+   - Click "Explain" to understand what the query does
+   - Click "Optimize" for performance improvement suggestions
+   - Save queries to favorites for quick access
+   - View query history in the sidebar
+
+4. **Analytics**
+   - Navigate to the Analytics page
+   - View query usage statistics
+   - Monitor performance metrics
 
 ### Example Queries
 
-- "Show me all customers who made purchases in the last 30 days"
-- "Find products with low inventory levels"
-- "Calculate average order value by region"
-- "List the top 10 customers by total revenue"
+```
+Natural Language Input → Generated Query
 
-## Technology Stack
+"Get all active users"
+→ db.users.find({ status: "active" })
+
+"Find products with price less than 100"
+→ db.products.find({ price: { $lt: 100 } })
+
+"Show users who registered last week"
+→ db.users.find({ createdAt: { $gte: new Date(Date.now() - 7*24*60*60*1000) } })
+
+"Calculate average order value by region"
+→ db.orders.aggregate([
+    { $group: { _id: "$region", avgValue: { $avg: "$total" } } }
+  ])
+```
+
+## 🛠️ Technology Stack
 
 ### Frontend
-- **HTML5** - Semantic markup
-- **CSS3** - Modern styling with Grid and Flexbox
-- **JavaScript (ES6+)** - Application logic and DOM manipulation
-- **Font Awesome** - Icons and visual elements
+- **React 19** - UI library
+- **Vite 7** - Build tool and dev server
+- **React Router 6** - Client-side routing
+- **Axios** - HTTP client
+- **Chart.js** - Data visualization
+- **Lucide React** - Icon library
+- **Three.js** - 3D graphics (optional)
 
-### Features Implemented
-- Responsive design for mobile and desktop
-- Modern UI with smooth animations
-- Real-time SQL generation simulation
-- Database connection simulation
-- Query result visualization
-- Keyboard shortcuts (Ctrl+Enter to execute, Ctrl+Shift+F to format)
+### Backend
+- **Node.js** - Runtime environment
+- **Express 5** - Web framework
+- **MongoDB** - Database
+- **Mongoose 8** - MongoDB ODM
+- **JWT** - Authentication
+- **bcryptjs** - Password hashing
+- **Google Gemini AI** - Query generation
+- **CORS** - Cross-origin resource sharing
 
-## Customization
+### Development Tools
+- **ESLint** - Code linting
+- **Nodemon** - Auto-restart dev server
+- **dotenv** - Environment variable management
 
-### Adding New Database Types
-Edit the database type dropdown in `dashboard.html`:
+## 📡 API Endpoints
 
-```html
-<select id="dbType" required>
-  <option value="mysql">MySQL</option>
-  <option value="postgresql">PostgreSQL</option>
-  <!-- Add new database types here -->
-</select>
+### Authentication
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/auth/signup` | Register new user | No |
+| POST | `/api/auth/login` | User login | No |
+
+### Query Management
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/queries/generate` | Generate new query from natural language | Yes |
+| POST | `/api/queries/explain` | Get explanation for a query | Yes |
+| POST | `/api/queries/optimize` | Get optimization suggestions | Yes |
+| GET | `/api/queries` | Get all user queries | Yes |
+| GET | `/api/queries/favorites` | Get favorite queries | Yes |
+| GET | `/api/queries/:id` | Get specific query | Yes |
+| PUT | `/api/queries/:id` | Update query (title, favorite, tags) | Yes |
+| DELETE | `/api/queries/:id` | Delete query | Yes |
+
+For detailed API documentation, see [auth-backend/API_TESTING.md](auth-backend/API_TESTING.md)
+
+## 🧪 Testing
+
+### Backend Testing
+
+```bash
+cd auth-backend
+
+# Test Gemini AI models
+node test-gemini-models.js
+
+# Use the provided Postman collection
+# See POSTMAN_TEST_COLLECTION.md for details
 ```
 
-### Modifying SQL Generation Logic
-Update the `callSQLGenerationAPI` method in `dashboard.js`:
+### Frontend Testing
+
+```bash
+cd frontend
+
+# Run linter
+npm run lint
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+## 🔧 Configuration
+
+### Customizing Query Generation
+
+Edit `auth-backend/services/geminiService.js` to customize AI prompts and behavior:
 
 ```javascript
-async callSQLGenerationAPI(naturalLanguage) {
-  // Add your custom SQL generation logic here
-  // Connect to actual AI/NLP service
-}
+const prompt = `You are a database query expert. Generate a ${queryType} query for: ${userPrompt}`;
 ```
 
-### Styling Customization
-Modify CSS custom properties in `dashboard.css`:
+### Styling
+
+Modify CSS variables in component stylesheets:
 
 ```css
+/* frontend/src/components/Dashboard.css */
 :root {
   --primary-color: #5a39c7;
   --secondary-color: #6c757d;
-  /* Add your brand colors */
 }
 ```
 
-## Browser Support
+## 🐛 Troubleshooting
 
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
+### Common Issues
 
-## Contributing
+1. **MongoDB Connection Failed**
+   - Verify MongoDB is running: `mongod --version`
+   - Check connection string in `.env`
+   - Ensure network access if using MongoDB Atlas
+
+2. **Gemini API Errors**
+   - Verify API key in `.env`
+   - Check API quota limits
+   - Ensure internet connectivity
+
+3. **CORS Errors**
+   - Verify backend URL in `frontend/src/utils/api.js`
+   - Check CORS configuration in `auth-backend/server.js`
+
+4. **JWT Token Expired**
+   - Re-login to get a new token
+   - Check token expiration settings in `auth-backend/utils/generateToken.js`
+
+For more details, see [auth-backend/TROUBLESHOOTING.md](auth-backend/TROUBLESHOOTING.md)
+
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -159,39 +347,55 @@ Modify CSS custom properties in `dashboard.css`:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## Roadmap
+### Code Style
 
-### Phase 1 (Current)
-- ✅ Basic UI/UX implementation
-- ✅ SQL generation simulation
-- ✅ Database connection interface
-- ✅ Query result display
+- Follow existing code patterns
+- Use ESLint for JavaScript linting
+- Write meaningful commit messages
+- Add comments for complex logic
 
-### Phase 2 (Next)
-- [ ] Integrate with actual NLP/AI service
-- [ ] Real database connectivity
-- [ ] User authentication system
-- [ ] Query optimization engine
-
-### Phase 3 (Future)
-- [ ] Team collaboration features
-- [ ] Advanced analytics dashboard
-- [ ] API endpoints for external integration
-- [ ] Mobile application
-
-## License
+## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Support
+## 🙏 Acknowledgments
 
-For support, email support@devquery.com or create an issue in the repository.
+- **Google Gemini AI** - For powerful query generation capabilities
+- **MongoDB** - For flexible document database
+- **React** - For the amazing UI library
+- **Vite** - For lightning-fast development experience
+- **Font Awesome / Lucide** - For beautiful icons
+- **The open-source community** - For inspiration and support
 
-## Acknowledgments
+## 📧 Support
 
-- Font Awesome for the beautiful icons
-- The open-source community for inspiration and resources
+For support and questions:
+- Create an issue in the repository
+- Email: support@devquery.com
+
+## 🗺️ Roadmap
+
+### Current Release (v1.0) ✅
+- ✅ Google Gemini AI integration
+- ✅ Natural language to query conversion
+- ✅ User authentication (JWT)
+- ✅ Query history and favorites
+- ✅ Query explanation and optimization
+- ✅ Analytics dashboard
+- ✅ Responsive UI
+
+### Upcoming Features
+- [ ] Multi-database support (PostgreSQL, MySQL)
+- [ ] Real-time query execution
+- [ ] Query result visualization
+- [ ] Team collaboration features
+- [ ] Query sharing and templates
+- [ ] Advanced analytics and insights
+- [ ] Mobile application
+- [ ] Browser extension
 
 ---
 
 **DevQuery** - Making database queries as simple as asking a question! 🚀
+
+Made with ❤️ by the DevQuery Team
