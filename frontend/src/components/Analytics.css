@@ -20,20 +20,99 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 32px 40px;
+  gap: 18px;
+  padding: 24px 32px;
   border-radius: var(--analytics-radius-lg);
   background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 60%, #fdf4ff 100%);
   box-shadow: var(--analytics-shadow);
   border: 1px solid rgba(148, 163, 184, 0.16);
 }
 
+/* Connection Status Indicator */
+.analytics-connection-status {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.connection-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.status-connected {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.15) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #059669;
+}
+
+.status-disconnected {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.15) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #d97706;
+}
+
+.status-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.status-connected .status-icon {
+  background: rgba(16, 185, 129, 0.2);
+  color: #059669;
+}
+
+.status-disconnected .status-icon {
+  background: rgba(245, 158, 11, 0.2);
+  color: #d97706;
+}
+
+.status-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-text strong {
+  font-weight: 700;
+  color: inherit;
+}
+
+.status-link {
+  background: none;
+  border: none;
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.status-link:hover {
+  opacity: 0.8;
+}
+
 .analytics-hero {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 24px 28px;
+  gap: 16px;
+  padding: 20px 24px;
   border-radius: var(--analytics-radius-lg);
   background: radial-gradient(120% 120% at 100% 0%, rgba(79, 70, 229, 0.18), rgba(14, 165, 233, 0.12), rgba(255, 255, 255, 0.82));
   overflow: hidden;
@@ -53,7 +132,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 36px;
+  gap: 24px;
   z-index: 1;
 }
 
@@ -85,7 +164,7 @@
 }
 
 .hero-copy h1 {
-  font-size: 2.75rem;
+  font-size: 2.25rem;
   line-height: 1.1;
   margin: 0;
   color: #0f172a;
@@ -93,8 +172,8 @@
 
 .hero-copy p {
   margin: 0;
-  font-size: 1.05rem;
-  line-height: 1.6;
+  font-size: 0.95rem;
+  line-height: 1.5;
   color: rgba(15, 23, 42, 0.72);
 }
 
@@ -237,12 +316,12 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 18px;
-  padding: 20px 24px;
+  gap: 14px;
+  padding: 16px 20px;
   border-radius: var(--analytics-radius-lg);
   background: rgba(255, 255, 255, 0.86);
   border: 1px solid var(--analytics-border);
-  box-shadow: 0 20px 40px -24px rgba(15, 23, 42, 0.25);
+  box-shadow: 0 16px 32px -20px rgba(15, 23, 42, 0.22);
 }
 
 .toolbar-input {
@@ -514,7 +593,7 @@
 
 .analytics-charts {
   display: grid;
-  gap: 20px;
+  gap: 16px;
   grid-template-columns: 1fr;
 }
 
@@ -524,15 +603,16 @@
 
 .chart-card {
   position: relative;
-  padding: 18px 24px;
-  border-radius: 22px;
+  padding: 12px 16px;
+  border-radius: 18px;
   background: radial-gradient(circle at 20% 20%, rgba(79, 70, 229, 0.12), rgba(255, 255, 255, 0.92));
   border: 1px solid rgba(148, 163, 184, 0.16);
-  box-shadow: 0 28px 44px -28px rgba(15, 23, 42, 0.4);
+  box-shadow: 0 20px 32px -24px rgba(15, 23, 42, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 280px;
+  min-height: 220px;
+  max-height: 380px;
 }
 
 .chart-card.secondary {
@@ -542,7 +622,8 @@
 .three-container {
   width: 100%;
   height: 100%;
-  min-height: 280px;
+  min-height: 220px;
+  max-height: 380px;
 }
 
 .three-tooltip {
@@ -632,17 +713,30 @@
 
 @media (max-width: 768px) {
   .analytics-page {
-    padding: 24px;
-    gap: 28px;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .analytics-connection-status {
+    margin-bottom: 0;
+  }
+
+  .connection-status-badge {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+
+  .status-text {
+    flex-wrap: wrap;
   }
 
   .analytics-hero {
-    padding: 24px;
-    gap: 24px;
+    padding: 18px;
+    gap: 18px;
   }
 
   .hero-copy h1 {
-    font-size: 2.2rem;
+    font-size: 1.95rem;
   }
 
   .toolbar-input {
@@ -663,7 +757,8 @@
   }
 
   .chart-card {
-    min-height: 260px;
+    min-height: 200px;
+    max-height: 320px;
   }
 }
 

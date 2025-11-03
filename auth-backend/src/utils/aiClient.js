@@ -206,7 +206,7 @@ const normalizeStringArray = (value) => {
     .filter(Boolean);
 };
 
-const interpretChatIntent = async ({ message, schema, connection = {}, runQuery = true, chatHistory = [] }) => {
+const interpretChatIntent = async ({ message, schema, connection = {}, runQuery = true, chatHistory = [], queryHistory = [], savedQueries = [] }) => {
   const trimmedMessage = (message || '').trim();
   if (!trimmedMessage) {
     return {
@@ -219,6 +219,7 @@ const interpretChatIntent = async ({ message, schema, connection = {}, runQuery 
   }
 
   const schemaSummary = summarizeSchemaForPrompt(schema);
+  const isMongoDB = connection.type === 'mongodb';
   
   // DEBUG: Log schema summary
   if (process.env.DEBUG_SCHEMA) {
@@ -228,7 +229,8 @@ const interpretChatIntent = async ({ message, schema, connection = {}, runQuery 
       isArray: Array.isArray(schema),
       schemaLength: Array.isArray(schema) ? schema.length : 'N/A',
       schemaSummaryLength: schemaSummary.length,
-      schemaSummaryPreview: schemaSummary.substring(0, 200)
+      schemaSummaryPreview: schemaSummary.substring(0, 200),
+      databaseType: connection.type
     });
   }
   
@@ -240,69 +242,173 @@ const interpretChatIntent = async ({ message, schema, connection = {}, runQuery 
     .filter(Boolean)
     .join('\n');
 
-  const systemPrompt = [
-    'You are DevQuery, an SQL assistant inside a developer tool.',
-    'You receive user questions about their database schema and must decide whether to generate SQL, execute it, or reply conversationally.',
-    'You must ALWAYS return valid JSON (no Markdown).',
-    'You can handle both READ (SELECT) and WRITE (INSERT, UPDATE, DELETE) operations.',
-    'Prefer adding LIMIT clauses when the query could return many rows.',
-    'Only set intent "execute_query" or "execute_write" when you are confident the query is safe and the user provided enough detail.',
-    'For write operations, ALWAYS use "require_confirmation" to ask user approval first.',
-    'If the schema is missing or incomplete, explain assumptions and prefer "generate_sql" unless the intent is clear.',
-    'If the user asks non-database questions, answer conversationally with intent "reply_only".',
-    '',
-    'IMPORTANT WHITELIST RULES:',
-    '- The schema below shows ONLY the tables you have access to (whitelisted tables)',
-    '- If a user asks about a table not in the schema, politely inform them you can only access the tables listed in your schema',
-    '- Do NOT try to query tables that are not shown in your schema - they are restricted',
-    '- When listing available tables, only mention tables from your schema',
-    '',
-    'IMPORTANT: You have access to conversation history. Use it to understand context.',
-    'If user refers to "above query", "previous query", "that table", etc., look in the history below.',
-    'When explaining follow-up questions, reference the context from earlier messages.',
-    '',
-    'IMPORTANT RULES FOR COLUMN QUERIES:',
-    '- When user asks about a column (type, data type, format, etc.), extract the exact column name and table name',
-    '- Look at the schema overview below to find the exact data type',
-    '- ALWAYS respond with the actual column type from the schema',
-    '- Do not say "schema is unavailable" if schema is provided below',
-    '- If user mentions a column name, search the schema to find which table it belongs to',
-    '- Respond with the EXACT type shown in the schema (e.g., "varchar", "bigint", "text", etc.)',
-    '- Include nullable status (YES/NO) in your response',
-    '',
-    'IMPORTANT RULES FOR INSERT OPERATIONS:',
-    '- When user wants to add/create/insert data, carefully examine the table schema',
-    '- Match user provided values to the correct columns based on schema',
-    '- Handle data type conversions properly (text needs quotes, numbers do not)',
-    '- If user provides invalid data format (e.g., multiple @ in email), politely explain the error',
-    '- For INSERT operations, ALWAYS use "require_confirmation" intent',
-    '- Generate complete INSERT statements with proper column names and value formats',
-    '- If required columns are missing, ask user to provide them instead of assuming values',
-    '- Use proper escaping for string values (escape single quotes)'
-  ].join('\n');
+  const systemPrompt = isMongoDB ?
+    [
+      'You are DevQuery, a MongoDB assistant inside a developer tool.',
+      'You receive user questions about their MongoDB database and must decide whether to generate MongoDB queries, execute them, or reply conversationally.',
+      'You must ALWAYS return valid JSON (no Markdown).',
+      'Generate MongoDB shell commands (e.g., db.collection.find(), db.collection.aggregate()) or JSON format queries.',
+      'For simple queries use find(), for analytics/aggregation use aggregate() with pipelines.',
+      'Use .limit() to restrict results when query could return many documents.',
+      'Only set intent "execute_query" when you are confident the query is safe and the user provided enough detail.',
+      'If the schema is missing or incomplete, explain assumptions and prefer "generate_sql" (we use "sql" field for MongoDB queries too).',
+      'If the user asks non-database questions, answer conversationally with intent "reply_only".',
+      '',
+      '🔥 CRITICAL: CONVERSATION MEMORY - YOU MUST USE CHAT HISTORY!',
+      '- You HAVE FULL ACCESS to previous conversation history below',
+      '- When user asks "what did I ask before?" or "last time" - SEARCH THE HISTORY and tell them exactly what they asked',
+      '- When user says "that collection", "above query", "previous question" - REFERENCE the specific message from history',
+      '- If user asks about something from earlier in conversation, cite the exact question/answer from history',
+      '- NEVER say "I don\'t have access to history" - you DO have it in the "Previous conversation" section below',
+      '',
+      'MongoDB Query Examples:',
+      '- Find all: db.users.find({})',
+      '- Find with filter: db.users.find({age: {$gt: 18}})',
+      '- Aggregation: db.orders.aggregate([{$group: {_id: "$status", count: {$sum: 1}}}])',
+      '- Count: db.products.countDocuments({category: "electronics"})',
+      '',
+      'IMPORTANT: Use MongoDB operators: $gt, $lt, $gte, $lte, $eq, $ne, $in, $nin, $and, $or, etc.',
+      'For aggregation: $match, $group, $sort, $limit, $project, $unwind, $lookup, etc.'
+    ].join('\n')
+    :
+    [
+      'You are DevQuery, an SQL assistant inside a developer tool.',
+      'You receive user questions about their database schema and must decide whether to generate SQL, execute it, or reply conversationally.',
+      'You must ALWAYS return valid JSON (no Markdown).',
+      'You can handle both READ (SELECT) and WRITE (INSERT, UPDATE, DELETE) operations.',
+      'Prefer adding LIMIT clauses when the query could return many rows.',
+      'Only set intent "execute_query" or "execute_write" when you are confident the query is safe and the user provided enough detail.',
+      'For write operations, ALWAYS use "require_confirmation" to ask user approval first.',
+      'If the schema is missing or incomplete, explain assumptions and prefer "generate_sql" unless the intent is clear.',
+      'If the user asks non-database questions, answer conversationally with intent "reply_only".',
+      '',
+      '🔥 CRITICAL: CONVERSATION MEMORY - YOU MUST USE CHAT HISTORY!',
+      '- You HAVE FULL ACCESS to previous conversation history below',
+      '- When user asks "what did I ask before?" or "last time" - SEARCH THE HISTORY and tell them exactly what they asked',
+      '- When user says "that table", "above query", "previous question" - REFERENCE the specific message from history',
+      '- If user asks about something from earlier in conversation, cite the exact question/answer from history',
+      '- NEVER say "I don\'t have access to history" - you DO have it in the "Previous conversation" section below',
+      '- Example: User asks "what did I ask last time?" → You respond: "You asked me \'[exact previous question]\'"',
+      '',
+      'IMPORTANT WHITELIST RULES:',
+      '- The schema below shows ONLY the tables you have access to (whitelisted tables)',
+      '- If a user asks about a table not in the schema, politely inform them you can only access the tables listed in your schema',
+      '- Do NOT try to query tables that are not shown in your schema - they are restricted',
+      '- When listing available tables, only mention tables from your schema',
+      '',
+      'IMPORTANT RULES FOR COLUMN QUERIES:',
+      '- When user asks about a column (type, data type, format, etc.), extract the exact column name and table name',
+      '- Look at the schema overview below to find the exact data type',
+      '- ALWAYS respond with the actual column type from the schema',
+      '- Do not say "schema is unavailable" if schema is provided below',
+      '- If user mentions a column name, search the schema to find which table it belongs to',
+      '- Respond with the EXACT type shown in the schema (e.g., "varchar", "bigint", "text", etc.)',
+      '- Include nullable status (YES/NO) in your response',
+      '',
+      'IMPORTANT RULES FOR INSERT OPERATIONS:',
+      '- When user wants to add/create/insert data, carefully examine the table schema',
+      '- Match user provided values to the correct columns based on schema',
+      '- Handle data type conversions properly (text needs quotes, numbers do not)',
+      '- If user provides invalid data format (e.g., multiple @ in email), politely explain the error',
+      '- For INSERT operations, ALWAYS use "require_confirmation" intent',
+      '- Generate complete INSERT statements with proper column names and value formats',
+      '- If required columns are missing, ask user to provide them instead of assuming values',
+      '- Use proper escaping for string values (escape single quotes)'
+    ].join('\n');
 
   const schemaSection = schemaSummary
-    ? `Database Schema (Tables and Columns):\n${schemaSummary}`
+    ? `Database Schema (${isMongoDB ? 'Collections and Fields' : 'Tables and Columns'}):\n${schemaSummary}`
     : 'Database Schema: No schema available - the database may be empty or connection may not have schema visibility.';
 
   const runCapability = runQuery && connection.connected ? 'true' : 'false';
 
-  // Format chat history for context
+  // Format chat history for context - Make it VERY prominent
   const chatHistorySection = Array.isArray(chatHistory) && chatHistory.length > 0
-    ? `Previous conversation (for context):\n${chatHistory
-        .map((msg) => {
-          const role = msg.role === 'assistant' ? 'Assistant' : 'User';
-          const content = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
-          return `${role}: ${content.substring(0, 200)}${content.length > 200 ? '...' : ''}`;
-        })
-        .join('\n')}`
-    : '';
+    ? `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📝 CONVERSATION HISTORY (Last ${chatHistory.length} messages):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${chatHistory
+  .map((msg, idx) => {
+    const role = msg.role === 'assistant' ? '🤖 Assistant' : '👤 User';
+    const content = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
+    const preview = content.length > 300 ? content.substring(0, 300) + '...' : content;
+    return `[Message ${idx + 1}] ${role}:\n${preview}`;
+  })
+  .join('\n\n')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️  USE THE ABOVE HISTORY to answer questions about "what I asked before", "last time", etc.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`
+    : '\n(No previous conversation history)\n';
+
+  // Format query history for context
+  const queryHistorySection = Array.isArray(queryHistory) && queryHistory.length > 0
+    ? `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 QUERY EXECUTION HISTORY (Last ${queryHistory.length} executed queries):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${queryHistory
+  .map((q, idx) => {
+    const executedTime = q.executedAt ? new Date(q.executedAt).toLocaleString() : 'N/A';
+    const statusIcon = q.status === 'success' ? '✅' : '❌';
+    return `[Query ${idx + 1}] ${statusIcon} ${q.status.toUpperCase()} - ${executedTime}
+SQL: ${q.sql}
+${q.explanation ? `Explanation: ${q.explanation}` : ''}
+${q.status === 'success' ? `Results: ${q.resultCount || 0} rows in ${q.executionTime || 0}ms` : ''}
+${q.errorMessage ? `Error: ${q.errorMessage}` : ''}`;
+  })
+  .join('\n\n')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💡 USE THIS HISTORY when user asks "show me my recent queries", "what queries failed?", etc.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`
+    : '\n(No query execution history available)\n';
+
+  // Format saved queries for context
+  const savedQueriesSection = Array.isArray(savedQueries) && savedQueries.length > 0
+    ? `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💾 SAVED QUERIES (${savedQueries.length} bookmarked queries):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${savedQueries
+  .map((q, idx) => {
+    const createdTime = q.createdAt ? new Date(q.createdAt).toLocaleString() : 'N/A';
+    return `[Saved Query ${idx + 1}] 📌 ${q.name || 'Unnamed Query'} - ${createdTime}
+SQL: ${q.sql}
+${q.explanation ? `Explanation: ${q.explanation}` : ''}`;
+  })
+  .join('\n\n')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💡 USE THESE when user asks "show my saved queries", "run my saved query about X", etc.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`
+    : '\n(No saved queries available)\n';
 
   const userPrompt = [
     connectionDetails,
     schemaSection,
     chatHistorySection,
+    queryHistorySection,
+    savedQueriesSection,
     `Assistant capabilities: { canExecuteQuery: ${runCapability}, canExecuteWrite: ${runCapability} }`,
+    '',
+    '🎯 SPECIAL INSTRUCTIONS FOR MEMORY-BASED QUERIES:',
+    '- If user asks "what did I ask?" → Set intent: "reply_only", extract their question from CONVERSATION HISTORY',
+    '- If user asks "re-run that query" → Set intent: "execute_query", copy the SQL from QUERY HISTORY',
+    '- If user asks "what was the last query?" → Set intent: "reply_only", quote the SQL from QUERY HISTORY',
+    '- If user asks "show my saved queries" → Set intent: "reply_only", list queries from SAVED QUERIES section',
+    '- If user asks "run my saved query about X" → Set intent: "execute_query", find matching SQL in SAVED QUERIES',
+    '- If user asks "what queries failed?" → Set intent: "reply_only", filter failed queries from QUERY HISTORY',
+    '- If user asks "show recent queries" → Set intent: "reply_only", list queries from QUERY HISTORY',
+    '- Always check CONVERSATION HISTORY, QUERY HISTORY, and SAVED QUERIES FIRST before saying you don\'t have information',
+    '',
     'Return a JSON object with the following shape:',
     '{',
     '  "intent": "execute_query" | "generate_sql" | "execute_write" | "require_confirmation" | "reply_only",',
@@ -360,24 +466,51 @@ const generateSqlFromDescription = async ({ description, schema, connection = {}
   }
 
   const schemaSummary = summarizeSchemaForPrompt(schema);
+  const isMongoDB = connection.type === 'mongodb';
 
-  const systemPrompt = [
-    'You are DevQuery, an expert SQL generator.',
-    'Produce safe, read-only SQL queries that match the user description.',
-    'Only output SELECT or WITH queries. Never mutate data.',
-    'Prefer including LIMIT when the request could return many rows.',
-    'Return JSON only. No Markdown.'
-  ].join('\n');
+  const systemPrompt = isMongoDB ?
+    [
+      'You are DevQuery, an expert MongoDB query generator.',
+      'Produce safe, read-only MongoDB queries that match the user description.',
+      'Only output find(), aggregate(), or countDocuments() queries. Never mutate data.',
+      'Use aggregation pipeline for complex queries with grouping, sorting, or calculations.',
+      'Use simple find() for basic queries.',
+      'Return JSON only. No Markdown.'
+    ].join('\n')
+    :
+    [
+      'You are DevQuery, an expert SQL generator.',
+      'Produce safe, read-only SQL queries that match the user description.',
+      'Only output SELECT or WITH queries. Never mutate data.',
+      'Prefer including LIMIT when the request could return many rows.',
+      'Return JSON only. No Markdown.'
+    ].join('\n');
 
-  const userPrompt = [
-    connection.type ? `Database type: ${connection.type}` : null,
-    connection.database ? `Database name: ${connection.database}` : null,
-    schemaSummary ? `Schema overview (partial):\n${schemaSummary}` : 'Schema overview: unavailable',
-    `Task: Generate a SQL query for the following description: ${trimmedDescription}`,
-    'Return a JSON object with keys { sql, explanation, cautions, confidence, estimated_row_count }.'
-  ]
-    .filter(Boolean)
-    .join('\n\n');
+  const userPrompt = isMongoDB ?
+    [
+      `Database type: MongoDB`,
+      connection.database ? `Database name: ${connection.database}` : null,
+      schemaSummary ? `Collections and Fields (partial):\n${schemaSummary}` : 'Schema overview: unavailable',
+      `Task: Generate a MongoDB query for the following description: ${trimmedDescription}`,
+      'Examples:',
+      '- Simple find: db.users.find({age: {$gt: 18}}).limit(10)',
+      '- Aggregation: db.orders.aggregate([{$group: {_id: "$status", count: {$sum: 1}}}, {$sort: {count: -1}}])',
+      '- Count: db.products.countDocuments({category: "electronics"})',
+      'Return a JSON object with keys { sql, explanation, cautions, confidence, estimated_row_count }.',
+      'IMPORTANT: Put the complete MongoDB shell command in the "sql" field.'
+    ]
+      .filter(Boolean)
+      .join('\n\n')
+    :
+    [
+      connection.type ? `Database type: ${connection.type}` : null,
+      connection.database ? `Database name: ${connection.database}` : null,
+      schemaSummary ? `Schema overview (partial):\n${schemaSummary}` : 'Schema overview: unavailable',
+      `Task: Generate a SQL query for the following description: ${trimmedDescription}`,
+      'Return a JSON object with keys { sql, explanation, cautions, confidence, estimated_row_count }.'
+    ]
+      .filter(Boolean)
+      .join('\n\n');
 
   const response = await callGemini({ prompt: userPrompt, systemPrompt });
 
@@ -505,12 +638,138 @@ const extractColumnsFromSql = (sql) => {
   return columns;
 };
 
+/**
+ * Generate analytics query and chart specification using Gemini AI
+ * @param {string} naturalLanguageQuery - User's analytics question
+ * @param {Array} tables - Database schema tables
+ * @param {string} dbType - Database type (postgresql, mysql, etc.)
+ * @returns {Promise<{sql: string, chartType: string, labels: string, values: string, explanation: string}>}
+ */
+const generateAnalyticsQuery = async (naturalLanguageQuery, tables = [], dbType = 'postgresql') => {
+  if (!hasGeminiConfig()) {
+    throw new MissingGeminiKeyError();
+  }
+
+  const schemaContext = summarizeSchemaForPrompt(tables);
+  const isMongoDB = dbType === 'mongodb';
+
+  const systemPrompt = isMongoDB ? 
+    `You are an expert data analyst and MongoDB specialist. 
+Your task is to convert natural language analytics questions into executable MongoDB queries and specify appropriate chart visualizations.
+
+Database Type: MongoDB
+Collections and Fields:
+${schemaContext}
+
+IMPORTANT RULES:
+1. Generate ONLY valid MongoDB shell commands or aggregation pipelines
+2. Use aggregation pipeline for complex analytics: $group, $sort, $limit, $project
+3. Use simple find() queries for basic data retrieval
+4. Limit results to reasonable amounts (10-20 for charts)
+5. Return data in format suitable for charts (labels and numeric values)
+6. Use $match for filtering, $group for aggregation
+7. Choose the most appropriate chart type based on the data
+
+MongoDB Query Formats:
+- Simple find: db.collection.find({query}, {projection}).limit(10)
+- Aggregation: db.collection.aggregate([{$group: {...}}, {$sort: {...}}, {$limit: 10}])
+- Count by field: db.collection.aggregate([{$group: {_id: "$field", count: {$sum: 1}}}, {$sort: {count: -1}}, {$limit: 10}])
+
+Chart Types Available:
+- line: For trends over time
+- bar: For comparing categories
+- pie: For showing composition/distribution
+- area: For cumulative trends
+
+Response Format (JSON):
+{
+  "sql": "db.products.aggregate([{$group: {_id: '$category', count: {$sum: 1}}}, {$sort: {count: -1}}, {$limit: 10}])",
+  "chartType": "bar",
+  "explanation": "This aggregation counts products by category and is best visualized as a bar chart",
+  "labelColumn": "_id",
+  "valueColumn": "count",
+  "suggestedTitle": "Products by Category"
+}
+
+CRITICAL: The "sql" field should contain the complete MongoDB shell command as shown above.`
+    :
+    `You are an expert data analyst and SQL specialist. 
+Your task is to convert natural language analytics questions into executable SQL queries and specify appropriate chart visualizations.
+
+Database Type: ${dbType}
+Schema Context:
+${schemaContext}
+
+IMPORTANT RULES:
+1. Generate ONLY valid SQL that will return data for visualization
+2. Use aggregation functions (COUNT, SUM, AVG, MAX, MIN) when appropriate
+3. Include GROUP BY for categorical analysis
+4. Limit results to reasonable amounts (TOP 10-20 for charts)
+5. Return data in format suitable for charts (labels and numeric values)
+6. Use date functions for time-series analysis
+7. Choose the most appropriate chart type based on the data
+
+Chart Types Available:
+- line: For trends over time
+- bar: For comparing categories
+- pie: For showing composition/distribution
+- area: For cumulative trends
+- scatter: For correlation analysis
+
+Response Format (JSON):
+{
+  "sql": "SELECT category, COUNT(*) as count FROM table GROUP BY category ORDER BY count DESC LIMIT 10",
+  "chartType": "bar",
+  "explanation": "This query counts records by category and is best visualized as a bar chart for comparison",
+  "labelColumn": "category",
+  "valueColumn": "count",
+  "suggestedTitle": "Distribution by Category"
+}`;
+
+  const userPrompt = `Analytics Question: "${naturalLanguageQuery}"
+
+Generate an appropriate ${isMongoDB ? 'MongoDB query' : 'SQL query'} and chart specification for this analytics question.
+Consider the database schema and choose the best visualization method.
+
+Return ONLY valid JSON with sql, chartType, explanation, labelColumn, valueColumn, and suggestedTitle.`;
+
+  try {
+    const response = await callGemini({
+      prompt: userPrompt,
+      systemPrompt,
+      temperature: 0.2,
+      maxOutputTokens: 1024,
+      responseMimeType: 'application/json'
+    });
+
+    let result;
+    try {
+      result = JSON.parse(response);
+    } catch (parseError) {
+      logger.error('Failed to parse Gemini analytics response as JSON:', parseError);
+      throw new Error('AI returned invalid JSON response');
+    }
+
+    // Validate required fields
+    if (!result.sql || !result.chartType) {
+      throw new Error('AI response missing required fields (sql or chartType)');
+    }
+
+    logger.info(`Generated analytics query for: "${naturalLanguageQuery}" (${dbType})`);
+    return result;
+  } catch (error) {
+    logger.error('Error generating analytics query with Gemini:', error);
+    throw error;
+  }
+};
+
 module.exports = {
   hasGeminiConfig,
   callGemini,
   summarizeSchemaForPrompt,
   interpretChatIntent,
   generateSqlFromDescription,
+  generateAnalyticsQuery,
   isWriteOperation,
   isReadOperation,
   extractTableFromSql,

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { ArrowDown, ArrowUp, Activity, Clock, Search } from 'lucide-react';
+import { Clock, Search } from 'lucide-react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { useNavigate } from 'react-router-dom';
@@ -22,11 +22,12 @@ import {
 } from 'chart.js';
 import './Analytics.css';
 
-const SAMPLE_QUERIES = [
-  { label: 'Monthly signups', value: 'last month users' },
-  { label: 'Sales by region', value: 'sales by region' },
-  { label: 'Top products', value: 'top 10 products' },
-  { label: 'Today’s active users', value: 'active users today' }
+// Default queries (fallback if no DB connection)
+const DEFAULT_QUERIES = [
+  { label: 'Query history trends', value: 'query history analytics' },
+  { label: 'Schema statistics', value: 'table count and schema stats' },
+  { label: 'Column types', value: 'column type distribution' },
+  { label: 'Saved queries', value: 'show my saved queries' }
 ];
 
 ChartJS.register(
@@ -53,6 +54,10 @@ function Analytics({ user, setUser }) {
   const [use3D, setUse3D] = useState(false);
   const [threeChartType, setThreeChartType] = useState('bar'); // 'bar' | 'scatter' | 'line'
   const [hover, setHover] = useState({ visible: false, x: 0, y: 0, text: '' });
+  const [connections, setConnections] = useState([]);
+  const [dbConnection, setDbConnection] = useState(null);
+  const [suggestedQueries, setSuggestedQueries] = useState(DEFAULT_QUERIES);
+  const [schemaData, setSchemaData] = useState([]);
   const chartCanvasRef = useRef(null);
   const currentChartRef = useRef(null);
   const threeContainerRef = useRef(null);
@@ -70,6 +75,130 @@ function Analytics({ user, setUser }) {
     lastIntersect: null,
   });
   const navigate = useNavigate();
+
+  // Fetch database connections on mount
+  useEffect(() => {
+    const fetchConnections = async () => {
+      try {
+        const response = await api.get('/api/database/connections');
+        if (response.data && response.data.data) {
+          const conns = response.data.data;
+          setConnections(conns);
+          // Set the first connection as active, or find one marked as active
+          const activeConn = conns.find(c => c.isActive) || conns[0];
+          if (activeConn) {
+            setDbConnection(activeConn);
+            // Fetch schema to generate relevant queries
+            fetchSchemaAndGenerateSuggestions(activeConn.connectionId);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch connections:', error);
+      }
+    };
+
+    if (user) {
+      fetchConnections();
+    }
+  }, [user]);
+
+  // Fetch schema and generate smart query suggestions based on actual tables
+  const fetchSchemaAndGenerateSuggestions = async (connectionId) => {
+    try {
+      const response = await api.get(`/api/database/connections/${connectionId}/schema`);
+      if (response.data && response.data.schema) {
+        const tables = response.data.schema;
+        setSchemaData(tables);
+        
+        // Generate smart query suggestions based on actual table names
+        const suggestions = generateSmartSuggestions(tables);
+        setSuggestedQueries(suggestions);
+      }
+    } catch (error) {
+      console.error('Failed to fetch schema for suggestions:', error);
+      // Keep default queries on error
+    }
+  };
+
+  // Generate intelligent query suggestions based on database schema
+  const generateSmartSuggestions = (tables) => {
+    const suggestions = [];
+    
+    // Always include meta-analytics
+    suggestions.push({ label: 'Query history trends', value: 'query history analytics' });
+    suggestions.push({ label: 'Schema statistics', value: 'table count and schema stats' });
+    
+    // Analyze table names to suggest relevant queries
+    const tableNames = tables.map(t => (t.table_name || t.name || '').toLowerCase());
+    
+    // Check for common patterns and suggest queries
+    if (tableNames.some(name => name.includes('user') || name.includes('customer') || name.includes('account'))) {
+      const userTable = tableNames.find(name => name.includes('user') || name.includes('customer') || name.includes('account'));
+      suggestions.push({ 
+        label: `User growth trends`, 
+        value: `show growth trend of ${userTable} over time` 
+      });
+      suggestions.push({ 
+        label: `Total users count`, 
+        value: `count total number of records in ${userTable}` 
+      });
+    }
+    
+    if (tableNames.some(name => name.includes('order') || name.includes('sale') || name.includes('transaction'))) {
+      const orderTable = tableNames.find(name => name.includes('order') || name.includes('sale') || name.includes('transaction'));
+      suggestions.push({ 
+        label: `Recent orders/sales`, 
+        value: `show ${orderTable} from last 30 days` 
+      });
+      suggestions.push({ 
+        label: `Sales trends`, 
+        value: `analyze ${orderTable} by month` 
+      });
+    }
+    
+    if (tableNames.some(name => name.includes('product') || name.includes('item') || name.includes('inventory'))) {
+      const productTable = tableNames.find(name => name.includes('product') || name.includes('item') || name.includes('inventory'));
+      suggestions.push({ 
+        label: `Top products`, 
+        value: `show most popular items from ${productTable}` 
+      });
+    }
+    
+    if (tableNames.some(name => name.includes('event') || name.includes('log') || name.includes('activity'))) {
+      const eventTable = tableNames.find(name => name.includes('event') || name.includes('log') || name.includes('activity'));
+      suggestions.push({ 
+        label: `Recent activity`, 
+        value: `show latest ${eventTable}` 
+      });
+    }
+    
+    if (tableNames.some(name => name.includes('employee') || name.includes('staff') || name.includes('worker'))) {
+      const empTable = tableNames.find(name => name.includes('employee') || name.includes('staff') || name.includes('worker'));
+      suggestions.push({ 
+        label: `Employee statistics`, 
+        value: `analyze ${empTable} distribution` 
+      });
+    }
+
+    // Add generic table analysis if we have tables
+    if (tables.length > 0) {
+      const largestTable = tables.reduce((prev, current) => 
+        ((current.columns || []).length > (prev.columns || []).length) ? current : prev
+      );
+      const tableName = largestTable.table_name || largestTable.name;
+      
+      suggestions.push({ 
+        label: `Analyze ${tableName}`, 
+        value: `show distribution of data in ${tableName}` 
+      });
+    }
+    
+    // Column type distribution
+    suggestions.push({ label: 'Column types', value: 'column type distribution' });
+    
+    // Limit to 8 suggestions max
+    return suggestions.slice(0, 8);
+  };
 
   useEffect(() => {
     // Only redirect if we're sure there's no user and we're not in a loading state
@@ -548,31 +677,98 @@ function Analytics({ user, setUser }) {
     
     setChartInfo('Generating SQL and fetching data...');
     
+    console.log('🔍 Analytics Query Debug:', {
+      query: input,
+      connectionId: dbConnection?.connectionId,
+      hasConnection: !!dbConnection,
+      connectionDetails: dbConnection
+    });
+    
     try {
-      // Simulate API call delay like in your original
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // Get query history and saved queries from localStorage
+      const queryHistory = localStorage.getItem('queryHistory') || '[]';
+      const savedQueries = localStorage.getItem('savedQueries') || '[]';
       
+      // Call the real analytics API
+      const response = await api.post('/api/analytics/nlquery', {
+        query: input,
+        connectionId: dbConnection?.connectionId,
+        queryHistory,
+        savedQueries
+      });
+      
+      console.log('📊 Analytics Response:', response.data);
+      
+      const { sql, chart, useRealData } = response.data;
+      
+      // Display SQL with indicator if using real data
+      const dataSource = useRealData ? '<span style="color:#43E97B;">[Real Data]</span>' : '<span style="color:#FFA500;">[Sample Data]</span>';
+      
+      // Show warning for demo data
+      const warningMessage = !useRealData 
+        ? '<div style="background:rgba(245,158,11,0.1);border-left:3px solid #f59e0b;padding:8px 12px;margin:8px 0;border-radius:4px;color:#92400e;font-size:0.875rem;">⚠️ Using demo data. Connect to your database for real analytics.</div>'
+        : '';
+      
+      setChartInfo(`${dataSource} ${warningMessage}<b>Generated SQL:</b><div style='max-width:100%;overflow-x:auto;'><pre>${sql || 'N/A'}</pre></div>`);
+      
+      // Use chart data from backend
+      if (chart && chart.labels && chart.values) {
+        // ALWAYS use user's selected chart type - don't let backend override it
+        // Backend's chartType is just a suggestion, user has final say
+        const effectiveChartType = chartType; // Use user selection, ignore backend suggestion
+        
+        console.log('📊 Chart rendering:', { userSelectedType: chartType, backendSuggestion: chart.chartType, using: effectiveChartType });
+        
+        // Render primary chart
+        renderChart(effectiveChartType, chart.labels, chart.values, { label: chart.title || input });
+
+        // Compute metrics from primary values
+        if (chart.values && chart.values.length) {
+          const min = Math.min(...chart.values);
+          const max = Math.max(...chart.values);
+          const mean = chart.values.reduce((a,b)=>a+b,0) / chart.values.length;
+          setMetrics({ min, max, mean: Number(mean.toFixed(2)), lastUpdated: new Date().toLocaleString() });
+        }
+
+        // Update 3D chart if enabled
+        if (use3D) initThree(chart.values, chart.labels);
+      } else {
+        // Fallback to demo data if backend doesn't return chart
+        const demoData = generateDemoData(input);
+        renderChart(chartType, demoData.labels, demoData.values, { label: input });
+        
+        if (demoData.values && demoData.values.length) {
+          const min = Math.min(...demoData.values);
+          const max = Math.max(...demoData.values);
+          const mean = demoData.values.reduce((a,b)=>a+b,0) / demoData.values.length;
+          setMetrics({ min, max, mean: Number(mean.toFixed(2)), lastUpdated: new Date().toLocaleString() });
+        }
+        
+        if (use3D) initThree(demoData.values, demoData.labels);
+      }
+      
+    } catch(error) {
+      console.error('Analytics query error:', error);
+      // Fallback to demo data on error
       const demoData = generateDemoData(input);
       
-      // Display SQL like in your original
-      setChartInfo(`<b>Generated SQL:</b><div style='max-width:100%;overflow-x:auto;'><pre>${demoData.sql}</pre></div>`);
+      const errorReason = dbConnection 
+        ? 'Connection lost or AI error. Check console for details.'
+        : 'No database connected';
       
-      // Render chart
+      const errorWarning = `<div style="background:rgba(220,38,38,0.1);border-left:3px solid #dc2626;padding:8px 12px;margin:8px 0;border-radius:4px;color:#991b1b;font-size:0.875rem;">❌ ${errorReason}</div>`;
+      
+      setChartInfo(`<span style="color:#FFA500;">[Demo Data - API Error]</span> ${errorWarning}<b>Generated SQL:</b><div style='max-width:100%;overflow-x:auto;'><pre>${demoData.sql}</pre></div>`);
       renderChart(chartType, demoData.labels, demoData.values, { label: input });
-
-      // Compute metrics
+      
       if (demoData.values && demoData.values.length) {
         const min = Math.min(...demoData.values);
         const max = Math.max(...demoData.values);
         const mean = demoData.values.reduce((a,b)=>a+b,0) / demoData.values.length;
         setMetrics({ min, max, mean: Number(mean.toFixed(2)), lastUpdated: new Date().toLocaleString() });
       }
-
-      // Update 3D chart if enabled
-      if (use3D) initThree(demoData.values, demoData.labels);
       
-    } catch(e) {
-      setChartInfo('Error: ' + (e.message || e));
+      if (use3D) initThree(demoData.values, demoData.labels);
     }
   };
 
@@ -616,43 +812,35 @@ function Analytics({ user, setUser }) {
     }
   };
 
-  const clampPercent = (value) => Math.max(0, Math.min(100, value));
-  const maxValue = metrics.max || 0;
-
-  const metricItems = [
-    {
-      key: 'min',
-      label: 'Minimum',
-      icon: ArrowDown,
-      tone: 'min',
-      value: metrics.min,
-      percent: maxValue ? clampPercent((metrics.min / maxValue) * 100) : 0,
-      delay: 0
-    },
-    {
-      key: 'mean',
-      label: 'Average',
-      icon: Activity,
-      tone: 'mean',
-      value: metrics.mean,
-      percent: maxValue ? clampPercent((metrics.mean / maxValue) * 100) : 0,
-      delay: 60
-    },
-    {
-      key: 'max',
-      label: 'Maximum',
-      icon: ArrowUp,
-      tone: 'max',
-      value: metrics.max,
-      percent: maxValue ? 100 : 0,
-      delay: 120
-    }
-  ];
-
   const lastUpdatedLabel = metrics.lastUpdated || '—';
 
   return (
     <div className="analytics-page">
+      {/* Connection Status Indicator */}
+      <div className="analytics-connection-status">
+        {dbConnection ? (
+          <div className="connection-status-badge status-connected">
+            <span className="status-icon">✓</span>
+            <span className="status-text">
+              Connected to <strong>{dbConnection.database}</strong> ({dbConnection.type || dbConnection.dbType})
+            </span>
+          </div>
+        ) : (
+          <div className="connection-status-badge status-disconnected">
+            <span className="status-icon">⚠</span>
+            <span className="status-text">
+              No database connected - 
+              <button 
+                className="status-link" 
+                onClick={() => navigate('/dashboard')}
+              >
+                Connect now
+              </button>
+            </span>
+          </div>
+        )}
+      </div>
+
       <section className="analytics-hero">
         <div className="analytics-hero__content">
           <div className="hero-copy">
@@ -680,20 +868,13 @@ function Analytics({ user, setUser }) {
             </div>
           </div>
           <div className="hero-visual">
-            <div className="hero-visual__ring">
-              {metricItems.map(({ key, label, value }) => (
-                <div key={key} className="ring-stat">
-                  <span className="ring-label">{label}</span>
-                  <strong>{value ?? 0}</strong>
-                </div>
-              ))}
-            </div>
+            {/* Decorative background only */}
           </div>
         </div>
         <div className="analytics-chip-group">
           <span className="chip-label">Popular queries</span>
           <div className="chip-tray">
-            {SAMPLE_QUERIES.map((sample) => (
+            {suggestedQueries.map((sample) => (
               <button
                 key={sample.value}
                 type="button"
@@ -767,29 +948,6 @@ function Analytics({ user, setUser }) {
             </div>
           </div>
         </div>
-      </section>
-
-      <section className="analytics-metrics">
-        {metricItems.map(({ key, label, icon: Icon, tone, value, percent, delay }) => (
-          <article key={key} className={`metric-card metric-${tone}`} style={{ animationDelay: `${delay}ms` }}>
-            <header>
-              <span className="metric-icon"><Icon size={18} /></span>
-              <span className="metric-label">{label}</span>
-            </header>
-            <strong className="metric-value">{Number.isFinite(value) ? value : 0}</strong>
-            <div className="metric-progress">
-              <div className="metric-progress-fill" style={{ ['--w']: `${percent}%` }} />
-            </div>
-          </article>
-        ))}
-        <article className="metric-card metric-time" style={{ animationDelay: '180ms' }}>
-          <header>
-            <span className="metric-icon"><Clock size={18} /></span>
-            <span className="metric-label">Last run</span>
-          </header>
-          <strong className="metric-value small">{lastUpdatedLabel}</strong>
-          <p className="metric-note">We store recent runs so you can refresh without retyping.</p>
-        </article>
       </section>
 
       <section className={`analytics-charts ${use3D ? 'with-3d' : ''}`}>

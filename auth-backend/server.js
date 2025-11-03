@@ -32,6 +32,7 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
+// CORS configuration - MUST be before routes
 app.use(cors({
   origin: [
     'http://localhost:3000',
@@ -39,12 +40,21 @@ app.use(cors({
     'http://localhost:5000',
     'http://127.0.0.1:5000',
     'http://localhost:5173',
+    'http://127.0.0.1:5173',
     'http://localhost:5174',
+    'http://127.0.0.1:5174',
     'null'
   ],
   credentials: true,
-  optionsSuccessStatus: 200
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  optionsSuccessStatus: 200,
+  maxAge: 86400 // 24 hours
 }));
+
+// Handle preflight requests
+app.options('*', cors());
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));

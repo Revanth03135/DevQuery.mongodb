@@ -85,8 +85,15 @@ class AssistantController {
   }
 
   static async handleChat(req, res) {
-    const { message, connectionId, options = {}, chatHistory = [] } = req.body;
+    const { message, connectionId, options = {}, chatHistory = [], queryHistory = [], savedQueries = [] } = req.body;
     const trimmedMessage = (message || '').trim();
+
+    // DEBUG: Log chat history to verify it's being received
+    logger.info(`Chat request received with ${chatHistory.length} history messages`);
+    if (chatHistory.length > 0) {
+      logger.info(`Last history message: ${JSON.stringify(chatHistory[chatHistory.length - 1])}`);
+    }
+    logger.info(`Query history: ${queryHistory.length} queries, Saved queries: ${savedQueries.length} queries`);
 
     if (!trimmedMessage) {
       return res.status(400).json({
@@ -172,7 +179,9 @@ class AssistantController {
         schema,
         connection: connectionStatus,
         runQuery,
-        chatHistory
+        chatHistory,
+        queryHistory,
+        savedQueries
       });
     } catch (error) {
       if (error instanceof MissingGeminiKeyError) {

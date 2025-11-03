@@ -22,6 +22,377 @@ const normalizeSearchValue = (value) => {
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+// ERD Renderer Component
+const ERDRenderer = ({ tables, onTableClick }) => {
+  const [selectedTable, setSelectedTable] = useState(null);
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const canvasRef = useRef(null);
+
+  const handleTableClick = (table) => {
+    setSelectedTable(table);
+    onTableClick(table);
+  };
+
+  const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.1, 2));
+  const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.1, 0.5));
+  const handleResetView = () => { setZoom(1); setPan({ x: 0, y: 0 }); };
+
+  const handleMouseDown = (e) => {
+    if (e.button === 0 && e.target === canvasRef.current) {
+      setIsDragging(true);
+      setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
+    }
+  };
+
+  const handleMouseMove = (e) => {
+    if (isDragging) {
+      setPan({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
+    }
+  };
+
+  const handleMouseUp = () => setIsDragging(false);
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, dragStart]);
+
+  // Calculate table positions in a grid layout
+  const tablePositions = useMemo(() => {
+    const positions = [];
+    const columns = Math.ceil(Math.sqrt(tables.length));
+    const spacing = { x: 280, y: 300 };
+    const offset = { x: 50, y: 50 };
+
+    tables.forEach((table, idx) => {
+      const col = idx % columns;
+      const row = Math.floor(idx / columns);
+      positions.push({
+        table,
+        x: offset.x + col * spacing.x,
+        y: offset.y + row * spacing.y
+      });
+    });
+
+    return positions;
+  }, [tables]);
+
+  // Find relationships between tables
+  const relationships = useMemo(() => {
+    const rels = [];
+    tablePositions.forEach(({ table, x, y }) => {
+      const tableName = table.name;
+      (table.columns || []).forEach(column => {
+        // Simple FK detection: column name ends with _id and matches another table name
+        if (column.name.endsWith('_id')) {
+          const potentialTable = column.name.replace(/_id$/, '');
+          const targetPos = tablePositions.find(tp => 
+            tp.table.name.toLowerCase() === potentialTable.toLowerCase() ||
+            tp.table.name.toLowerCase() === potentialTable.toLowerCase() + 's'
+          );
+          if (targetPos && targetPos.table.name !== tableName) {
+            rels.push({
+              from: { table: tableName, x, y },
+              to: { table: targetPos.table.name, x: targetPos.x, y: targetPos.y },
+              column: column.name
+            });
+          }
+        }
+      });
+    });
+    return rels;
+  }, [tablePositions]);
+
+  return (
+    <div className="erd-container">
+      <div className="erd-controls">
+        <button onClick={handleZoomOut} className="btn btn-sm" title="Zoom Out">
+          <i className="fas fa-search-minus"></i>
+        </button>
+        <span className="erd-zoom-level">{Math.round(zoom * 100)}%</span>
+        <button onClick={handleZoomIn} className="btn btn-sm" title="Zoom In">
+          <i className="fas fa-search-plus"></i>
+        </button>
+        <button onClick={handleResetView} className="btn btn-sm" title="Reset View">
+          <i className="fas fa-redo"></i>
+        </button>
+        <span className="erd-info">{tables.length} tables • {relationships.length} relationships</span>
+      </div>
+      
+      <div 
+        ref={canvasRef}
+        className="erd-canvas"
+        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+        onMouseDown={handleMouseDown}
+      >
+        <svg width="100%" height="100%" className="erd-svg">
+          <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
+            {/* Render relationships */}
+            {relationships.map((rel, idx) => {
+              const fromX = rel.from.x + 120;
+              const fromY = rel.from.y + 30;
+              const toX = rel.to.x + 120;
+              const toY = rel.to.y + 30;
+              
+              return (
+                <g key={`rel-${idx}`}>
+                  <line
+                    x1={fromX}
+                    y1={fromY}
+                    x2={toX}
+                    y2={toY}
+                    stroke="#6366f1"
+                    strokeWidth="2"
+                    markerEnd="url(#arrowhead)"
+                    opacity="0.6"
+                  />
+                  <title>{`${rel.from.table}.${rel.column} → ${rel.to.table}`}</title>
+                </g>
+              );
+            })}
+            
+            {/* Arrow marker definition */}
+            <defs>
+              <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                <polygon points="0 0, 10 3, 0 6" fill="#6366f1" />
+              </marker>
+            </defs>
+          </g>
+        </svg>
+
+        <div style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`, transformOrigin: '0 0' }}>
+          {tablePositions.map(({ table, x, y }, idx) => {
+            const pkColumns = (table.columns || []).filter(c => c.primaryKey || c.key === 'PRI');
+            const fkColumns = (table.columns || []).filter(c => c.name.endsWith('_id'));
+            const isSelected = selectedTable?.name === table.name;
+
+            return (
+              <div
+                key={`table-${idx}`}
+                className={`erd-table ${isSelected ? 'selected' : ''}`}
+                style={{ left: `${x}px`, top: `${y}px` }}
+                onClick={(e) => { e.stopPropagation(); handleTableClick(table); }}
+              >
+                <div className="erd-table-header">
+                  <i className="fas fa-table"></i>
+                  <span className="erd-table-name">{table.name}</span>
+                  <span className="erd-table-count">{table.columns?.length || 0}</span>
+                </div>
+                <div className="erd-table-body">
+                  {pkColumns.map((col, cidx) => (
+                    <div key={`pk-${cidx}`} className="erd-column primary">
+                      <i className="fas fa-key"></i>
+                      <span>{col.name}</span>
+                      <span className="erd-column-type">{col.type}</span>
+                    </div>
+                  ))}
+                  {fkColumns.map((col, cidx) => (
+                    <div key={`fk-${cidx}`} className="erd-column foreign">
+                      <i className="fas fa-link"></i>
+                      <span>{col.name}</span>
+                      <span className="erd-column-type">{col.type}</span>
+                    </div>
+                  ))}
+                  {(table.columns || []).filter(c => !c.primaryKey && c.key !== 'PRI' && !c.name.endsWith('_id')).slice(0, 5).map((col, cidx) => (
+                    <div key={`col-${cidx}`} className="erd-column">
+                      <i className="fas fa-circle" style={{ fontSize: '4px' }}></i>
+                      <span>{col.name}</span>
+                      <span className="erd-column-type">{col.type}</span>
+                    </div>
+                  ))}
+                  {(table.columns?.length || 0) > (pkColumns.length + fkColumns.length + 5) && (
+                    <div className="erd-column-more">
+                      +{(table.columns?.length || 0) - (pkColumns.length + fkColumns.length + 5)} more...
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Docs Renderer Component
+const DocsRenderer = ({ tables, dbConnection }) => {
+  const [format, setFormat] = useState('markdown');
+  const [selectedTable, setSelectedTable] = useState(null);
+
+  const generateMarkdown = () => {
+    let md = `# Database Documentation\n\n`;
+    md += `**Database**: ${dbConnection?.database || 'N/A'}\n`;
+    md += `**Type**: ${dbConnection?.dbType?.toUpperCase() || 'N/A'}\n`;
+    md += `**Generated**: ${new Date().toLocaleString()}\n`;
+    md += `**Total Tables**: ${tables.length}\n\n`;
+    md += `---\n\n`;
+
+    tables.forEach(table => {
+      md += `## Table: \`${table.name}\`\n\n`;
+      md += `**Columns**: ${table.columns?.length || 0}\n\n`;
+
+      if (table.columns && table.columns.length > 0) {
+        md += `| Column | Type | Nullable | Default | Key |\n`;
+        md += `|--------|------|----------|---------|-----|\n`;
+        table.columns.forEach(col => {
+          const nullable = col.nullable ? 'YES' : 'NO';
+          const defaultVal = col.defaultValue || '-';
+          const key = col.primaryKey || col.key === 'PRI' ? '🔑 PK' : col.name.endsWith('_id') ? '🔗 FK' : '-';
+          md += `| ${col.name} | ${col.type} | ${nullable} | ${defaultVal} | ${key} |\n`;
+        });
+        md += `\n`;
+      }
+
+      const pkCols = (table.columns || []).filter(c => c.primaryKey || c.key === 'PRI');
+      const fkCols = (table.columns || []).filter(c => c.name.endsWith('_id'));
+
+      if (pkCols.length > 0 || fkCols.length > 0) {
+        md += `**Relationships**:\n`;
+        if (pkCols.length > 0) {
+          md += `- Primary Key: ${pkCols.map(c => c.name).join(', ')}\n`;
+        }
+        if (fkCols.length > 0) {
+          md += `- Foreign Keys: ${fkCols.map(c => c.name).join(', ')}\n`;
+        }
+        md += `\n`;
+      }
+
+      md += `---\n\n`;
+    });
+
+    return md;
+  };
+
+  const generateHTML = () => {
+    const md = generateMarkdown();
+    // Simple markdown to HTML conversion
+    let html = md
+      .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+      .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+      .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/`(.*?)`/g, '<code>$1</code>')
+      .replace(/^---$/gm, '<hr>')
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/^\|(.+)\|$/gm, (match) => {
+        const cells = match.split('|').filter(Boolean).map(c => c.trim());
+        return '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
+      });
+    
+    html = `<div class="docs-html"><p>${html}</p></div>`;
+    return html;
+  };
+
+  const generateJSON = () => {
+    return JSON.stringify({
+      database: dbConnection?.database || 'N/A',
+      type: dbConnection?.dbType || 'N/A',
+      generatedAt: new Date().toISOString(),
+      tables: tables.map(table => ({
+        name: table.name,
+        columnCount: table.columns?.length || 0,
+        columns: (table.columns || []).map(col => ({
+          name: col.name,
+          type: col.type,
+          nullable: col.nullable,
+          defaultValue: col.defaultValue,
+          isPrimaryKey: col.primaryKey || col.key === 'PRI',
+          isForeignKey: col.name.endsWith('_id')
+        }))
+      }))
+    }, null, 2);
+  };
+
+  const handleExport = () => {
+    let content, filename, mimeType;
+
+    if (format === 'markdown') {
+      content = generateMarkdown();
+      filename = `database-docs-${Date.now()}.md`;
+      mimeType = 'text/markdown';
+    } else if (format === 'html') {
+      content = generateHTML();
+      filename = `database-docs-${Date.now()}.html`;
+      mimeType = 'text/html';
+    } else {
+      content = generateJSON();
+      filename = `database-docs-${Date.now()}.json`;
+      mimeType = 'application/json';
+    }
+
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCopy = () => {
+    const content = format === 'markdown' ? generateMarkdown() : format === 'html' ? generateHTML() : generateJSON();
+    navigator.clipboard.writeText(content);
+  };
+
+  const renderContent = () => {
+    if (format === 'markdown') {
+      return <pre className="docs-content markdown">{generateMarkdown()}</pre>;
+    } else if (format === 'html') {
+      return <div className="docs-content html" dangerouslySetInnerHTML={{ __html: generateHTML() }} />;
+    } else {
+      return <pre className="docs-content json">{generateJSON()}</pre>;
+    }
+  };
+
+  return (
+    <div className="docs-container">
+      <div className="docs-toolbar">
+        <div className="docs-format-toggle">
+          <button 
+            className={`btn btn-sm ${format === 'markdown' ? 'active' : ''}`}
+            onClick={() => setFormat('markdown')}
+          >
+            <i className="fab fa-markdown"></i> Markdown
+          </button>
+          <button 
+            className={`btn btn-sm ${format === 'html' ? 'active' : ''}`}
+            onClick={() => setFormat('html')}
+          >
+            <i className="fab fa-html5"></i> HTML
+          </button>
+          <button 
+            className={`btn btn-sm ${format === 'json' ? 'active' : ''}`}
+            onClick={() => setFormat('json')}
+          >
+            <i className="fas fa-code"></i> JSON
+          </button>
+        </div>
+        <div className="docs-actions">
+          <button className="btn btn-sm" onClick={handleCopy} title="Copy to clipboard">
+            <i className="fas fa-copy"></i> Copy
+          </button>
+          <button className="btn btn-sm btn-primary" onClick={handleExport} title="Export documentation">
+            <i className="fas fa-download"></i> Export
+          </button>
+        </div>
+      </div>
+      <div className="docs-preview">
+        {renderContent()}
+      </div>
+    </div>
+  );
+};
+
 function Dashboard({ user }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [showWhitelistModal, setShowWhitelistModal] = useState(false);
@@ -40,15 +411,31 @@ function Dashboard({ user }) {
     dispatch: drawerDispatch,
     dragRef
   } = useSQLDrawer();
-  // Chat assistant state
-  const [chatMessages, setChatMessages] = useState(() => [
-    {
-      sender: 'bot',
-      type: 'text',
-      text: 'Hi! I am your database assistant. Ask me anything about your data.',
-      timestamp: new Date().toISOString()
+  // Chat assistant state with localStorage persistence
+  const [chatMessages, setChatMessages] = useState(() => {
+    try {
+      const saved = localStorage.getItem('devquery.chatHistory');
+      if (saved) {
+        const { messages, timestamp } = JSON.parse(saved);
+        // Keep chat history for 24 hours
+        const age = Date.now() - new Date(timestamp).getTime();
+        if (age < 24 * 60 * 60 * 1000 && Array.isArray(messages) && messages.length > 0) {
+          return messages;
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load chat history:', error);
     }
-  ]);
+    // Default welcome message
+    return [
+      {
+        sender: 'bot',
+        type: 'text',
+        text: 'Hi! I am your database assistant. Ask me anything about your data.',
+        timestamp: new Date().toISOString()
+      }
+    ];
+  });
   const [chatInput, setChatInput] = useState('');
   const [assistantLoading, setAssistantLoading] = useState(false);
   const chatMessagesContainerRef = useRef(null);
@@ -109,14 +496,44 @@ function Dashboard({ user }) {
       setAssistantLoading(true);
 
       try {
+        // Get query history and saved queries from localStorage
+        const queryHistory = JSON.parse(localStorage.getItem('queryHistory') || '[]');
+        const savedQueries = JSON.parse(localStorage.getItem('savedQueries') || '[]');
+        
         const payload = {
           message: userMessage,
           connectionId: dbConnection?.connectionId || undefined,
           options: { runQuery: true },
-          // Include chat history for context (last 10 messages for better context)
-          chatHistory: chatMessages.slice(-10).map(msg => ({
-            role: msg.sender === 'bot' ? 'assistant' : msg.sender === 'user' ? 'user' : 'system',
-            content: msg.text || msg.content || ''
+          // Include chat history for context (last 20 messages, excluding welcome message and results)
+          chatHistory: chatMessages
+            .filter(msg => {
+              // Exclude welcome message
+              if (msg.text?.includes('Hi! I am your database assistant')) return false;
+              // Exclude result tables (too much data)
+              if (msg.type === 'results') return false;
+              // Include everything else
+              return true;
+            })
+            .slice(-20)
+            .map(msg => ({
+              role: msg.sender === 'bot' ? 'assistant' : msg.sender === 'user' ? 'user' : 'system',
+              content: msg.text || msg.content || ''
+            })),
+          // Include query history (last 10 queries for context)
+          queryHistory: queryHistory.slice(0, 10).map(q => ({
+            sql: q.sql,
+            explanation: q.explanation,
+            executedAt: q.executedAt,
+            status: q.status,
+            resultCount: q.resultCount,
+            executionTime: q.executionTime
+          })),
+          // Include saved queries (last 10 for context)
+          savedQueries: savedQueries.slice(0, 10).map(q => ({
+            sql: q.sql,
+            explanation: q.explanation,
+            createdAt: q.createdAt,
+            name: q.name || 'Unnamed Query'
           }))
         };
 
@@ -445,6 +862,9 @@ function Dashboard({ user }) {
   const [schemaViewMode, setSchemaViewMode] = useState('tables');
   const [isSchemaCollapsed, setIsSchemaCollapsed] = useState(false);
   const navigate = useNavigate();
+  
+  // Track if chat restore notification was shown to prevent duplicates
+  const chatRestoreNotifiedRef = useRef(false);
 
   const searchTokens = useMemo(() => {
     const tokens = (schemaSearch || '')
@@ -561,9 +981,11 @@ function Dashboard({ user }) {
     });
   };
 
+  const isMongoDB = dbConnection?.dbType === 'mongodb';
+  const itemName = isMongoDB ? 'field' : 'column';
   const columnCountLabel = hasSearch
-    ? `Showing ${visibleColumns.length} of ${totalColumns} columns`
-    : `${totalColumns} column${totalColumns === 1 ? '' : 's'}`;
+    ? `Showing ${visibleColumns.length} of ${totalColumns} ${itemName}s`
+    : `${totalColumns} ${itemName}${totalColumns === 1 ? '' : 's'}`;
 
   useEffect(() => {
     if (!user) {
@@ -583,7 +1005,42 @@ function Dashboard({ user }) {
 
     // Check for existing connections
     checkExistingConnections();
+
+    // Notify user if chat history was restored (only once)
+    if (!chatRestoreNotifiedRef.current) {
+      try {
+        const saved = localStorage.getItem('devquery.chatHistory');
+        if (saved) {
+          const { messages, timestamp } = JSON.parse(saved);
+          const age = Date.now() - new Date(timestamp).getTime();
+          if (age < 24 * 60 * 60 * 1000 && Array.isArray(messages) && messages.length > 1) {
+            const hours = Math.floor(age / (1000 * 60 * 60));
+            const timeAgo = hours > 0 ? `${hours}h ago` : 'recently';
+            showNotification(`💬 Restored ${messages.length} messages from ${timeAgo}`, 'info');
+            chatRestoreNotifiedRef.current = true; // Mark as notified
+          }
+        }
+      } catch (error) {
+        console.error('Failed to check chat history:', error);
+      }
+    }
   }, [user, navigate]);
+
+  // Auto-save chat messages to localStorage
+  useEffect(() => {
+    try {
+      if (chatMessages.length > 0) {
+        // Save last 50 messages with timestamp
+        const toSave = {
+          messages: chatMessages.slice(-50),
+          timestamp: new Date().toISOString()
+        };
+        localStorage.setItem('devquery.chatHistory', JSON.stringify(toSave));
+      }
+    } catch (error) {
+      console.error('Failed to save chat history:', error);
+    }
+  }, [chatMessages]);
 
   useEffect(() => {
     if (!filteredTables.length) {
@@ -598,6 +1055,20 @@ function Dashboard({ user }) {
       setSelectedTable(filteredTables[0]);
     }
   }, [filteredTables, selectedTable]);
+
+  // Close dropdown menus on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      document.querySelectorAll('.dropdown-menu').forEach(menu => {
+        if (!menu.parentElement.contains(e.target)) {
+          menu.style.display = 'none';
+        }
+      });
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     // Add keyboard shortcuts
@@ -644,26 +1115,49 @@ function Dashboard({ user }) {
     if (!connectionId) return;
     setSchemaData(prev => ({ ...prev, loading: true, error: null }));
     try {
+      console.log('🔍 Fetching schema for connection:', connectionId);
       const response = await api.get(`/api/database/connections/${connectionId}/schema`);
+      console.log('📦 Schema response:', response.data);
 
       if (!response.data?.success) {
         throw new Error(response.data?.message || 'Failed to fetch schema');
       }
 
+      console.log('📊 Raw schema data:', response.data.data);
       const tables = transformSchemaResponse(response.data.data);
+      console.log('✅ Transformed tables:', tables);
+      console.log('📈 Number of collections/tables:', tables.length);
+      
       setSchemaData(prev => ({ ...prev, tables, loading: false }));
       localStorage.setItem('devquery.schema', JSON.stringify({ tables }));
     } catch (error) {
-      console.error('Schema fetch error:', error);
+      console.error('❌ Schema fetch error:', error);
+      console.error('Error details:', error.response?.data);
       setSchemaData(prev => ({ ...prev, loading: false, error: error.message || 'Failed to fetch schema' }));
       showNotification('Schema explorer unavailable. Check console for details.', 'warning');
     }
   };
 
   const transformSchemaResponse = (data) => {
-    if (!data) return [];
+    if (!data) {
+      console.warn('⚠️ Schema data is null or undefined');
+      return [];
+    }
 
-    if (Array.isArray(data) && data.length && data[0].table_name && !data[0].columns) {
+    if (!Array.isArray(data)) {
+      console.warn('⚠️ Schema data is not an array:', typeof data);
+      return [];
+    }
+
+    if (data.length === 0) {
+      console.info('ℹ️ Schema data is empty array - database has no collections/tables');
+      return [];
+    }
+
+    console.log('🔄 Transforming schema data:', data.length, 'items');
+
+    // Format 1: Flat structure with table_name (old SQL format)
+    if (data[0].table_name && !data[0].columns) {
       const grouped = data.reduce((acc, item) => {
         const tableName = item.table_name;
         if (!acc[tableName]) {
@@ -684,7 +1178,8 @@ function Dashboard({ user }) {
       }));
     }
 
-    if (Array.isArray(data) && data.length && data[0].columns) {
+    // Format 2: Grouped structure with columns array (MongoDB/modern SQL)
+    if (data[0].columns) {
       return data.map((table) => ({
         name: table.table_name || table.name,
         columns: (table.columns || []).map((column) => ({
@@ -697,6 +1192,7 @@ function Dashboard({ user }) {
       }));
     }
 
+    // Format 3: Collections format (alternative MongoDB format)
     if (data.collections) {
       return Object.entries(data.collections).map(([name, info]) => ({
         name,
@@ -710,6 +1206,7 @@ function Dashboard({ user }) {
       }));
     }
 
+    console.warn('⚠️ Unknown schema format, returning empty array');
     return [];
   };
 
@@ -1265,17 +1762,135 @@ LIMIT 100;`,
   };
 
   const handleRefreshChat = () => {
+    // Confirm before clearing chat history
+    const confirmed = window.confirm(
+      'Are you sure you want to clear the chat history? This will delete all conversation messages.'
+    );
+    
+    if (!confirmed) return;
+
     // Reset chat to initial state
-    setChatMessages([
+    const welcomeMessage = [
       {
         sender: 'bot',
         type: 'text',
         text: 'Hi! I am your database assistant. Ask me anything about your data.',
         timestamp: new Date().toISOString()
       }
-    ]);
+    ];
+    
+    setChatMessages(welcomeMessage);
     setChatInput('');
+    
+    // Clear from localStorage
+    try {
+      localStorage.removeItem('devquery.chatHistory');
+    } catch (error) {
+      console.error('Failed to clear chat history from storage:', error);
+    }
+    
     showNotification('Chat cleared. Starting fresh conversation.', 'info');
+  };
+
+  const handleExportChat = (format = 'json') => {
+    try {
+      let content, filename, mimeType;
+      const timestamp = new Date().toISOString().split('T')[0];
+
+      if (format === 'json') {
+        // Export as JSON
+        content = JSON.stringify({
+          exportedAt: new Date().toISOString(),
+          messageCount: chatMessages.length,
+          database: dbConnection?.database || 'Unknown',
+          messages: chatMessages
+        }, null, 2);
+        filename = `devquery-chat-${timestamp}.json`;
+        mimeType = 'application/json';
+      } else if (format === 'markdown') {
+        // Export as Markdown
+        const lines = [
+          `# DevQuery Chat Export`,
+          `**Date:** ${new Date().toLocaleString()}`,
+          `**Database:** ${dbConnection?.database || 'Unknown'}`,
+          `**Messages:** ${chatMessages.length}`,
+          '',
+          '---',
+          ''
+        ];
+
+        chatMessages.forEach((msg, idx) => {
+          const sender = msg.sender === 'bot' ? '🤖 **Assistant**' : '👤 **You**';
+          const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : '';
+          lines.push(`### ${sender} ${time ? `(${time})` : ''}`);
+          
+          if (msg.type === 'sql') {
+            lines.push('```sql');
+            lines.push(msg.text);
+            lines.push('```');
+          } else if (msg.type === 'results') {
+            try {
+              const data = JSON.parse(msg.text);
+              lines.push(`*Query returned ${data.rows?.length || 0} rows*`);
+            } catch (e) {
+              lines.push(msg.text);
+            }
+          } else {
+            lines.push(msg.text);
+          }
+          lines.push('');
+        });
+
+        content = lines.join('\n');
+        filename = `devquery-chat-${timestamp}.md`;
+        mimeType = 'text/markdown';
+      } else if (format === 'txt') {
+        // Export as plain text
+        const lines = [
+          'DevQuery Chat Export',
+          `Date: ${new Date().toLocaleString()}`,
+          `Database: ${dbConnection?.database || 'Unknown'}`,
+          `Messages: ${chatMessages.length}`,
+          '',
+          '=' .repeat(60),
+          ''
+        ];
+
+        chatMessages.forEach((msg) => {
+          const sender = msg.sender === 'bot' ? 'Assistant' : 'You';
+          const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : '';
+          lines.push(`[${sender}] ${time}`);
+          lines.push(msg.text);
+          lines.push('-'.repeat(60));
+          lines.push('');
+        });
+
+        content = lines.join('\n');
+        filename = `devquery-chat-${timestamp}.txt`;
+        mimeType = 'text/plain';
+      }
+
+      // Create download link
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      // Close dropdown menu
+      document.querySelectorAll('.dropdown-menu').forEach(menu => {
+        menu.style.display = 'none';
+      });
+
+      showNotification(`📥 Chat exported as ${format.toUpperCase()} (${chatMessages.length} messages)`, 'success');
+    } catch (error) {
+      console.error('Export failed:', error);
+      showNotification('Failed to export chat. Please try again.', 'error');
+    }
   };
 
   const handleLogout = async () => {
@@ -1351,8 +1966,7 @@ LIMIT 100;`,
                 <span>Saved Queries</span>
               </button>
             </li>
-            {/* Analytics page hidden temporarily - changes needed before demo */}
-            <li style={{ display: 'none' }}>
+            <li>
               <Link to="/analytics">
                 <i className="fas fa-chart-line"></i>
                 <span>Analytics</span>
@@ -1411,6 +2025,30 @@ LIMIT 100;`,
               <i className="fas fa-redo"></i>
               Refresh Chat
             </button>
+            <div className="btn-group">
+              <button 
+                className="btn btn-secondary dropdown-toggle"
+                title="Export chat history"
+                onClick={(e) => {
+                  const menu = e.currentTarget.nextElementSibling;
+                  menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+                }}
+              >
+                <i className="fas fa-download"></i>
+                Export
+              </button>
+              <div className="dropdown-menu" style={{ display: 'none' }}>
+                <button onClick={() => handleExportChat('json')}>
+                  <i className="fas fa-file-code"></i> JSON
+                </button>
+                <button onClick={() => handleExportChat('markdown')}>
+                  <i className="fas fa-file-alt"></i> Markdown
+                </button>
+                <button onClick={() => handleExportChat('txt')}>
+                  <i className="fas fa-file-text"></i> Text
+                </button>
+              </div>
+            </div>
             <div
               className={`connection-status ${connectionStatus}`}
               title={connectionStatus === 'connected'
@@ -1567,14 +2205,14 @@ LIMIT 100;`,
             <div className="schema-explorer-header">
               <div className="schema-title">
                 <h2>Schema Explorer</h2>
-                <p>Browse tables, inspect columns, and generate docs without leaving DevQuery.</p>
+                <p>Browse {dbConnection?.dbType === 'mongodb' ? 'collections, inspect fields' : 'tables, inspect columns'}, and generate docs without leaving DevQuery.</p>
               </div>
               <div className="schema-toolbar">
                 <div className="schema-search">
                   <i className="fas fa-search"></i>
                   <input
                     type="text"
-                    placeholder="Search tables or columns"
+                    placeholder={dbConnection?.dbType === 'mongodb' ? 'Search collections or fields' : 'Search tables or columns'}
                     value={schemaSearch}
                     onChange={(e) => setSchemaSearch(e.target.value)}
                   />
@@ -1584,14 +2222,13 @@ LIMIT 100;`,
                     className={`btn btn-sm ${schemaViewMode === 'tables' ? 'active' : ''}`}
                     onClick={() => setSchemaViewMode('tables')}
                   >
-                    <i className="fas fa-table"></i>
-                    Tables
+                    <i className={`fas ${dbConnection?.dbType === 'mongodb' ? 'fa-layer-group' : 'fa-table'}`}></i>
+                    {dbConnection?.dbType === 'mongodb' ? 'Collections' : 'Tables'}
                   </button>
                   <button
                     className={`btn btn-sm ${schemaViewMode === 'erd' ? 'active' : ''}`}
                     onClick={() => setSchemaViewMode('erd')}
-                    disabled
-                    title="ERD view coming soon"
+                    title="Entity Relationship Diagram"
                   >
                     <i className="fas fa-project-diagram"></i>
                     ERD
@@ -1599,8 +2236,7 @@ LIMIT 100;`,
                   <button
                     className={`btn btn-sm ${schemaViewMode === 'docs' ? 'active' : ''}`}
                     onClick={() => setSchemaViewMode('docs')}
-                    disabled
-                    title="Live documentation in development"
+                    title="Auto-generated Documentation"
                   >
                     <i className="fas fa-file-alt"></i>
                     Docs
@@ -1630,64 +2266,113 @@ LIMIT 100;`,
             </div>
 
             <div className="schema-body">
-              <div className="schema-sidebar">
-                <div className="schema-connection-info">
-                  <div className="schema-connection-name">
-                    <i className="fas fa-plug"></i>
-                    <span>{connectionStatus === 'connected' ? (dbConnection?.connectionName || 'Active Connection') : 'Not Connected'}</span>
-                  </div>
-                  <small>{dbConnection ? `${dbConnection.dbType?.toUpperCase()}${dbConnection.database ? ` • ${dbConnection.database}` : ''}` : 'Connect to explore schema'}</small>
-                </div>
+              {/* Tables View */}
+              {schemaViewMode === 'tables' && (
+                <>
+                  <div className="schema-sidebar">
+                    <div className="schema-connection-info">
+                      <div className="schema-connection-name">
+                        <i className={`fas ${dbConnection?.dbType === 'mongodb' ? 'fa-leaf' : 'fa-plug'}`}></i>
+                        <span>{connectionStatus === 'connected' ? (dbConnection?.connectionName || 'Active Connection') : 'Not Connected'}</span>
+                      </div>
+                      <small>
+                        {dbConnection ? (
+                          <>
+                            <span className={`db-type-badge ${dbConnection.dbType === 'mongodb' ? 'mongodb' : 'sql'}`}>
+                              {dbConnection.dbType?.toUpperCase()}
+                            </span>
+                            {dbConnection.database && ` • ${dbConnection.database}`}
+                          </>
+                        ) : (
+                          'Connect to explore schema'
+                        )}
+                      </small>
+                    </div>
 
-                {schemaData.loading && (
-                  <div className="schema-loading">
-                    <i className="fas fa-spinner fa-spin"></i>
-                    <span>Loading schema...</span>
-                  </div>
-                )}
+                    {schemaData.loading && (
+                      <div className="schema-loading">
+                        <i className="fas fa-spinner fa-spin"></i>
+                        <span>Loading {dbConnection?.dbType === 'mongodb' ? 'collections' : 'schema'}...</span>
+                      </div>
+                    )}
 
-                {!schemaData.loading && schemaData.tables.length === 0 && (
-                  <div className="schema-empty">
-                    <i className="fas fa-database"></i>
-                    <p>No schema information available. {connectionStatus === 'connected' ? 'Try refreshing or run a query first.' : 'Connect a database to get started.'}</p>
-                  </div>
-                )}
-
-                {!schemaData.loading && schemaData.tables.length > 0 && filteredTables.length === 0 && (
-                  <div className="schema-empty schema-empty-compact">
-                    <i className="fas fa-search"></i>
-                    <p>No matches found. Try a different search term.</p>
-                  </div>
-                )}
-
-                {!schemaData.loading && filteredTables.length > 0 && (
-                  <div className="schema-table-list">
-                    {filteredTables.map((table, index) => {
-                      const totalColumnCount = Array.isArray(table?.columns) ? table.columns.length : 0;
-                      const matchCount = countMatchingColumns(table);
-                      const metaLabel = hasSearch
-                        ? `${matchCount} match${matchCount === 1 ? '' : 'es'}`
-                        : `${totalColumnCount} column${totalColumnCount === 1 ? '' : 's'}`;
-
-                      return (
-                        <button
-                          type="button"
-                          key={table.name || `table-${index}`}
-                          className={`schema-table-item ${selectedTable?.name === table.name ? 'active' : ''}`}
-                          onClick={() => setSelectedTable(table)}
-                        >
-                          <div className="schema-table-name">
-                            <span>{renderHighlight(table.name, table.name || '—')}</span>
+                    {!schemaData.loading && schemaData.tables.length === 0 && (
+                      <div className="schema-empty">
+                        <i className={`fas ${dbConnection?.dbType === 'mongodb' ? 'fa-layer-group' : 'fa-database'}`}></i>
+                        <p>
+                          {dbConnection?.dbType === 'mongodb' 
+                            ? 'No collections found in your MongoDB database.' 
+                            : 'No schema information available.'}
+                        </p>
+                        {connectionStatus === 'connected' && dbConnection?.dbType === 'mongodb' && (
+                          <div style={{ marginTop: '12px', fontSize: '0.9em', color: '#888' }}>
+                            <p style={{ marginBottom: '8px' }}>💡 Your database appears to be empty.</p>
+                            <p style={{ marginBottom: '4px' }}>Add data using MongoDB shell:</p>
+                            <code style={{ 
+                              display: 'block', 
+                              background: '#2a2a2a', 
+                              padding: '8px', 
+                              borderRadius: '4px',
+                              marginTop: '8px',
+                              fontSize: '0.85em',
+                              color: '#00ed64'
+                            }}>
+                              db.users.insertOne(&#123; name: "Test" &#125;)
+                            </code>
+                            <p style={{ marginTop: '8px', fontSize: '0.85em' }}>Then click "Refresh Schema" above.</p>
                           </div>
-                          <div className="schema-table-meta">{metaLabel}</div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+                        )}
+                        {connectionStatus === 'connected' && dbConnection?.dbType !== 'mongodb' && (
+                          <p style={{ marginTop: '8px', fontSize: '0.9em', color: '#888' }}>
+                            Try refreshing or running a query first.
+                          </p>
+                        )}
+                        {connectionStatus !== 'connected' && (
+                          <p style={{ marginTop: '8px', fontSize: '0.9em', color: '#888' }}>
+                            Connect a database to get started.
+                          </p>
+                        )}
+                      </div>
+                    )}
 
-              <div className="schema-details">
+                    {!schemaData.loading && schemaData.tables.length > 0 && filteredTables.length === 0 && (
+                      <div className="schema-empty schema-empty-compact">
+                        <i className="fas fa-search"></i>
+                        <p>No matches found. Try a different search term.</p>
+                      </div>
+                    )}
+
+                    {!schemaData.loading && filteredTables.length > 0 && (
+                      <div className="schema-table-list">
+                        {filteredTables.map((table, index) => {
+                          const totalColumnCount = Array.isArray(table?.columns) ? table.columns.length : 0;
+                          const matchCount = countMatchingColumns(table);
+                          const isMongoDB = dbConnection?.dbType === 'mongodb';
+                          const itemLabel = isMongoDB ? 'field' : 'column';
+                          const metaLabel = hasSearch
+                            ? `${matchCount} match${matchCount === 1 ? '' : 'es'}`
+                            : `${totalColumnCount} ${itemLabel}${totalColumnCount === 1 ? '' : 's'}`;
+
+                          return (
+                            <button
+                              type="button"
+                              key={table.name || `table-${index}`}
+                              className={`schema-table-item ${selectedTable?.name === table.name ? 'active' : ''} ${isMongoDB ? 'mongodb-collection' : ''}`}
+                              onClick={() => setSelectedTable(table)}
+                            >
+                              <div className="schema-table-name">
+                                <i className={`fas ${isMongoDB ? 'fa-layer-group' : 'fa-table'}`} style={{marginRight: '6px', opacity: 0.6, fontSize: '0.9em'}}></i>
+                                <span>{renderHighlight(table.name, table.name || '—')}</span>
+                              </div>
+                              <div className="schema-table-meta">{metaLabel}</div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="schema-details">
                 {selectedTable ? (
                   <div className="schema-table-details">
                     <div className="schema-table-header">
@@ -1720,10 +2405,10 @@ LIMIT 100;`,
                       <table>
                         <thead>
                           <tr>
-                            <th>Column</th>
+                            <th>{dbConnection?.dbType === 'mongodb' ? 'Field' : 'Column'}</th>
                             <th>Type</th>
-                            <th>Nullable</th>
-                            <th>Default / Sample</th>
+                            <th>{dbConnection?.dbType === 'mongodb' ? 'Nullable' : 'Nullable'}</th>
+                            <th>{dbConnection?.dbType === 'mongodb' ? 'Sample Value' : 'Default / Sample'}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1773,10 +2458,53 @@ LIMIT 100;`,
                 ) : (
                   <div className="schema-placeholder">
                     <i className="fas fa-table"></i>
-                    <p>{filteredTables.length === 0 ? 'No tables match your search. Clear the filter to explore everything.' : 'Select a table on the left to view its columns and insights.'}</p>
+                    <p>{filteredTables.length === 0 
+                      ? `No ${dbConnection?.dbType === 'mongodb' ? 'collections' : 'tables'} match your search. Clear the filter to explore everything.` 
+                      : `Select a ${dbConnection?.dbType === 'mongodb' ? 'collection' : 'table'} on the left to view its ${dbConnection?.dbType === 'mongodb' ? 'fields' : 'columns'} and insights.`}
+                    </p>
                   </div>
                 )}
               </div>
+                </>
+              )}
+
+              {/* ERD View */}
+              {schemaViewMode === 'erd' && (
+                <div className="erd-view">
+                  {schemaData.loading ? (
+                    <div className="erd-loading">
+                      <i className="fas fa-spinner fa-spin"></i>
+                      <span>Loading schema...</span>
+                    </div>
+                  ) : schemaData.tables.length === 0 ? (
+                    <div className="erd-empty">
+                      <i className="fas fa-project-diagram"></i>
+                      <p>No schema available. Connect to a database to view ERD.</p>
+                    </div>
+                  ) : (
+                    <ERDRenderer tables={filteredTables} onTableClick={setSelectedTable} />
+                  )}
+                </div>
+              )}
+
+              {/* Docs View */}
+              {schemaViewMode === 'docs' && (
+                <div className="docs-view">
+                  {schemaData.loading ? (
+                    <div className="docs-loading">
+                      <i className="fas fa-spinner fa-spin"></i>
+                      <span>Generating documentation...</span>
+                    </div>
+                  ) : schemaData.tables.length === 0 ? (
+                    <div className="docs-empty">
+                      <i className="fas fa-file-alt"></i>
+                      <p>No schema available. Connect to a database to generate documentation.</p>
+                    </div>
+                  ) : (
+                    <DocsRenderer tables={filteredTables} dbConnection={dbConnection} />
+                  )}
+                </div>
+              )}
             </div>
           </section>
         )}
@@ -2026,13 +2754,18 @@ LIMIT 100;`,
                     disabled={!!dbConfig.connectionString}
                   >
                     <option value="">Select database type</option>
-                    <option value="mongodb">MongoDB</option>
+                    <option value="mongodb">🍃 MongoDB</option>
                     <option value="mysql">MySQL</option>
                     <option value="postgresql">PostgreSQL</option>
                     <option value="sqlite">SQLite</option>
                     <option value="mssql">SQL Server</option>
                     <option value="oracle">Oracle</option>
                   </select>
+                  {dbConfig.type === 'mongodb' && (
+                    <small style={{ color: '#00ed64', fontWeight: '500', display: 'block', marginTop: '8px' }}>
+                      ✓ MongoDB selected - Schema Explorer will show Collections & Fields
+                    </small>
+                  )}
                 </div>
 
                 <div className="form-group">
@@ -2314,7 +3047,12 @@ LIMIT 100;`,
           <div key={notification.id} className={`notification notification-${notification.type}`}>
             <i className={`fas fa-${getNotificationIcon(notification.type)}`}></i>
             <span>{notification.message}</span>
-            <button className="close-notification" onClick={() => removeNotification(notification.id)}>
+            <button 
+              className="close-notification" 
+              onClick={() => removeNotification(notification.id)}
+              aria-label="Close notification"
+              title="Close"
+            >
               &times;
             </button>
           </div>

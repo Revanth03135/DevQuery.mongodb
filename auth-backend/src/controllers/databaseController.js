@@ -192,13 +192,17 @@ class DatabaseController {
       const { connectionId } = req.params;
       const { query, params, limit } = req.body;
 
+      const status = dbManager.getConnectionStatus(connectionId);
+      const isMongoDB = status?.type === 'mongodb';
+
       let finalQuery = query;
-      if (limit && typeof query === 'string' && !query.toLowerCase().includes('limit')) {
+      
+      // Only add LIMIT for SQL databases, not MongoDB
+      if (limit && typeof query === 'string' && !isMongoDB && !query.toLowerCase().includes('limit')) {
         finalQuery += ` LIMIT ${limit}`;
       }
 
       const execution = await dbManager.executeQuery(connectionId, finalQuery, params);
-      const status = dbManager.getConnectionStatus(connectionId);
       const normalized = DatabaseController.normalizeQueryResult(execution.data);
 
       await userManager.trackQuery(connectionId, {

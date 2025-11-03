@@ -13,40 +13,70 @@ const extractMongoFields = (doc, parentPath, fields) => {
     return;
   }
 
-  Object.entries(doc).forEach(([key, value]) => {
-    const path = parentPath ? `${parentPath}.${key}` : key;
-    const fieldMeta = fields.get(path) || {
-      types: new Set(),
-      nullable: false,
-      sample: null
-    };
+  try {
+    Object.entries(doc).forEach(([key, value]) => {
+      const path = parentPath ? `${parentPath}.${key}` : key;
+      const fieldMeta = fields.get(path) || {
+        types: new Set(),
+        nullable: false,
+        sample: null
+      };
 
-    if (value === null || value === undefined) {
-      fieldMeta.nullable = true;
-    } else {
-      const valueType = Array.isArray(value) ? 'array' : typeof value;
-      fieldMeta.types.add(valueType);
-      if (fieldMeta.sample === null) {
-        fieldMeta.sample = Array.isArray(value) ? value.slice(0, 3) : value;
-      }
-
-      if (valueType === 'object') {
-        extractMongoFields(value, path, fields);
-      }
-
-      if (Array.isArray(value)) {
-        value.slice(0, 5).forEach((item, index) => {
-          const itemType = Array.isArray(item) ? 'array' : typeof item;
-          fieldMeta.types.add(`array<${itemType}>`);
-          if (item && typeof item === 'object') {
-            extractMongoFields(item, `${path}[${index}]`, fields);
+      if (value === null || value === undefined) {
+        fieldMeta.nullable = true;
+      } else {
+        const valueType = Array.isArray(value) ? 'array' : typeof value;
+        
+        // Handle ObjectId and other MongoDB types
+        if (value && value.constructor && value.constructor.name === 'ObjectId') {
+          fieldMeta.types.add('ObjectId');
+        } else if (value instanceof Date) {
+          fieldMeta.types.add('Date');
+        } else {
+          fieldMeta.types.add(valueType);
+        }
+        
+        if (fieldMeta.sample === null) {
+          if (Array.isArray(value)) {
+            fieldMeta.sample = value.slice(0, 3);
+          } else if (value && value.constructor && value.constructor.name === 'ObjectId') {
+            fieldMeta.sample = value.toString();
+          } else if (value instanceof Date) {
+            fieldMeta.sample = value.toISOString();
+          } else {
+            fieldMeta.sample = value;
           }
-        });
-      }
-    }
+        }
 
-    fields.set(path, fieldMeta);
-  });
+        // Recurse into nested objects
+        if (valueType === 'object' && !Array.isArray(value) && !(value instanceof Date)) {
+          extractMongoFields(value, path, fields);
+        }
+
+        // Handle arrays
+        if (Array.isArray(value) && value.length > 0) {
+          value.slice(0, 5).forEach((item, index) => {
+            if (item !== null && item !== undefined) {
+              const itemType = Array.isArray(item) ? 'array' : 
+                               (item && item.constructor && item.constructor.name === 'ObjectId') ? 'ObjectId' :
+                               (item instanceof Date) ? 'Date' :
+                               typeof item;
+              fieldMeta.types.add(`array<${itemType}>`);
+              
+              if (item && typeof item === 'object' && !(item instanceof Date)) {
+                extractMongoFields(item, `${path}[${index}]`, fields);
+              }
+            }
+          });
+        }
+      }
+
+      fields.set(path, fieldMeta);
+    });
+  } catch (error) {
+    logger.error('Error extracting MongoDB fields:', error);
+    // Don't throw - just log and continue with other fields
+  }
 };
 
 class DatabaseConnectionManager {
@@ -281,6 +311,8 @@ class DatabaseConnectionManager {
       client,
       db,
       type: 'mongodb',
+      database: dbName,
+      host: config.host || url.match(/mongodb(?:\+srv)?:\/\/([^\/]+)\//)?.[1] || 'unknown',
       query: async (collection, operation, query = {}, options = {}) => {
         const coll = db.collection(collection);
         switch (operation) {
@@ -403,34 +435,79 @@ class DatabaseConnectionManager {
     const connectionData = this.activeConnections.get(connectionId);
 
     if (!connectionData) {
-      throw new Error('Connection not found or expired');
+      throw new Error('Connection not found or expired. Please reconnect to the database.');
     }
 
     try {
       connectionData.lastUsed = new Date();
 
       const startTime = Date.now();
-      const result = await connectionData.connection.query(query, params);
+      const { connection, config } = connectionData;
+      
+      // Validate connection is still alive
+      if (!connection) {
+        throw new Error('Database connection object is missing');
+      }
+      
+      let result;
+      let rowCount = 0;
+      let affectedRows = 0;
+      let insertId = null;
+
+      // Handle MongoDB differently
+      if (config.type === 'mongodb') {
+        logger.info(`Executing MongoDB query for connection ${connectionId}`);
+        
+        // Validate MongoDB connection
+        if (!connection.db) {
+          throw new Error('MongoDB database instance not available. Please reconnect.');
+        }
+        
+        const MongoQueryAdapter = require('./mongoQueryAdapter');
+        
+        // MongoDB queries use the db instance
+        result = await MongoQueryAdapter.executeMongoQuery(connection.db, query);
+        
+        rowCount = result.rowCount || 0;
+        affectedRows = result.affectedRows || 0;
+        insertId = result.insertedId || null;
+        
+        // Normalize MongoDB result to match SQL format
+        result = {
+          rows: result.rows || [],
+          rowCount: rowCount,
+          affectedRows: affectedRows,
+          insertId: insertId,
+          collection: result.collection,
+          operation: result.operation
+        };
+      } else {
+        // SQL databases
+        result = await connection.query(query, params);
+        
+        // Determine row count based on query type
+        // For SELECT: result.rows.length
+        // For INSERT/UPDATE/DELETE: result.affectedRows (MySQL) or result.rowCount (PostgreSQL)
+        rowCount = result.rows 
+          ? result.rows.length 
+          : result.affectedRows 
+          ? result.affectedRows 
+          : result.rowCount || 0;
+        
+        affectedRows = result.affectedRows || result.rowCount || 0;
+        insertId = result.insertId || null;
+      }
+
       const executionTime = Date.now() - startTime;
-
-      logger.info(`Query executed in ${executionTime}ms for connection ${connectionId}`);
-
-      // Determine row count based on query type
-      // For SELECT: result.rows.length
-      // For INSERT/UPDATE/DELETE: result.affectedRows (MySQL) or result.rowCount (PostgreSQL)
-      const rowCount = result.rows 
-        ? result.rows.length 
-        : result.affectedRows 
-        ? result.affectedRows 
-        : result.rowCount || 0;
+      logger.info(`Query executed in ${executionTime}ms for connection ${connectionId} (type: ${config.type})`);
 
       return {
         success: true,
         data: result,
         executionTime,
         rowCount: rowCount,
-        affectedRows: result.affectedRows || result.rowCount || 0,
-        insertId: result.insertId || null
+        affectedRows: affectedRows,
+        insertId: insertId
       };
     } catch (error) {
       logger.error(`Query execution failed for connection ${connectionId}:`, error);
@@ -523,19 +600,37 @@ class DatabaseConnectionManager {
           `;
           break;
         case 'mongodb': {
+          logger.info(`Retrieving MongoDB schema for connection ${connectionId}`);
+          
+          if (!connection.db) {
+            throw new Error('MongoDB database instance not found');
+          }
+          
           const collections = await connection.db.collections();
+          logger.info(`Found ${collections.length} collections in MongoDB`);
+          
           const schema = [];
 
           for (const coll of collections) {
+            const collName = coll.collectionName;
             const sampleDocs = await coll.find({}).limit(25).toArray();
             const fields = new Map();
 
-            sampleDocs.forEach((doc) => {
-              extractMongoFields(doc, '', fields);
-            });
+            if (sampleDocs.length > 0) {
+              sampleDocs.forEach((doc) => {
+                extractMongoFields(doc, '', fields);
+              });
+            } else {
+              // Empty collection - add _id field as default
+              fields.set('_id', {
+                types: new Set(['ObjectId']),
+                nullable: false,
+                sample: null
+              });
+            }
 
             schema.push({
-              table_name: coll.collectionName,
+              table_name: collName,
               columns: Array.from(fields.entries()).map(([path, meta]) => ({
                 name: path,
                 type: meta.types.size === 1 ? Array.from(meta.types)[0] : Array.from(meta.types).join(' | '),
@@ -547,6 +642,7 @@ class DatabaseConnectionManager {
             });
           }
 
+          logger.info(`MongoDB schema retrieved: ${schema.length} collections processed`);
           return { success: true, schema };
         }
         default:
