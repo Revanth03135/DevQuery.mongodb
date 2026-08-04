@@ -1,4 +1,6 @@
 const UserManager = require('../models/UserManager');
+const User = require('../models/User');
+const bcrypt = require('bcryptjs');
 const logger = require('../utils/logger');
 
 const userManager = new UserManager();
@@ -172,33 +174,35 @@ const reAuthenticate = async (req, res) => {
       });
     }
 
-    // Verify password by attempting login
-    try {
-      const userResult = await userManager.loginUser(
-        { username: email, password },
-        {
-          ipAddress: req.ip || req.connection.remoteAddress,
-          userAgent: req.get('User-Agent')
-        }
-      );
+    // Look up the user record and verify the password hash directly.
+    // We intentionally do NOT call loginUser() here because that function
+    // creates a brand-new session + refresh token on every invocation,
+    // leaking sessions whenever a user simply re-confirms their password.
+    const user = await User.findOne({
+      isActive: true,
+      $or: [{ email: email.toLowerCase() }, { username: email.trim() }]
+    });
 
-      logger.info(`User ${currentUser.id} re-authenticated successfully`);
-      res.json({
-        success: true,
-        message: 'Password verified successfully',
-        user: {
-          id: userResult.user.userId,
-          email: userResult.user.email,
-          username: userResult.user.username
-        }
-      });
-    } catch (loginError) {
-      logger.warn(`Re-authentication password verification failed for user ${currentUser.id}`);
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid password'
-      });
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'Invalid password' });
     }
+
+    const passwordValid = await bcrypt.compare(password, user.passwordHash);
+    if (!passwordValid) {
+      logger.warn(`Re-authentication password verification failed for user ${currentUser.id}`);
+      return res.status(401).json({ success: false, message: 'Invalid password' });
+    }
+
+    logger.info(`User ${currentUser.id} re-authenticated successfully`);
+    res.json({
+      success: true,
+      message: 'Password verified successfully',
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username
+      }
+    });
   } catch (error) {
     logger.error('Re-authentication error:', error);
     res.status(500).json({

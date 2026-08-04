@@ -73,7 +73,7 @@ const validateUserLogin = (req, res, next) => {
 
 const validateDatabaseConnection = (req, res, next) => {
   const schema = Joi.object({
-    connectionString: Joi.string().pattern(/^mongodb(\+srv)?:\/\//).optional(),
+    connectionString: Joi.string().pattern(/^(mongodb(\+srv)?|postgres(ql)?|mysql|sqlite|mssql):\/\//).optional(),
     type: Joi.string()
       .valid('postgresql', 'postgres', 'mysql', 'sqlite', 'sqlserver', 'mssql', 'oracle', 'mongodb', 'mongo')
       .when('connectionString', {
@@ -186,7 +186,10 @@ const validateAssistantMessage = (req, res, next) => {
       runQuery: Joi.boolean().default(true)
     })
       .default({})
-      .optional()
+      .optional(),
+    chatHistory: Joi.array().items(Joi.object()).optional(),
+    queryHistory: Joi.array().items(Joi.object()).optional(),
+    savedQueries: Joi.array().items(Joi.object()).optional()
   });
 
   const { error, value } = schema.validate(req.body, {

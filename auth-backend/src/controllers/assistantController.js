@@ -88,12 +88,14 @@ class AssistantController {
     const { message, connectionId, options = {}, chatHistory = [], queryHistory = [], savedQueries = [] } = req.body;
     const trimmedMessage = (message || '').trim();
 
-    // DEBUG: Log chat history to verify it's being received
-    logger.info(`Chat request received with ${chatHistory.length} history messages`);
-    if (chatHistory.length > 0) {
-      logger.info(`Last history message: ${JSON.stringify(chatHistory[chatHistory.length - 1])}`);
+    // Issue 4 fix: only log detailed chat context in non-production environments
+    if (process.env.NODE_ENV !== 'production') {
+      logger.info(`[DEBUG] Chat request received with ${chatHistory.length} history messages (capped to ${Math.min(chatHistory.length, 12)})`);
+      if (chatHistory.length > 0) {
+        logger.info(`[DEBUG] Last history message role: ${chatHistory[chatHistory.length - 1]?.role}`);
+      }
+      logger.info(`[DEBUG] Query history: ${queryHistory.length} queries, Saved queries: ${savedQueries.length} queries`);
     }
-    logger.info(`Query history: ${queryHistory.length} queries, Saved queries: ${savedQueries.length} queries`);
 
     if (!trimmedMessage) {
       return res.status(400).json({
@@ -123,7 +125,8 @@ class AssistantController {
           // Filter schema by whitelist if enabled
           if (Array.isArray(schema)) {
             const whitelistManager = WhitelistController.getManager();
-            const whitelist = whitelistManager.getWhitelist(connectionId);
+            // Use synchronous in-memory getter — whitelist is pre-loaded at connect time
+            const whitelist = whitelistManager.getWhitelistSync(connectionId);
             
             if (whitelist.enabled && Object.keys(whitelist.tables).length > 0) {
               // Filter to only include whitelisted tables
@@ -156,14 +159,16 @@ class AssistantController {
             }
           }
           
-          // DEBUG: Log schema retrieval
-          logger.info(`Schema retrieved for connectionId ${connectionId}:`, {
-            success: schemaResult.success,
-            schemaExists: !!schema,
-            schemaLength: Array.isArray(schema) ? schema.length : 'not-array',
-            schemaType: typeof schema,
-            firstTable: Array.isArray(schema) && schema[0] ? { name: schema[0].table_name, columns: schema[0].columns?.length } : null
-          });
+          // Issue 4 fix: only log schema details outside production
+          if (process.env.NODE_ENV !== 'production') {
+            logger.info(`[DEBUG] Schema retrieved for connectionId ${connectionId}:`, {
+              success: schemaResult.success,
+              schemaExists: !!schema,
+              schemaLength: Array.isArray(schema) ? schema.length : 'not-array',
+              schemaType: typeof schema,
+              firstTable: Array.isArray(schema) && schema[0] ? { name: schema[0].table_name, columns: schema[0].columns?.length } : null
+            });
+          }
         } catch (error) {
           logger.warn('Schema retrieval failed for assistant chat:', error.message);
           logger.error('Schema retrieval error details:', error);
@@ -234,7 +239,7 @@ class AssistantController {
       if (!isAllowed) {
         // Get whitelist status to provide better error message
         const whitelistManager = WhitelistController.getManager();
-        const whitelist = whitelistManager.getWhitelist(connectionId);
+        const whitelist = whitelistManager.getWhitelistSync(connectionId);
         
         let errorMessage;
         if (whitelist.enabled && Object.keys(whitelist.tables).length === 0) {

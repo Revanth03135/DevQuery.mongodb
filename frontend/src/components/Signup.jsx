@@ -10,6 +10,7 @@ function Signup({ setUser }) {
     email: '',
     password: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -26,7 +27,6 @@ function Signup({ setUser }) {
     setLoading(true);
     setError('');
 
-    // Validate form before sending
     if (!formData.email || !formData.email.includes('@')) {
       setError('Please enter a valid email address');
       setLoading(false);
@@ -64,6 +64,11 @@ function Signup({ setUser }) {
   return (
     <div className="login-page">
       <div className="login-container">
+        <div className="auth-logo">
+          <img src="/img1.png" alt="DevQuery Logo" />
+          <span>DevQuery</span>
+        </div>
+
         <form id="signupForm" onSubmit={handleSubmit}>
           <h2>Create Account</h2>
 
@@ -74,6 +79,7 @@ function Signup({ setUser }) {
             type="text"
             id="username"
             name="username"
+            placeholder="johndoe"
             value={formData.username}
             onChange={handleChange}
             required
@@ -84,9 +90,9 @@ function Signup({ setUser }) {
             type="text"
             id="name"
             name="fullName"
+            placeholder="John Doe"
             value={formData.fullName}
             onChange={handleChange}
-            required
           />
 
           <label htmlFor="email">Email</label>
@@ -94,27 +100,51 @@ function Signup({ setUser }) {
             type="email"
             id="email"
             name="email"
+            placeholder="john@example.com"
             value={formData.email}
             onChange={handleChange}
             required
           />
 
           <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
+          <div className="password-input-wrapper" style={{ position: 'relative' }}>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              id="password"
+              name="password"
+              placeholder="At least 6 characters"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              style={{ paddingRight: '40px' }}
+            />
+            <button
+              type="button"
+              className="password-toggle-btn"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: 'absolute',
+                right: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+              title={showPassword ? 'Hide password' : 'Show password'}
+            >
+              <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+            </button>
+          </div>
 
           <button type="submit" disabled={loading || !formData.email || !formData.password || (!formData.username && !formData.fullName)}>
             {loading ? 'Creating Account...' : 'Sign Up'}
           </button>
 
           <p className="signup-link">
-            Already have an account?
+            Already have an account?{' '}
             <Link to="/login">Log In</Link>
           </p>
         </form>

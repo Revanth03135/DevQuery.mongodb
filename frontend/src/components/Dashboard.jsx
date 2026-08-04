@@ -9,389 +9,19 @@ import WhitelistManager from './WhitelistManager';
 import SavedQueries from './SavedQueries';
 import QueryHistory from './QueryHistory';
 
-const normalizeSearchValue = (value) => {
-  if (value === null || value === undefined) return '';
-  if (typeof value === 'string') return value.toLowerCase();
-  if (typeof value === 'number' || typeof value === 'boolean') return String(value).toLowerCase();
-  try {
-    return JSON.stringify(value).toLowerCase();
-  } catch (error) {
-    return '';
-  }
-};
+// Extracted components
+import ERDRenderer from './ERDRenderer';
+import DocsRenderer from './DocsRenderer';
+import DashboardSidebar from './DashboardSidebar';
+import DashboardHeader from './DashboardHeader';
+import ChatMain from './ChatMain';
+import DatabaseConnectModal from './DatabaseConnectModal';
+import QueryResultsModal from './QueryResultsModal';
 
-const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+// Extracted utilities
+import { normalizeSearchValue, escapeRegExp, formatDefaultValue, formatResultValue } from '../utils/schemaUtils';
 
-// ERD Renderer Component
-const ERDRenderer = ({ tables, onTableClick }) => {
-  const [selectedTable, setSelectedTable] = useState(null);
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const canvasRef = useRef(null);
-
-  const handleTableClick = (table) => {
-    setSelectedTable(table);
-    onTableClick(table);
-  };
-
-  const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.1, 2));
-  const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.1, 0.5));
-  const handleResetView = () => { setZoom(1); setPan({ x: 0, y: 0 }); };
-
-  const handleMouseDown = (e) => {
-    if (e.button === 0 && e.target === canvasRef.current) {
-      setIsDragging(true);
-      setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
-    }
-  };
-
-  const handleMouseMove = (e) => {
-    if (isDragging) {
-      setPan({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
-    }
-  };
-
-  const handleMouseUp = () => setIsDragging(false);
-
-  useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-      return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [isDragging, dragStart]);
-
-  // Calculate table positions in a grid layout
-  const tablePositions = useMemo(() => {
-    const positions = [];
-    const columns = Math.ceil(Math.sqrt(tables.length));
-    const spacing = { x: 280, y: 300 };
-    const offset = { x: 50, y: 50 };
-
-    tables.forEach((table, idx) => {
-      const col = idx % columns;
-      const row = Math.floor(idx / columns);
-      positions.push({
-        table,
-        x: offset.x + col * spacing.x,
-        y: offset.y + row * spacing.y
-      });
-    });
-
-    return positions;
-  }, [tables]);
-
-  // Find relationships between tables
-  const relationships = useMemo(() => {
-    const rels = [];
-    tablePositions.forEach(({ table, x, y }) => {
-      const tableName = table.name;
-      (table.columns || []).forEach(column => {
-        // Simple FK detection: column name ends with _id and matches another table name
-        if (column.name.endsWith('_id')) {
-          const potentialTable = column.name.replace(/_id$/, '');
-          const targetPos = tablePositions.find(tp => 
-            tp.table.name.toLowerCase() === potentialTable.toLowerCase() ||
-            tp.table.name.toLowerCase() === potentialTable.toLowerCase() + 's'
-          );
-          if (targetPos && targetPos.table.name !== tableName) {
-            rels.push({
-              from: { table: tableName, x, y },
-              to: { table: targetPos.table.name, x: targetPos.x, y: targetPos.y },
-              column: column.name
-            });
-          }
-        }
-      });
-    });
-    return rels;
-  }, [tablePositions]);
-
-  return (
-    <div className="erd-container">
-      <div className="erd-controls">
-        <button onClick={handleZoomOut} className="btn btn-sm" title="Zoom Out">
-          <i className="fas fa-search-minus"></i>
-        </button>
-        <span className="erd-zoom-level">{Math.round(zoom * 100)}%</span>
-        <button onClick={handleZoomIn} className="btn btn-sm" title="Zoom In">
-          <i className="fas fa-search-plus"></i>
-        </button>
-        <button onClick={handleResetView} className="btn btn-sm" title="Reset View">
-          <i className="fas fa-redo"></i>
-        </button>
-        <span className="erd-info">{tables.length} tables • {relationships.length} relationships</span>
-      </div>
-      
-      <div 
-        ref={canvasRef}
-        className="erd-canvas"
-        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
-        onMouseDown={handleMouseDown}
-      >
-        <svg width="100%" height="100%" className="erd-svg">
-          <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
-            {/* Render relationships */}
-            {relationships.map((rel, idx) => {
-              const fromX = rel.from.x + 120;
-              const fromY = rel.from.y + 30;
-              const toX = rel.to.x + 120;
-              const toY = rel.to.y + 30;
-              
-              return (
-                <g key={`rel-${idx}`}>
-                  <line
-                    x1={fromX}
-                    y1={fromY}
-                    x2={toX}
-                    y2={toY}
-                    stroke="#6366f1"
-                    strokeWidth="2"
-                    markerEnd="url(#arrowhead)"
-                    opacity="0.6"
-                  />
-                  <title>{`${rel.from.table}.${rel.column} → ${rel.to.table}`}</title>
-                </g>
-              );
-            })}
-            
-            {/* Arrow marker definition */}
-            <defs>
-              <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                <polygon points="0 0, 10 3, 0 6" fill="#6366f1" />
-              </marker>
-            </defs>
-          </g>
-        </svg>
-
-        <div style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`, transformOrigin: '0 0' }}>
-          {tablePositions.map(({ table, x, y }, idx) => {
-            const pkColumns = (table.columns || []).filter(c => c.primaryKey || c.key === 'PRI');
-            const fkColumns = (table.columns || []).filter(c => c.name.endsWith('_id'));
-            const isSelected = selectedTable?.name === table.name;
-
-            return (
-              <div
-                key={`table-${idx}`}
-                className={`erd-table ${isSelected ? 'selected' : ''}`}
-                style={{ left: `${x}px`, top: `${y}px` }}
-                onClick={(e) => { e.stopPropagation(); handleTableClick(table); }}
-              >
-                <div className="erd-table-header">
-                  <i className="fas fa-table"></i>
-                  <span className="erd-table-name">{table.name}</span>
-                  <span className="erd-table-count">{table.columns?.length || 0}</span>
-                </div>
-                <div className="erd-table-body">
-                  {pkColumns.map((col, cidx) => (
-                    <div key={`pk-${cidx}`} className="erd-column primary">
-                      <i className="fas fa-key"></i>
-                      <span>{col.name}</span>
-                      <span className="erd-column-type">{col.type}</span>
-                    </div>
-                  ))}
-                  {fkColumns.map((col, cidx) => (
-                    <div key={`fk-${cidx}`} className="erd-column foreign">
-                      <i className="fas fa-link"></i>
-                      <span>{col.name}</span>
-                      <span className="erd-column-type">{col.type}</span>
-                    </div>
-                  ))}
-                  {(table.columns || []).filter(c => !c.primaryKey && c.key !== 'PRI' && !c.name.endsWith('_id')).slice(0, 5).map((col, cidx) => (
-                    <div key={`col-${cidx}`} className="erd-column">
-                      <i className="fas fa-circle" style={{ fontSize: '4px' }}></i>
-                      <span>{col.name}</span>
-                      <span className="erd-column-type">{col.type}</span>
-                    </div>
-                  ))}
-                  {(table.columns?.length || 0) > (pkColumns.length + fkColumns.length + 5) && (
-                    <div className="erd-column-more">
-                      +{(table.columns?.length || 0) - (pkColumns.length + fkColumns.length + 5)} more...
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Docs Renderer Component
-const DocsRenderer = ({ tables, dbConnection }) => {
-  const [format, setFormat] = useState('markdown');
-  const [selectedTable, setSelectedTable] = useState(null);
-
-  const generateMarkdown = () => {
-    let md = `# Database Documentation\n\n`;
-    md += `**Database**: ${dbConnection?.database || 'N/A'}\n`;
-    md += `**Type**: ${dbConnection?.dbType?.toUpperCase() || 'N/A'}\n`;
-    md += `**Generated**: ${new Date().toLocaleString()}\n`;
-    md += `**Total Tables**: ${tables.length}\n\n`;
-    md += `---\n\n`;
-
-    tables.forEach(table => {
-      md += `## Table: \`${table.name}\`\n\n`;
-      md += `**Columns**: ${table.columns?.length || 0}\n\n`;
-
-      if (table.columns && table.columns.length > 0) {
-        md += `| Column | Type | Nullable | Default | Key |\n`;
-        md += `|--------|------|----------|---------|-----|\n`;
-        table.columns.forEach(col => {
-          const nullable = col.nullable ? 'YES' : 'NO';
-          const defaultVal = col.defaultValue || '-';
-          const key = col.primaryKey || col.key === 'PRI' ? '🔑 PK' : col.name.endsWith('_id') ? '🔗 FK' : '-';
-          md += `| ${col.name} | ${col.type} | ${nullable} | ${defaultVal} | ${key} |\n`;
-        });
-        md += `\n`;
-      }
-
-      const pkCols = (table.columns || []).filter(c => c.primaryKey || c.key === 'PRI');
-      const fkCols = (table.columns || []).filter(c => c.name.endsWith('_id'));
-
-      if (pkCols.length > 0 || fkCols.length > 0) {
-        md += `**Relationships**:\n`;
-        if (pkCols.length > 0) {
-          md += `- Primary Key: ${pkCols.map(c => c.name).join(', ')}\n`;
-        }
-        if (fkCols.length > 0) {
-          md += `- Foreign Keys: ${fkCols.map(c => c.name).join(', ')}\n`;
-        }
-        md += `\n`;
-      }
-
-      md += `---\n\n`;
-    });
-
-    return md;
-  };
-
-  const generateHTML = () => {
-    const md = generateMarkdown();
-    // Simple markdown to HTML conversion
-    let html = md
-      .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-      .replace(/^## (.*$)/gm, '<h2>$1</h2>')
-      .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/`(.*?)`/g, '<code>$1</code>')
-      .replace(/^---$/gm, '<hr>')
-      .replace(/\n\n/g, '</p><p>')
-      .replace(/^\|(.+)\|$/gm, (match) => {
-        const cells = match.split('|').filter(Boolean).map(c => c.trim());
-        return '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
-      });
-    
-    html = `<div class="docs-html"><p>${html}</p></div>`;
-    return html;
-  };
-
-  const generateJSON = () => {
-    return JSON.stringify({
-      database: dbConnection?.database || 'N/A',
-      type: dbConnection?.dbType || 'N/A',
-      generatedAt: new Date().toISOString(),
-      tables: tables.map(table => ({
-        name: table.name,
-        columnCount: table.columns?.length || 0,
-        columns: (table.columns || []).map(col => ({
-          name: col.name,
-          type: col.type,
-          nullable: col.nullable,
-          defaultValue: col.defaultValue,
-          isPrimaryKey: col.primaryKey || col.key === 'PRI',
-          isForeignKey: col.name.endsWith('_id')
-        }))
-      }))
-    }, null, 2);
-  };
-
-  const handleExport = () => {
-    let content, filename, mimeType;
-
-    if (format === 'markdown') {
-      content = generateMarkdown();
-      filename = `database-docs-${Date.now()}.md`;
-      mimeType = 'text/markdown';
-    } else if (format === 'html') {
-      content = generateHTML();
-      filename = `database-docs-${Date.now()}.html`;
-      mimeType = 'text/html';
-    } else {
-      content = generateJSON();
-      filename = `database-docs-${Date.now()}.json`;
-      mimeType = 'application/json';
-    }
-
-    const blob = new Blob([content], { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleCopy = () => {
-    const content = format === 'markdown' ? generateMarkdown() : format === 'html' ? generateHTML() : generateJSON();
-    navigator.clipboard.writeText(content);
-  };
-
-  const renderContent = () => {
-    if (format === 'markdown') {
-      return <pre className="docs-content markdown">{generateMarkdown()}</pre>;
-    } else if (format === 'html') {
-      return <div className="docs-content html" dangerouslySetInnerHTML={{ __html: generateHTML() }} />;
-    } else {
-      return <pre className="docs-content json">{generateJSON()}</pre>;
-    }
-  };
-
-  return (
-    <div className="docs-container">
-      <div className="docs-toolbar">
-        <div className="docs-format-toggle">
-          <button 
-            className={`btn btn-sm ${format === 'markdown' ? 'active' : ''}`}
-            onClick={() => setFormat('markdown')}
-          >
-            <i className="fab fa-markdown"></i> Markdown
-          </button>
-          <button 
-            className={`btn btn-sm ${format === 'html' ? 'active' : ''}`}
-            onClick={() => setFormat('html')}
-          >
-            <i className="fab fa-html5"></i> HTML
-          </button>
-          <button 
-            className={`btn btn-sm ${format === 'json' ? 'active' : ''}`}
-            onClick={() => setFormat('json')}
-          >
-            <i className="fas fa-code"></i> JSON
-          </button>
-        </div>
-        <div className="docs-actions">
-          <button className="btn btn-sm" onClick={handleCopy} title="Copy to clipboard">
-            <i className="fas fa-copy"></i> Copy
-          </button>
-          <button className="btn btn-sm btn-primary" onClick={handleExport} title="Export documentation">
-            <i className="fas fa-download"></i> Export
-          </button>
-        </div>
-      </div>
-      <div className="docs-preview">
-        {renderContent()}
-      </div>
-    </div>
-  );
-};
+// ERDRenderer, DocsRenderer are now imported from separate files
 
 function Dashboard({ user }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -400,6 +30,7 @@ function Dashboard({ user }) {
   const [showQueryHistoryModal, setShowQueryHistoryModal] = useState(false);
   const [showWriteConfirmation, setShowWriteConfirmation] = useState(false);
   const [pendingWriteOperation, setPendingWriteOperation] = useState(null);
+  const [showClearChatModal, setShowClearChatModal] = useState(false);
   const {
     showSQLDrawer,
     dragEnabled,
@@ -472,230 +103,230 @@ function Dashboard({ user }) {
     setActiveTab('results');
   };
 
-    const handleSendChat = async (e) => {
-      e.preventDefault();
-      if (!chatInput.trim() || assistantLoading) return;
+  const handleSendChat = async (e) => {
+    e.preventDefault();
+    if (!chatInput.trim() || assistantLoading) return;
 
-      const userMessage = chatInput.trim();
-      const timestamp = new Date().toISOString();
+    const userMessage = chatInput.trim();
+    const timestamp = new Date().toISOString();
 
-      // Check for display mode keywords
-      const showKeywords = ['show', 'display', 'popup', 'window', 'open'];
-      const inlineKeywords = ['here', 'in chat', 'inline'];
-      
-      const messageLower = userMessage.toLowerCase();
-      const shouldPopup = showKeywords.some(keyword => messageLower.includes(keyword)) && 
-                         !inlineKeywords.some(keyword => messageLower.includes(keyword));
-      const shouldInline = inlineKeywords.some(keyword => messageLower.includes(keyword));
+    // Check for display mode keywords
+    const showKeywords = ['show', 'display', 'popup', 'window', 'open'];
+    const inlineKeywords = ['here', 'in chat', 'inline'];
+
+    const messageLower = userMessage.toLowerCase();
+    const shouldPopup = showKeywords.some(keyword => messageLower.includes(keyword)) &&
+      !inlineKeywords.some(keyword => messageLower.includes(keyword));
+    const shouldInline = inlineKeywords.some(keyword => messageLower.includes(keyword));
+
+    setChatMessages((msgs) => [
+      ...msgs,
+      { sender: 'user', type: 'text', text: userMessage, timestamp }
+    ]);
+    setChatInput('');
+    setAssistantLoading(true);
+
+    try {
+      // Get query history and saved queries from localStorage
+      const queryHistory = JSON.parse(localStorage.getItem('queryHistory') || '[]');
+      const savedQueries = JSON.parse(localStorage.getItem('savedQueries') || '[]');
+
+      const payload = {
+        message: userMessage,
+        connectionId: dbConnection?.connectionId || undefined,
+        options: { runQuery: true },
+        // Include chat history for context (last 20 messages, excluding welcome message and results)
+        chatHistory: chatMessages
+          .filter(msg => {
+            // Exclude welcome message
+            if (msg.text?.includes('Hi! I am your database assistant')) return false;
+            // Exclude result tables (too much data)
+            if (msg.type === 'results') return false;
+            // Include everything else
+            return true;
+          })
+          .slice(-20)
+          .map(msg => ({
+            role: msg.sender === 'bot' ? 'assistant' : msg.sender === 'user' ? 'user' : 'system',
+            content: msg.text || msg.content || ''
+          })),
+        // Include query history (last 10 queries for context)
+        queryHistory: queryHistory.slice(0, 10).map(q => ({
+          sql: q.sql,
+          explanation: q.explanation,
+          executedAt: q.executedAt,
+          status: q.status,
+          resultCount: q.resultCount,
+          executionTime: q.executionTime
+        })),
+        // Include saved queries (last 10 for context)
+        savedQueries: savedQueries.slice(0, 10).map(q => ({
+          sql: q.sql,
+          explanation: q.explanation,
+          createdAt: q.createdAt,
+          name: q.name || 'Unnamed Query'
+        }))
+      };
+
+      const response = await api.post('/api/assistant/chat', payload);
+
+      const assistantMessages = Array.isArray(response.data?.data?.messages)
+        ? response.data.data.messages
+          .map((msg) => {
+            if (!msg?.content) return null;
+            const role = msg.role === 'assistant' ? 'bot' : msg.role === 'user' ? 'user' : 'system';
+            return {
+              sender: role,
+              type: msg.type || 'text',
+              text: msg.content,
+              timestamp: msg.timestamp || new Date().toISOString()
+            };
+          })
+          .filter(Boolean)
+        : [];
+
+      if (assistantMessages.length) {
+        setChatMessages((msgs) => [...msgs, ...assistantMessages]);
+      }
+
+      const result = response.data?.data?.result;
+      const meta = response.data?.data?.meta;
+
+      // Check if write operation requires confirmation
+      if (meta?.requiresConfirmation || result?.intent === 'require_confirmation') {
+        setPendingWriteOperation({
+          sql: result?.sql || '',
+          message: result?.explanation || 'Please review and confirm this database write operation.',
+          affectedTable: meta?.affectedTable || null,
+          affectedColumns: meta?.affectedColumns || [],
+          connectionId: dbConnection?.connectionId
+        });
+        setShowWriteConfirmation(true);
+        return;
+      }
+
+      if (result) {
+        if (result.sql) {
+          setGeneratedSQL(result.sql);
+        }
+        if (result.explanation) {
+          setExplanation(result.explanation);
+        }
+
+        const cautions = Array.isArray(result.cautions) ? result.cautions : [];
+
+        // Detect intent from user message and response
+        const messageLower = userMessage.toLowerCase();
+        const hasExplainKeywords = ['explain', 'how does', 'what does', 'why', 'understanding'];
+        const hasResultKeywords = ['show', 'result', 'display', 'fetch', 'get', 'retrieve', 'find', 'list', 'count', 'sum', 'average', 'select'];
+
+        const wantsExplanation = hasExplainKeywords.some(kw => messageLower.includes(kw));
+        const wantsResults = hasResultKeywords.some(kw => messageLower.includes(kw));
+
+        if (Array.isArray(result.rows) || Array.isArray(result.columns)) {
+          applyQueryResults(result.rows || [], result.columns || [], {
+            rowCount: result.rowCount,
+            executionTime: result.executionTime,
+            provider: result.provider || 'assistant',
+            model: result.model || null,
+            confidence: result.confidence || null,
+            intent: result.intent,
+            cautions
+          });
+
+          // Save automatic query execution to history
+          if (result.sql) {
+            saveQueryToHistory(
+              result.sql,
+              result.executionTime || 0,
+              result.rowCount || (result.rows || []).length,
+              'success'
+            );
+          }
+
+          // Smart tab: If user asked for explanation + result, prioritize results popup
+          // but also show explanation below results
+          if (wantsExplanation && wantsResults) {
+            // User asked for both explanation and results
+            setModalMode('popup');
+            setShowResultsModal(true);
+            // Show explanation in a notification
+            if (result.explanation) {
+              showNotification(`📊 Results shown above. Explanation: ${result.explanation.substring(0, 100)}...`, 'info');
+            }
+          } else if (shouldPopup) {
+            setModalMode('popup');
+            setShowResultsModal(true);
+            showNotification('Results displayed in popup window.', 'success');
+          } else if (shouldInline) {
+            // Add results table to chat
+            setChatMessages((msgs) => [
+              ...msgs,
+              {
+                sender: 'bot',
+                type: 'results',
+                text: JSON.stringify({ rows: result.rows || [], columns: result.columns || [] }),
+                timestamp: new Date().toISOString()
+              }
+            ]);
+            showNotification('Results displayed in chat.', 'success');
+          } else {
+            // Default: show popup
+            setModalMode('popup');
+            setShowResultsModal(true);
+            showNotification('Results displayed automatically.', 'success');
+          }
+        } else if (result.sql) {
+          // Smart tab: Determine which tab to show based on user intent
+          if (wantsExplanation && result.explanation) {
+            setActiveTab('explanation');
+            showNotification('📖 Explanation displayed.', 'info');
+          } else if (wantsResults) {
+            // If results are wanted but no data, show SQL tab
+            setActiveTab('sql');
+          } else {
+            // Default: show SQL tab
+            setActiveTab('sql');
+          }
+
+          setQueryMetadata((prev) => ({
+            ...(prev || {}),
+            rowCount: prev?.rowCount ?? 0,
+            provider: result.provider || 'assistant',
+            model: result.model || null,
+            confidence: result.confidence || null,
+            cautions
+          }));
+          showNotification('Assistant generated SQL. Review before executing.', 'info');
+        }
+      }
+    } catch (error) {
+      const errorCode = error.response?.data?.code;
+      const errorMessage = error.response?.data?.message || 'The assistant could not respond.';
+      const fallbackText =
+        errorCode === 'AI_CONFIG_MISSING'
+          ? 'AI assistant is not configured yet. Set GEMINI_API_KEY on the backend to enable automated SQL.'
+          : `⚠️ ${errorMessage}`;
 
       setChatMessages((msgs) => [
         ...msgs,
-        { sender: 'user', type: 'text', text: userMessage, timestamp }
+        {
+          sender: 'bot',
+          type: 'note',
+          text: fallbackText,
+          timestamp: new Date().toISOString()
+        }
       ]);
-      setChatInput('');
-      setAssistantLoading(true);
 
-      try {
-        // Get query history and saved queries from localStorage
-        const queryHistory = JSON.parse(localStorage.getItem('queryHistory') || '[]');
-        const savedQueries = JSON.parse(localStorage.getItem('savedQueries') || '[]');
-        
-        const payload = {
-          message: userMessage,
-          connectionId: dbConnection?.connectionId || undefined,
-          options: { runQuery: true },
-          // Include chat history for context (last 20 messages, excluding welcome message and results)
-          chatHistory: chatMessages
-            .filter(msg => {
-              // Exclude welcome message
-              if (msg.text?.includes('Hi! I am your database assistant')) return false;
-              // Exclude result tables (too much data)
-              if (msg.type === 'results') return false;
-              // Include everything else
-              return true;
-            })
-            .slice(-20)
-            .map(msg => ({
-              role: msg.sender === 'bot' ? 'assistant' : msg.sender === 'user' ? 'user' : 'system',
-              content: msg.text || msg.content || ''
-            })),
-          // Include query history (last 10 queries for context)
-          queryHistory: queryHistory.slice(0, 10).map(q => ({
-            sql: q.sql,
-            explanation: q.explanation,
-            executedAt: q.executedAt,
-            status: q.status,
-            resultCount: q.resultCount,
-            executionTime: q.executionTime
-          })),
-          // Include saved queries (last 10 for context)
-          savedQueries: savedQueries.slice(0, 10).map(q => ({
-            sql: q.sql,
-            explanation: q.explanation,
-            createdAt: q.createdAt,
-            name: q.name || 'Unnamed Query'
-          }))
-        };
-
-        const response = await api.post('/api/assistant/chat', payload);
-
-        const assistantMessages = Array.isArray(response.data?.data?.messages)
-          ? response.data.data.messages
-              .map((msg) => {
-                if (!msg?.content) return null;
-                const role = msg.role === 'assistant' ? 'bot' : msg.role === 'user' ? 'user' : 'system';
-                return {
-                  sender: role,
-                  type: msg.type || 'text',
-                  text: msg.content,
-                  timestamp: msg.timestamp || new Date().toISOString()
-                };
-              })
-              .filter(Boolean)
-          : [];
-
-        if (assistantMessages.length) {
-          setChatMessages((msgs) => [...msgs, ...assistantMessages]);
-        }
-
-        const result = response.data?.data?.result;
-        const meta = response.data?.data?.meta;
-        
-        // Check if write operation requires confirmation
-        if (meta?.requiresConfirmation || result?.intent === 'require_confirmation') {
-          setPendingWriteOperation({
-            sql: result?.sql || '',
-            message: result?.explanation || 'Please review and confirm this database write operation.',
-            affectedTable: meta?.affectedTable || null,
-            affectedColumns: meta?.affectedColumns || [],
-            connectionId: dbConnection?.connectionId
-          });
-          setShowWriteConfirmation(true);
-          return;
-        }
-        
-        if (result) {
-          if (result.sql) {
-            setGeneratedSQL(result.sql);
-          }
-          if (result.explanation) {
-            setExplanation(result.explanation);
-          }
-
-          const cautions = Array.isArray(result.cautions) ? result.cautions : [];
-
-          // Detect intent from user message and response
-          const messageLower = userMessage.toLowerCase();
-          const hasExplainKeywords = ['explain', 'how does', 'what does', 'why', 'understanding'];
-          const hasResultKeywords = ['show', 'result', 'display', 'fetch', 'get', 'retrieve', 'find', 'list', 'count', 'sum', 'average', 'select'];
-          
-          const wantsExplanation = hasExplainKeywords.some(kw => messageLower.includes(kw));
-          const wantsResults = hasResultKeywords.some(kw => messageLower.includes(kw));
-
-          if (Array.isArray(result.rows) || Array.isArray(result.columns)) {
-            applyQueryResults(result.rows || [], result.columns || [], {
-              rowCount: result.rowCount,
-              executionTime: result.executionTime,
-              provider: result.provider || 'assistant',
-              model: result.model || null,
-              confidence: result.confidence || null,
-              intent: result.intent,
-              cautions
-            });
-
-            // Save automatic query execution to history
-            if (result.sql) {
-              saveQueryToHistory(
-                result.sql, 
-                result.executionTime || 0, 
-                result.rowCount || (result.rows || []).length, 
-                'success'
-              );
-            }
-
-            // Smart tab: If user asked for explanation + result, prioritize results popup
-            // but also show explanation below results
-            if (wantsExplanation && wantsResults) {
-              // User asked for both explanation and results
-              setModalMode('popup');
-              setShowResultsModal(true);
-              // Show explanation in a notification
-              if (result.explanation) {
-                showNotification(`📊 Results shown above. Explanation: ${result.explanation.substring(0, 100)}...`, 'info');
-              }
-            } else if (shouldPopup) {
-              setModalMode('popup');
-              setShowResultsModal(true);
-              showNotification('Results displayed in popup window.', 'success');
-            } else if (shouldInline) {
-              // Add results table to chat
-              setChatMessages((msgs) => [
-                ...msgs,
-                {
-                  sender: 'bot',
-                  type: 'results',
-                  text: JSON.stringify({ rows: result.rows || [], columns: result.columns || [] }),
-                  timestamp: new Date().toISOString()
-                }
-              ]);
-              showNotification('Results displayed in chat.', 'success');
-            } else {
-              // Default: show popup
-              setModalMode('popup');
-              setShowResultsModal(true);
-              showNotification('Results displayed automatically.', 'success');
-            }
-          } else if (result.sql) {
-            // Smart tab: Determine which tab to show based on user intent
-            if (wantsExplanation && result.explanation) {
-              setActiveTab('explanation');
-              showNotification('📖 Explanation displayed.', 'info');
-            } else if (wantsResults) {
-              // If results are wanted but no data, show SQL tab
-              setActiveTab('sql');
-            } else {
-              // Default: show SQL tab
-              setActiveTab('sql');
-            }
-            
-            setQueryMetadata((prev) => ({
-              ...(prev || {}),
-              rowCount: prev?.rowCount ?? 0,
-              provider: result.provider || 'assistant',
-              model: result.model || null,
-              confidence: result.confidence || null,
-              cautions
-            }));
-            showNotification('Assistant generated SQL. Review before executing.', 'info');
-          }
-        }
-      } catch (error) {
-        const errorCode = error.response?.data?.code;
-        const errorMessage = error.response?.data?.message || 'The assistant could not respond.';
-        const fallbackText =
-          errorCode === 'AI_CONFIG_MISSING'
-            ? 'AI assistant is not configured yet. Set GEMINI_API_KEY on the backend to enable automated SQL.'
-            : `⚠️ ${errorMessage}`;
-
-        setChatMessages((msgs) => [
-          ...msgs,
-          {
-            sender: 'bot',
-            type: 'note',
-            text: fallbackText,
-            timestamp: new Date().toISOString()
-          }
-        ]);
-
-        if (errorCode === 'AI_CONFIG_MISSING') {
-          showNotification('Configure GEMINI_API_KEY to unlock AI automation.', 'warning');
-        } else {
-          showNotification('Assistant response failed.', 'error');
-        }
-      } finally {
-        setAssistantLoading(false);
+      if (errorCode === 'AI_CONFIG_MISSING') {
+        showNotification('Configure GEMINI_API_KEY to unlock AI automation.', 'warning');
+      } else {
+        showNotification('Assistant response failed.', 'error');
       }
-    };
+    } finally {
+      setAssistantLoading(false);
+    }
+  };
 
   const handleConfirmWrite = async () => {
     if (!pendingWriteOperation) return;
@@ -711,7 +342,7 @@ function Dashboard({ user }) {
       });
 
       const data = response.data;
-      
+
       if (data.success && data.executed !== false) {
         const result = data.data?.result || data.result;
         const rowsAffected = result?.rowsAffected || result?.affectedRows || 0;
@@ -719,11 +350,11 @@ function Dashboard({ user }) {
         const insertId = result?.insertId || null;
         const table = pendingWriteOperation.affectedTable || 'table';
         const columns = pendingWriteOperation.affectedColumns || [];
-        
+
         // Update Query Generator with the executed SQL
         setGeneratedSQL(pendingWriteOperation.sql);
         setExplanation(`Write operation executed on table '${table}'`);
-        
+
         // Show results in popup with write operation details
         const writeResultRows = [{
           'Status': '✅ Success',
@@ -732,10 +363,10 @@ function Dashboard({ user }) {
           'Execution Time': `${executionTime}ms`,
           ...(insertId ? { 'Insert ID': insertId } : {})
         }];
-        
+
         const writeResultColumns = ['Status', 'Rows Affected', 'Table', 'Execution Time'];
         if (insertId) writeResultColumns.push('Insert ID');
-        
+
         applyQueryResults(writeResultRows, writeResultColumns, {
           rowCount: 1,
           executionTime,
@@ -745,19 +376,19 @@ function Dashboard({ user }) {
           intent: 'write_executed',
           cautions: []
         });
-        
+
         // Show results modal
         setModalMode('popup');
         setShowResultsModal(true);
-        
+
         // Save write operation to history
         saveQueryToHistory(
-          pendingWriteOperation.sql, 
-          executionTime, 
-          rowsAffected, 
+          pendingWriteOperation.sql,
+          executionTime,
+          rowsAffected,
           'success'
         );
-        
+
         // Create detailed success message
         let successMessage = `✅ Operation completed successfully!\n`;
         successMessage += `• Rows affected: ${rowsAffected}\n`;
@@ -769,14 +400,14 @@ function Dashboard({ user }) {
           successMessage += `• Insert ID: ${insertId}\n`;
         }
         successMessage += `• Execution time: ${executionTime}ms`;
-        
+
         setChatMessages(prev => [...prev, {
           sender: 'bot',
           type: 'text',
           text: successMessage,
           timestamp: new Date().toISOString()
         }]);
-        
+
         showNotification(`✅ ${rowsAffected} row(s) affected successfully!`, 'success');
       } else if (data.executed === false) {
         // Operation was not executed (likely cancelled or validation failed)
@@ -787,28 +418,28 @@ function Dashboard({ user }) {
           timestamp: new Date().toISOString()
         }]);
       }
-      
+
       setShowWriteConfirmation(false);
       setPendingWriteOperation(null);
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || 'Write operation failed';
-      
+
       // Save failed write operation to history
       saveQueryToHistory(
-        pendingWriteOperation.sql, 
-        0, 
-        0, 
-        'error', 
+        pendingWriteOperation.sql,
+        0,
+        0,
+        'error',
         errorMessage
       );
-      
+
       setChatMessages(prev => [...prev, {
         sender: 'bot',
         type: 'note',
         text: `❌ Error: ${errorMessage}`,
         timestamp: new Date().toISOString()
       }]);
-      
+
       showNotification(`Write operation failed: ${errorMessage}`, 'error');
       setShowWriteConfirmation(false);
       setPendingWriteOperation(null);
@@ -820,14 +451,14 @@ function Dashboard({ user }) {
   const handleCancelWrite = () => {
     setShowWriteConfirmation(false);
     setPendingWriteOperation(null);
-    
+
     setChatMessages(prev => [...prev, {
       sender: 'bot',
       type: 'text',
       text: '❌ Write operation cancelled by user.',
       timestamp: new Date().toISOString()
     }]);
-    
+
     showNotification('Write operation cancelled', 'info');
   };
 
@@ -862,7 +493,7 @@ function Dashboard({ user }) {
   const [schemaViewMode, setSchemaViewMode] = useState('tables');
   const [isSchemaCollapsed, setIsSchemaCollapsed] = useState(false);
   const navigate = useNavigate();
-  
+
   // Track if chat restore notification was shown to prevent duplicates
   const chatRestoreNotifiedRef = useRef(false);
 
@@ -992,7 +623,7 @@ function Dashboard({ user }) {
       navigate('/login');
       return;
     }
-    
+
     const cachedSchema = localStorage.getItem('devquery.schema');
     if (cachedSchema) {
       try {
@@ -1078,13 +709,13 @@ function Dashboard({ user }) {
         e.preventDefault();
         handleExecuteQuery();
       }
-      
+
       // Ctrl+Shift+G to generate SQL
       if (e.ctrlKey && e.shiftKey && e.key === 'G') {
         e.preventDefault();
         handleGenerateSQL();
       }
-      
+
       // Escape to close modals
       if (e.key === 'Escape') {
         setShowDbModal(false);
@@ -1092,7 +723,7 @@ function Dashboard({ user }) {
     };
 
     document.addEventListener('keydown', handleKeyboard);
-    
+
     return () => {
       document.removeEventListener('keydown', handleKeyboard);
     };
@@ -1127,7 +758,7 @@ function Dashboard({ user }) {
       const tables = transformSchemaResponse(response.data.data);
       console.log('✅ Transformed tables:', tables);
       console.log('📈 Number of collections/tables:', tables.length);
-      
+
       setSchemaData(prev => ({ ...prev, tables, loading: false }));
       localStorage.setItem('devquery.schema', JSON.stringify({ tables }));
     } catch (error) {
@@ -1300,7 +931,7 @@ function Dashboard({ user }) {
 
   const generateDemoSQL = (naturalLanguage) => {
     const input = naturalLanguage.toLowerCase();
-    
+
     if (input.includes('users') && input.includes('month')) {
       return {
         sql: `SELECT u.id, u.name, u.email, u.created_at
@@ -1389,14 +1020,14 @@ LIMIT 100;`,
         const payload = response.data.data || {};
         const executionTime = performance.now() - startTime;
         const resultCount = (payload.rows || []).length;
-        
+
         applyQueryResults(payload.rows || [], payload.columns || [], {
           rowCount: payload.rowCount,
           executionTime: payload.executionTime || executionTime,
           provider: payload.provider || 'manual',
           intent: payload.intent || 'manual_execute'
         });
-        
+
         // Save to query history
         saveQueryToHistory(generatedSQL, executionTime, resultCount, 'success');
         showNotification('Query executed successfully!', 'success');
@@ -1618,7 +1249,7 @@ LIMIT 100;`,
         const { sql, explanation } = response.data.data;
         setGeneratedSQL(sql);
         setExplanation(explanation || `Insight for ${tableName}.${column.name}`);
-        
+
         // Smart display: Show explanation tab if available, otherwise show SQL
         if (explanation) {
           setActiveTab('explanation');
@@ -1741,9 +1372,9 @@ LIMIT 100;`,
 
       if (response.data?.success) {
         showNotification(response.data.message || 'Database disconnected successfully.', 'info');
-  setDbConnection(null);
-  setConnectionStatus('disconnected');
-  setSchemaData(prev => ({ ...prev, tables: [], loading: false, error: null }));
+        setDbConnection(null);
+        setConnectionStatus('disconnected');
+        setSchemaData(prev => ({ ...prev, tables: [], loading: false, error: null }));
         setSchemaSearch('');
         setSelectedTable(null);
         setIsSchemaCollapsed(false);
@@ -1762,14 +1393,10 @@ LIMIT 100;`,
   };
 
   const handleRefreshChat = () => {
-    // Confirm before clearing chat history
-    const confirmed = window.confirm(
-      'Are you sure you want to clear the chat history? This will delete all conversation messages.'
-    );
-    
-    if (!confirmed) return;
+    setShowClearChatModal(true);
+  };
 
-    // Reset chat to initial state
+  const handleConfirmClearChat = () => {
     const welcomeMessage = [
       {
         sender: 'bot',
@@ -1778,17 +1405,17 @@ LIMIT 100;`,
         timestamp: new Date().toISOString()
       }
     ];
-    
+
     setChatMessages(welcomeMessage);
     setChatInput('');
-    
-    // Clear from localStorage
+    setShowClearChatModal(false);
+
     try {
       localStorage.removeItem('devquery.chatHistory');
     } catch (error) {
       console.error('Failed to clear chat history from storage:', error);
     }
-    
+
     showNotification('Chat cleared. Starting fresh conversation.', 'info');
   };
 
@@ -1823,7 +1450,7 @@ LIMIT 100;`,
           const sender = msg.sender === 'bot' ? '🤖 **Assistant**' : '👤 **You**';
           const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : '';
           lines.push(`### ${sender} ${time ? `(${time})` : ''}`);
-          
+
           if (msg.type === 'sql') {
             lines.push('```sql');
             lines.push(msg.text);
@@ -1852,7 +1479,7 @@ LIMIT 100;`,
           `Database: ${dbConnection?.database || 'Unknown'}`,
           `Messages: ${chatMessages.length}`,
           '',
-          '=' .repeat(60),
+          '='.repeat(60),
           ''
         ];
 
@@ -1907,7 +1534,7 @@ LIMIT 100;`,
   };
 
   // Quick examples removed - will be implemented differently
-  
+
   const handleExampleClick = (example) => {
     setNaturalLanguageInput(example);
     // Focus the textarea
@@ -1925,160 +1552,32 @@ LIMIT 100;`,
 
   return (
     <div className={`dashboard${isSidebarOpen ? '' : ' sidebar-closed'}`}>
-      {/* Sidebar */}
-      <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
-        <div className="logo">
-          <img src={logoImg} alt="DevQuery Logo" />
-          <span>DevQuery</span>
-        </div>
-
-        <nav className="sidebar-nav">
-          <ul>
-            <li className="active">
-              <a href="#sql-generator">
-                <i className="fas fa-database"></i>
-                <span>Query Generator</span>
-              </a>
-            </li>
-            <li>
-              <button 
-                className="sidebar-btn"
-                onClick={() => setShowQueryHistoryModal(true)}
-                title="View query history from last 24 hours"
-              >
-                <i className="fas fa-history"></i>
-                <span>Query History</span>
-              </button>
-            </li>
-            <li>
-              <a href="#schema-explorer">
-                <i className="fas fa-sitemap"></i>
-                <span>Schema Explorer</span>
-              </a>
-            </li>
-            <li>
-              <button 
-                className="sidebar-btn"
-                onClick={() => setShowSavedQueriesModal(true)}
-                title="View and manage saved queries"
-              >
-                <i className="fas fa-bookmark"></i>
-                <span>Saved Queries</span>
-              </button>
-            </li>
-            <li>
-              <Link to="/analytics">
-                <i className="fas fa-chart-line"></i>
-                <span>Analytics</span>
-              </Link>
-            </li>
-          </ul>
-        </nav>
-
-        <div className="user-profile">
-          <div className="user-avatar">
-            <i className="fas fa-user"></i>
-          </div>
-          <div className="user-info">
-            <span className="user-name">{user?.name || 'User'}</span>
-            <span className="user-role">Developer</span>
-          </div>
-          <button className="logout-btn" onClick={handleLogout} title="Logout">
-            <i className="fas fa-sign-out-alt"></i>
-          </button>
-        </div>
-      </div>
+      {/* Sidebar - using extracted component */}
+      <DashboardSidebar
+        isOpen={isSidebarOpen}
+        user={user}
+        onOpenQueryHistory={() => setShowQueryHistoryModal(true)}
+        onOpenSavedQueries={() => setShowSavedQueriesModal(true)}
+        onOpenDrawer={() => drawerDispatch({ type: 'OPEN_DRAWER' })}
+        onLogout={handleLogout}
+      />
 
       {/* Main Content */}
       <div className="main-content chat-fullscreen">
-        <header className="header">
-          <div className="header-left">
-            <button
-              type="button"
-              className="btn icon-btn sidebar-toggle"
-              onClick={() => setIsSidebarOpen(prev => !prev)}
-              title={isSidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
-              aria-label="Toggle sidebar"
-            >
-              <i className="fas fa-bars"></i>
-            </button>
-            <h1>Database Chat</h1>
-          </div>
-          <div className="header-right">
-            <button className="btn btn-secondary" onClick={() => drawerDispatch({ type: 'OPEN_DRAWER' })}>
-              <i className="fas fa-database"></i>
-              Query Generator
-            </button>
-            <button 
-              className="btn btn-secondary" 
-              onClick={() => setShowWhitelistModal(true)}
-              title="Manage AI whitelist permissions"
-            >
-              <i className="fas fa-lock"></i>
-              🔐 Whitelist
-            </button>
-            <button 
-              className="btn btn-secondary" 
-              onClick={handleRefreshChat}
-              title="Clear chat history and start fresh"
-            >
-              <i className="fas fa-redo"></i>
-              Refresh Chat
-            </button>
-            <div className="btn-group">
-              <button 
-                className="btn btn-secondary dropdown-toggle"
-                title="Export chat history"
-                onClick={(e) => {
-                  const menu = e.currentTarget.nextElementSibling;
-                  menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-                }}
-              >
-                <i className="fas fa-download"></i>
-                Export
-              </button>
-              <div className="dropdown-menu" style={{ display: 'none' }}>
-                <button onClick={() => handleExportChat('json')}>
-                  <i className="fas fa-file-code"></i> JSON
-                </button>
-                <button onClick={() => handleExportChat('markdown')}>
-                  <i className="fas fa-file-alt"></i> Markdown
-                </button>
-                <button onClick={() => handleExportChat('txt')}>
-                  <i className="fas fa-file-text"></i> Text
-                </button>
-              </div>
-            </div>
-            <div
-              className={`connection-status ${connectionStatus}`}
-              title={connectionStatus === 'connected'
-                ? `${dbConnection?.dbType?.toUpperCase() || 'DB'}${dbConnection?.database ? ` • ${dbConnection.database}` : ''}`
-                : 'No active database connection'}
-            >
-              <i className="fas fa-circle"></i>
-              <span>
-                {connectionStatus === 'connected'
-                  ? (dbConnection?.connectionName || 'Connected')
-                  : 'Disconnected'}
-              </span>
-            </div>
-            {connectionStatus === 'connected' ? (
-              <button
-                className="btn btn-outline-danger"
-                onClick={handleDisconnectDatabase}
-                disabled={isDisconnecting}
-              >
-                <i className="fas fa-unlink"></i>
-                {isDisconnecting ? 'Disconnecting...' : 'Disconnect'}
-              </button>
-            ) : (
-              <button className="btn btn-primary" onClick={handleConnectDatabase}>
-                <i className="fas fa-plug"></i>
-                Connect Database
-              </button>
-            )}
-          </div>
-        </header>
+        {/* Header - using extracted component */}
+        <DashboardHeader
+          isSidebarOpen={isSidebarOpen}
+          onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
+          connectionStatus={connectionStatus}
+          dbConnection={dbConnection}
+          isDisconnecting={isDisconnecting}
+          onOpenDrawer={() => drawerDispatch({ type: 'OPEN_DRAWER' })}
+          onOpenWhitelist={() => setShowWhitelistModal(true)}
+          onRefreshChat={handleRefreshChat}
+          onExportChat={handleExportChat}
+          onConnectDatabase={handleConnectDatabase}
+          onDisconnectDatabase={handleDisconnectDatabase}
+        />
 
         {/* Fullscreen Chatbox */}
         <div className="chat-main fullscreen">
@@ -2086,16 +1585,18 @@ LIMIT 100;`,
             {chatMessages.map((msg, idx) => {
               const key = `${msg.timestamp || idx}-${idx}`;
               const typeClass = msg.type ? ` ${msg.type}` : '';
-              
+              const avatar = msg.sender === 'bot' ? '🤖' : '👤';
+
               // Handle results type for inline display
               if (msg.type === 'results') {
                 try {
                   const data = JSON.parse(msg.text);
                   const cols = data.columns || [];
                   const rows = data.rows || [];
-                  
+
                   return (
                     <div key={key} className={`chat-msg ${msg.sender}${typeClass}`}>
+                      <div className="chat-msg-avatar">{avatar}</div>
                       <div className="chat-results-table">
                         {cols.length > 0 ? (
                           <table>
@@ -2131,20 +1632,23 @@ LIMIT 100;`,
                 } catch (e) {
                   return (
                     <div key={key} className={`chat-msg ${msg.sender}${typeClass}`}>
+                      <div className="chat-msg-avatar">{avatar}</div>
                       <span>{msg.text}</span>
                     </div>
                   );
                 }
               }
-              
+
               return (
                 <div key={key} className={`chat-msg ${msg.sender}${typeClass}`}>
+                  <div className="chat-msg-avatar">{avatar}</div>
                   {msg.type === 'sql' ? <pre>{msg.text}</pre> : <span>{msg.text}</span>}
                 </div>
               );
             })}
             {assistantLoading && (
               <div className="chat-msg bot chat-typing">
+                <div className="chat-msg-avatar">🤖</div>
                 <span>Thinking</span>
                 <div className="typing-dots">
                   <span></span>
@@ -2155,19 +1659,24 @@ LIMIT 100;`,
             )}
           </div>
           <form className="chat-footer-main" onSubmit={handleSendChat} autoComplete="off">
-            <input
-              id="mainChatInput"
-              type="text"
-              className="chat-input-main"
-              placeholder="Ask about your data..."
-              value={chatInput}
-              onChange={e => setChatInput(e.target.value)}
-              autoFocus
-              disabled={assistantLoading}
-            />
-            <button type="submit" className="btn btn-primary chat-send-main" disabled={!chatInput.trim() || assistantLoading}>
-              <i className="fas fa-paper-plane"></i>
-            </button>
+            <div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center' }}>
+              <input
+                id="mainChatInput"
+                type="text"
+                className="chat-input-main"
+                placeholder="Ask about your data... (e.g. show total users registered this month)"
+                value={chatInput}
+                onChange={e => setChatInput(e.target.value)}
+                autoFocus
+                disabled={assistantLoading}
+              />
+              <button type="submit" className="btn btn-primary chat-send-main" disabled={!chatInput.trim() || assistantLoading}>
+                <i className="fas fa-paper-plane"></i>
+              </button>
+            </div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px', textAlign: 'right', width: '100%' }}>
+              Press <strong>Enter</strong> to send • <strong>Ctrl+Enter</strong> to execute SQL in drawer
+            </div>
           </form>
         </div>
 
@@ -2300,18 +1809,18 @@ LIMIT 100;`,
                       <div className="schema-empty">
                         <i className={`fas ${dbConnection?.dbType === 'mongodb' ? 'fa-layer-group' : 'fa-database'}`}></i>
                         <p>
-                          {dbConnection?.dbType === 'mongodb' 
-                            ? 'No collections found in your MongoDB database.' 
+                          {dbConnection?.dbType === 'mongodb'
+                            ? 'No collections found in your MongoDB database.'
                             : 'No schema information available.'}
                         </p>
                         {connectionStatus === 'connected' && dbConnection?.dbType === 'mongodb' && (
                           <div style={{ marginTop: '12px', fontSize: '0.9em', color: '#888' }}>
                             <p style={{ marginBottom: '8px' }}>💡 Your database appears to be empty.</p>
                             <p style={{ marginBottom: '4px' }}>Add data using MongoDB shell:</p>
-                            <code style={{ 
-                              display: 'block', 
-                              background: '#2a2a2a', 
-                              padding: '8px', 
+                            <code style={{
+                              display: 'block',
+                              background: '#2a2a2a',
+                              padding: '8px',
                               borderRadius: '4px',
                               marginTop: '8px',
                               fontSize: '0.85em',
@@ -2361,7 +1870,7 @@ LIMIT 100;`,
                               onClick={() => setSelectedTable(table)}
                             >
                               <div className="schema-table-name">
-                                <i className={`fas ${isMongoDB ? 'fa-layer-group' : 'fa-table'}`} style={{marginRight: '6px', opacity: 0.6, fontSize: '0.9em'}}></i>
+                                <i className={`fas ${isMongoDB ? 'fa-layer-group' : 'fa-table'}`} style={{ marginRight: '6px', opacity: 0.6, fontSize: '0.9em' }}></i>
                                 <span>{renderHighlight(table.name, table.name || '—')}</span>
                               </div>
                               <div className="schema-table-meta">{metaLabel}</div>
@@ -2373,98 +1882,98 @@ LIMIT 100;`,
                   </div>
 
                   <div className="schema-details">
-                {selectedTable ? (
-                  <div className="schema-table-details">
-                    <div className="schema-table-header">
-                      <div className="schema-table-title">
-                        <h3>{renderHighlight(selectedTable.name, selectedTable.name || '—')}</h3>
-                        <span className="schema-column-count">{columnCountLabel}</span>
-                      </div>
-                      <div className="schema-table-actions">
-                        <button
-                          type="button"
-                          className="btn btn-sm"
-                          onClick={() => handleGenerateDescribe(selectedTable.name)}
-                          disabled={!dbConnection}
-                        >
-                          <i className="fas fa-magic"></i>
-                          Generate Summary
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn-sm"
-                          onClick={() => handleCopySchema(selectedTable)}
-                        >
-                          <i className="fas fa-copy"></i>
-                          Copy Schema Snapshot
-                        </button>
-                      </div>
-                    </div>
+                    {selectedTable ? (
+                      <div className="schema-table-details">
+                        <div className="schema-table-header">
+                          <div className="schema-table-title">
+                            <h3>{renderHighlight(selectedTable.name, selectedTable.name || '—')}</h3>
+                            <span className="schema-column-count">{columnCountLabel}</span>
+                          </div>
+                          <div className="schema-table-actions">
+                            <button
+                              type="button"
+                              className="btn btn-sm"
+                              onClick={() => handleGenerateDescribe(selectedTable.name)}
+                              disabled={!dbConnection}
+                            >
+                              <i className="fas fa-magic"></i>
+                              Generate Summary
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-sm"
+                              onClick={() => handleCopySchema(selectedTable)}
+                            >
+                              <i className="fas fa-copy"></i>
+                              Copy Schema Snapshot
+                            </button>
+                          </div>
+                        </div>
 
-                    <div className="schema-columns">
-                      <table>
-                        <thead>
-                          <tr>
-                            <th>{dbConnection?.dbType === 'mongodb' ? 'Field' : 'Column'}</th>
-                            <th>Type</th>
-                            <th>{dbConnection?.dbType === 'mongodb' ? 'Nullable' : 'Nullable'}</th>
-                            <th>{dbConnection?.dbType === 'mongodb' ? 'Sample Value' : 'Default / Sample'}</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {visibleColumns.length > 0 ? (
-                            visibleColumns.map((column, index) => {
-                              const columnKey = `${column.name || column.type || 'column'}-${index}`;
-                              const columnType = column.type || 'unknown';
-                              const defaultText = formatDefaultValue(column.defaultValue ?? column.sample);
+                        <div className="schema-columns">
+                          <table>
+                            <thead>
+                              <tr>
+                                <th>{dbConnection?.dbType === 'mongodb' ? 'Field' : 'Column'}</th>
+                                <th>Type</th>
+                                <th>{dbConnection?.dbType === 'mongodb' ? 'Nullable' : 'Nullable'}</th>
+                                <th>{dbConnection?.dbType === 'mongodb' ? 'Sample Value' : 'Default / Sample'}</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {visibleColumns.length > 0 ? (
+                                visibleColumns.map((column, index) => {
+                                  const columnKey = `${column.name || column.type || 'column'}-${index}`;
+                                  const columnType = column.type || 'unknown';
+                                  const defaultText = formatDefaultValue(column.defaultValue ?? column.sample);
 
-                              return (
-                                <tr key={columnKey}>
-                                  <td>
-                                    <div className="column-name">
-                                      <span>{renderHighlight(column.name, column.name || '—')}</span>
-                                      <button
-                                        type="button"
-                                        className="btn btn-ghost"
-                                        onClick={() => handleGenerateColumnInsight(selectedTable.name, column)}
-                                        disabled={!dbConnection}
-                                        title="Generate insights"
-                                      >
-                                        <i className="fas fa-lightbulb"></i>
-                                      </button>
-                                    </div>
-                                  </td>
-                                  <td>{renderHighlight(columnType, columnType)}</td>
-                                  <td>{column.nullable ? 'Yes' : 'No'}</td>
-                                  <td>
-                                    <code>{renderHighlight(defaultText, defaultText)}</code>
+                                  return (
+                                    <tr key={columnKey}>
+                                      <td>
+                                        <div className="column-name">
+                                          <span>{renderHighlight(column.name, column.name || '—')}</span>
+                                          <button
+                                            type="button"
+                                            className="btn btn-ghost"
+                                            onClick={() => handleGenerateColumnInsight(selectedTable.name, column)}
+                                            disabled={!dbConnection}
+                                            title="Generate insights"
+                                          >
+                                            <i className="fas fa-lightbulb"></i>
+                                          </button>
+                                        </div>
+                                      </td>
+                                      <td>{renderHighlight(columnType, columnType)}</td>
+                                      <td>{column.nullable ? 'Yes' : 'No'}</td>
+                                      <td>
+                                        <code>{renderHighlight(defaultText, defaultText)}</code>
+                                      </td>
+                                    </tr>
+                                  );
+                                })
+                              ) : (
+                                <tr className="schema-empty-row">
+                                  <td colSpan="4">
+                                    {hasSearch
+                                      ? 'No columns match your search. Try a different keyword.'
+                                      : 'This table has no columns to display.'}
                                   </td>
                                 </tr>
-                              );
-                            })
-                          ) : (
-                            <tr className="schema-empty-row">
-                              <td colSpan="4">
-                                {hasSearch
-                                  ? 'No columns match your search. Try a different keyword.'
-                                  : 'This table has no columns to display.'}
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="schema-placeholder">
+                        <i className="fas fa-table"></i>
+                        <p>{filteredTables.length === 0
+                          ? `No ${dbConnection?.dbType === 'mongodb' ? 'collections' : 'tables'} match your search. Clear the filter to explore everything.`
+                          : `Select a ${dbConnection?.dbType === 'mongodb' ? 'collection' : 'table'} on the left to view its ${dbConnection?.dbType === 'mongodb' ? 'fields' : 'columns'} and insights.`}
+                        </p>
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <div className="schema-placeholder">
-                    <i className="fas fa-table"></i>
-                    <p>{filteredTables.length === 0 
-                      ? `No ${dbConnection?.dbType === 'mongodb' ? 'collections' : 'tables'} match your search. Clear the filter to explore everything.` 
-                      : `Select a ${dbConnection?.dbType === 'mongodb' ? 'collection' : 'table'} on the left to view its ${dbConnection?.dbType === 'mongodb' ? 'fields' : 'columns'} and insights.`}
-                    </p>
-                  </div>
-                )}
-              </div>
                 </>
               )}
 
@@ -2510,6 +2019,8 @@ LIMIT 100;`,
         )}
       </div>
 
+
+
       {/* SQL Drawer (sliding window) */}
       <div
         className={`sql-drawer${showSQLDrawer ? ' open' : ''} ${dragEnabled ? 'drag-enabled' : ''} ${isFullscreen ? ' fullscreen' : ''}`}
@@ -2554,7 +2065,7 @@ LIMIT 100;`,
               type="button"
               className="close-sql"
               onPointerDown={(e) => { e.stopPropagation(); }}
-                  onClick={() => drawerDispatch({ type: 'CLOSE_DRAWER' })}
+              onClick={() => drawerDispatch({ type: 'CLOSE_DRAWER' })}
               title="Close"
             >
               <i className="fas fa-times"></i>
@@ -2563,7 +2074,7 @@ LIMIT 100;`,
         </div>
         <div className="sql-drawer-body">
           {/* Quick examples section removed - will be implemented differently */}
-          
+
           <div className="result-tabs">
             <button className={`tab-btn ${activeTab === 'sql' ? 'active' : ''}`} onClick={() => setActiveTab('sql')}>Generated SQL</button>
             <button className={`tab-btn ${activeTab === 'results' ? 'active' : ''}`} onClick={() => setActiveTab('results')}>Query Results</button>
@@ -2715,140 +2226,19 @@ LIMIT 100;`,
         </div>
       )}
 
-      {/* Database Connection Modal */}
-      {showDbModal && (
-        <div className="modal" onClick={(e) => {
-          if (e.target.className === 'modal') {
-            setShowDbModal(false);
-          }
-        }}>
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3>Connect to Database</h3>
-              <button className="close-modal" onClick={() => setShowDbModal(false)}>
-                <i className="fas fa-times"></i>
-              </button>
-            </div>
-            
-            <div className="modal-body">
-              <form onSubmit={handleDbConnect}>
-                <div className="form-group">
-                  <label htmlFor="dbConnectionString">Connection String (recommended for MongoDB)</label>
-                  <input
-                    type="text"
-                    id="dbConnectionString"
-                    placeholder="e.g. mongodb+srv://Genesis:genesis@2025@genesis.2l3xrq4.mongodb.net/"
-                    value={dbConfig.connectionString}
-                    onChange={e => handleDbConfigChange('connectionString', e.target.value)}
-                  />
-                  <small style={{ color: '#888' }}>If provided, all other fields are optional. Supports MongoDB, PostgreSQL, MySQL, etc.</small>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="dbType">Database Type *</label>
-                  <select
-                    id="dbType"
-                    value={dbConfig.type}
-                    onChange={(e) => handleDbConfigChange('type', e.target.value)}
-                    required={!dbConfig.connectionString}
-                    disabled={!!dbConfig.connectionString}
-                  >
-                    <option value="">Select database type</option>
-                    <option value="mongodb">🍃 MongoDB</option>
-                    <option value="mysql">MySQL</option>
-                    <option value="postgresql">PostgreSQL</option>
-                    <option value="sqlite">SQLite</option>
-                    <option value="mssql">SQL Server</option>
-                    <option value="oracle">Oracle</option>
-                  </select>
-                  {dbConfig.type === 'mongodb' && (
-                    <small style={{ color: '#00ed64', fontWeight: '500', display: 'block', marginTop: '8px' }}>
-                      ✓ MongoDB selected - Schema Explorer will show Collections & Fields
-                    </small>
-                  )}
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="dbHost">Host *</label>
-                  <input
-                    type="text"
-                    id="dbHost"
-                    placeholder="localhost"
-                    value={dbConfig.host}
-                    onChange={(e) => handleDbConfigChange('host', e.target.value)}
-                    required={!dbConfig.connectionString}
-                    disabled={!!dbConfig.connectionString}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="dbPort">Port</label>
-                  <input
-                    type="number"
-                    id="dbPort"
-                    placeholder="3306"
-                    value={dbConfig.port}
-                    onChange={(e) => handleDbConfigChange('port', e.target.value)}
-                    disabled={!!dbConfig.connectionString}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="dbName">Database Name *</label>
-                  <input
-                    type="text"
-                    id="dbName"
-                    placeholder="my_database"
-                    value={dbConfig.database}
-                    onChange={(e) => handleDbConfigChange('database', e.target.value)}
-                    required={!dbConfig.connectionString}
-                    disabled={!!dbConfig.connectionString}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="dbUser">Username *</label>
-                  <input
-                    type="text"
-                    id="dbUser"
-                    placeholder="username"
-                    value={dbConfig.username}
-                    onChange={(e) => handleDbConfigChange('username', e.target.value)}
-                    required={!dbConfig.connectionString}
-                    disabled={!!dbConfig.connectionString}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="dbPassword">Password</label>
-                  <input
-                    type="password"
-                    id="dbPassword"
-                    placeholder="password"
-                    value={dbConfig.password}
-                    onChange={(e) => handleDbConfigChange('password', e.target.value)}
-                    disabled={!!dbConfig.connectionString}
-                  />
-                </div>
-                
-                <div className="form-actions">
-                  <button type="button" className="btn btn-secondary" onClick={handleTestConnection} disabled={loading}>
-                    <i className="fas fa-check"></i>
-                    {loading ? 'Testing...' : 'Test Connection'}
-                  </button>
-                  <button type="submit" className="btn btn-primary" disabled={loading}>
-                    <i className="fas fa-plug"></i>
-                    {loading ? 'Connecting...' : 'Connect'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Database Connection Modal - extracted to DatabaseConnectModal.jsx */}
+      <DatabaseConnectModal
+        isOpen={showDbModal}
+        onClose={() => setShowDbModal(false)}
+        dbConfig={dbConfig}
+        onConfigChange={handleDbConfigChange}
+        onConnect={handleDbConnect}
+        onTestConnection={handleTestConnection}
+        loading={loading}
+      />
 
       {/* Whitelist Manager Modal */}
-      <WhitelistManager 
+      <WhitelistManager
         isOpen={showWhitelistModal}
         onClose={() => setShowWhitelistModal(false)}
         connectionId={dbConnection?.connectionId}
@@ -2890,19 +2280,19 @@ LIMIT 100;`,
               <h2>⚠️ Confirm Database Write Operation</h2>
               <button className="close-btn" onClick={handleCancelWrite}>×</button>
             </div>
-            
+
             <div className="write-confirmation-body">
               <div className="confirmation-message">
                 <p>{pendingWriteOperation.message}</p>
               </div>
-              
+
               <div className="sql-preview-section">
                 <h3>SQL Statement to Execute:</h3>
                 <div className="sql-preview-box">
                   <pre><code>{pendingWriteOperation.sql}</code></pre>
                 </div>
               </div>
-              
+
               {pendingWriteOperation.affectedTable && (
                 <div className="operation-details">
                   <div className="detail-item">
@@ -2915,23 +2305,23 @@ LIMIT 100;`,
                   )}
                 </div>
               )}
-              
+
               <div className="confirmation-warning">
                 <i className="fas fa-exclamation-triangle"></i>
                 <p>This operation will modify your database. Please review carefully before confirming.</p>
               </div>
             </div>
-            
+
             <div className="write-confirmation-footer">
-              <button 
-                className="btn btn-cancel" 
+              <button
+                className="btn btn-cancel"
                 onClick={handleCancelWrite}
                 disabled={assistantLoading}
               >
                 <i className="fas fa-times"></i> Cancel
               </button>
-              <button 
-                className="btn btn-confirm" 
+              <button
+                className="btn btn-confirm"
                 onClick={handleConfirmWrite}
                 disabled={assistantLoading}
               >
@@ -2950,91 +2340,46 @@ LIMIT 100;`,
         </div>
       )}
 
-      {/* Results Modal/Popup */}
-      {showResultsModal && (
-        <div className="modal results-modal" onClick={(e) => {
-          if (e.target.className === 'modal results-modal') {
-            setShowResultsModal(false);
+      {/* Results Modal/Popup - extracted to QueryResultsModal.jsx */}
+      <QueryResultsModal
+        isOpen={showResultsModal}
+        onClose={() => setShowResultsModal(false)}
+        queryResults={queryResults}
+        queryResultColumns={queryResultColumns}
+        queryMetadata={queryMetadata}
+        onCopyResults={handleCopyResults}
+        onExportResults={handleExportResults}
+      />
+
+      {/* Clear Chat Confirmation Modal */}
+      {showClearChatModal && (
+        <div className="modal custom-confirm-modal" onClick={(e) => {
+          if (e.target.className === 'modal custom-confirm-modal') {
+            setShowClearChatModal(false);
           }
         }}>
-          <div className="modal-content results-modal-content">
+          <div className="modal-content">
             <div className="modal-header">
-              <h3>Query Results</h3>
-              <button className="close-modal" onClick={() => setShowResultsModal(false)}>
+              <h3>Clear Chat History</h3>
+              <button className="close-modal" onClick={() => setShowClearChatModal(false)}>
                 <i className="fas fa-times"></i>
               </button>
             </div>
-            
-            <div className="modal-body results-modal-body">
-              <div className="results-header">
-                <div>
-                  <div className="results-title">Results</div>
-                  <div className="results-meta">
-                    <span className="results-count">{queryMetadata?.rowCount ?? queryResults.length} rows</span>
-                    {typeof queryMetadata?.executionTime === 'number' && (
-                      <span className="results-chip">Execution {queryMetadata.executionTime} ms</span>
-                    )}
-                    {queryMetadata?.provider && (
-                      <span className="results-chip">{queryMetadata.provider === 'assistant' ? 'Assistant' : queryMetadata.provider}</span>
-                    )}
-                    {queryMetadata?.model && (
-                      <span className="results-chip neutral">{queryMetadata.model}</span>
-                    )}
-                    {queryMetadata?.confidence && (
-                      <span className="results-chip neutral">Confidence: {queryMetadata.confidence}</span>
-                    )}
-                  </div>
-                </div>
-                <div className="results-actions">
-                  <button className="btn btn-sm" onClick={handleCopyResults} disabled={!queryResults.length} title="Copy JSON">
-                    <i className="fas fa-copy"></i> Copy
-                  </button>
-                  <button className="btn btn-sm" onClick={handleExportResults} disabled={!queryResults.length} title="Export CSV">
-                    <i className="fas fa-file-csv"></i> Export
-                  </button>
-                </div>
-              </div>
-
-              {queryMetadata?.cautions?.length ? (
-                <div className="results-alert">
-                  {queryMetadata.cautions.map((warning, idx) => (
-                    <span key={idx}>⚠️ {warning}</span>
-                  ))}
-                </div>
-              ) : null}
-
-              <div className="table-container">
-                {queryResultColumns.length ? (
-                  <table className="results-table">
-                    <thead>
-                      <tr>
-                        {queryResultColumns.map((column) => (
-                          <th key={column}>{column}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {queryResults.length ? (
-                        queryResults.map((row, index) => (
-                          <tr key={index}>
-                            {queryResultColumns.map((column) => (
-                              <td key={column}>{formatResultValue(row?.[column])}</td>
-                            ))}
-                          </tr>
-                        ))
-                      ) : (
-                        <tr className="empty-row">
-                          <td colSpan={queryResultColumns.length}>No rows returned for this query.</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                ) : (
-                  <div className="no-results">
-                    <i className="fas fa-table"></i>
-                    <p>No results to display.</p>
-                  </div>
-                )}
+            <div className="modal-body" style={{ textAlign: 'center', padding: '20px 0' }}>
+              <i className="fas fa-trash-alt" style={{ fontSize: '2.5rem', color: 'var(--warning-color)', marginBottom: '16px' }}></i>
+              <p style={{ margin: '0 0 8px 0', fontSize: '1rem', fontWeight: '500' }}>
+                Are you sure you want to clear the conversation?
+              </p>
+              <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                This will delete all message history from your local session.
+              </p>
+              <div className="custom-confirm-actions">
+                <button className="btn btn-secondary" onClick={() => setShowClearChatModal(false)}>
+                  Cancel
+                </button>
+                <button className="btn btn-outline-danger" onClick={handleConfirmClearChat}>
+                  Clear History
+                </button>
               </div>
             </div>
           </div>
@@ -3047,8 +2392,8 @@ LIMIT 100;`,
           <div key={notification.id} className={`notification notification-${notification.type}`}>
             <i className={`fas fa-${getNotificationIcon(notification.type)}`}></i>
             <span>{notification.message}</span>
-            <button 
-              className="close-notification" 
+            <button
+              className="close-notification"
               onClick={() => removeNotification(notification.id)}
               aria-label="Close notification"
               title="Close"

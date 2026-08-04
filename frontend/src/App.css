@@ -1,19 +1,14 @@
-/* App.css - Global styles for DevQuery React App */
+/* ========================================
+   DevQuery App - Global App Styles
+   OrbitAI Dark Theme
+   ======================================== */
 
-/* Reset and base styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* Reset and base styles handled by index.css/design-system.css */
 
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f4f4f9;
-  color: #333;
-  line-height: 1.6;
   overflow-x: hidden;
 }
 
@@ -27,23 +22,76 @@ html, body {
 .App {
   min-height: 100vh;
   width: 100%;
-  background-color: #f4f4f9;
+  background-color: var(--bg-base);
   display: flex;
   flex-direction: column;
 }
 
-/* Loading state */
+/* ========================================
+   Loading State
+   ======================================== */
 .loading-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: var(--space-4);
   height: 100vh;
-  background-color: #f4f4f9;
-  font-size: 1.2rem;
-  color: #666;
+  background-color: var(--bg-base);
+  position: relative;
+  overflow: hidden;
 }
 
-/* Utility classes */
+/* Animated background for loading */
+.loading-container::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 400px;
+  height: 400px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(52, 245, 197, 0.15) 0%, transparent 60%);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+.loading-spinner {
+  position: relative;
+  z-index: 1;
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--border-subtle);
+  border-top-color: var(--accent-cyan);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  position: relative;
+  z-index: 1;
+  font-size: var(--text-lg);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* ========================================
+   Utility Classes
+   ======================================== */
 .full-height {
   min-height: 100vh;
 }
@@ -52,8 +100,35 @@ html, body {
   width: 100%;
 }
 
-/* Loading spinner animation */
+.text-center {
+  text-align: center;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ========================================
+   Animations
+   ======================================== */
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }

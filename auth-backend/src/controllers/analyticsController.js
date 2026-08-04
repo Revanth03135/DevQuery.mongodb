@@ -126,7 +126,7 @@ const generateSchemaBasedQuery = (query, tables, dbType) => {
       case 'sqlserver':
         return `[${identifier}]`;
       case 'oracle':
-        return `"${identifier}"`;
+        return `"${identifier}"`; 
       case 'mongodb':
         // MongoDB uses different syntax, handled separately
         return identifier;

@@ -255,8 +255,21 @@ function Analytics({ user, setUser }) {
   };
 
   const initThree = (values = [], labels = []) => {
+    console.log('🎨 initThree called:', { 
+      valuesLength: values.length, 
+      labelsLength: labels.length, 
+      chartType: threeChartType,
+      containerExists: !!threeContainerRef.current 
+    });
+    
     cleanupThree();
-    if (!threeContainerRef.current) return;
+    
+    if (!threeContainerRef.current) {
+      console.error('❌ 3D container ref is null! Cannot initialize 3D scene.');
+      return;
+    }
+
+    console.log('✅ Starting 3D scene initialization...');
 
     const width = threeContainerRef.current.clientWidth || 600;
     const height = threeContainerRef.current.clientHeight || 360;
@@ -496,6 +509,12 @@ function Analytics({ user, setUser }) {
       renderer.domElement.removeEventListener('mouseleave', onMouseLeave);
     };
     threeStateRef.current.detach = detach;
+
+    console.log('🎉 3D scene initialized successfully!', {
+      objectsCount: objects.length,
+      chartType: threeChartType,
+      sceneChildren: scene.children.length
+    });
 
     // cleanup on unmount
     return () => {
@@ -796,12 +815,20 @@ function Analytics({ user, setUser }) {
 
   const handle3DToggle = (e) => {
     const checked = e.target.checked;
+    console.log('🎮 3D Toggle:', checked);
     setUse3D(checked);
     if (!checked) {
+      console.log('🧹 Cleaning up 3D scene');
       cleanupThree();
-    } else if (nlQueryInput) {
-      // regenerate 3D for current data
-      setTimeout(() => handleNLQuery(), 50);
+    } else {
+      console.log('🚀 Initializing 3D mode');
+      if (nlQueryInput) {
+        // regenerate 3D for current data
+        console.log('📊 Regenerating query with 3D');
+        setTimeout(() => handleNLQuery(), 50);
+      } else {
+        console.warn('⚠️ No query input - please generate a chart first');
+      }
     }
   };
 
@@ -944,6 +971,7 @@ function Analytics({ user, setUser }) {
                 <option value="bar">3D Bars</option>
                 <option value="scatter">3D Scatter</option>
                 <option value="line">3D Line</option>
+                <option value="surface">3D Surface</option>
               </select>
             </div>
           </div>

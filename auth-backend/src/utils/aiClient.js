@@ -35,6 +35,13 @@ const ensureFetch = async () => {
 
 const hasGeminiConfig = () => Boolean(GEMINI_API_KEY);
 
+// Maximum number of retry attempts for transient Gemini errors
+const GEMINI_MAX_RETRIES = parseInt(process.env.GEMINI_MAX_RETRIES, 10) || 3;
+// Base delay in ms for exponential backoff (doubles on each attempt)
+const GEMINI_RETRY_BASE_MS = parseInt(process.env.GEMINI_RETRY_BASE_MS, 10) || 1000;
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const callGemini = async ({
   prompt,
   systemPrompt,
@@ -63,49 +70,79 @@ const callGemini = async ({
     ]
   };
 
-  let response;
-  try {
-    response = await fetchFn(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-  } catch (error) {
-    logger.error('Gemini API request failed to send:', error);
-    throw new GeminiRequestError('Failed to reach Gemini API', undefined, { message: error.message });
-  }
+  let lastError;
 
-  let payload;
-  try {
-    payload = await response.json();
-  } catch (error) {
-    logger.error('Failed to parse Gemini response JSON:', error);
-    throw new GeminiRequestError('Failed to parse Gemini response', response.status);
-  }
+  for (let attempt = 0; attempt <= GEMINI_MAX_RETRIES; attempt++) {
+    let response;
+    let payload;
 
-  if (!response.ok) {
-    const errorMessage = payload?.error?.message || `Gemini API request failed with status ${response.status}`;
-    const err = new GeminiRequestError(errorMessage, response.status, payload);
-    if (response.status === 401 || response.status === 403) {
-      err.code = 'AI_AUTH_FAILED';
-    } else if (response.status === 429) {
-      err.code = 'AI_RATE_LIMIT';
+    try {
+      response = await fetchFn(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+    } catch (error) {
+      logger.error('Gemini API request failed to send:', error);
+      throw new GeminiRequestError('Failed to reach Gemini API', undefined, { message: error.message });
     }
-    throw err;
+
+    try {
+      payload = await response.json();
+    } catch (error) {
+      logger.error('Failed to parse Gemini response JSON:', error);
+      throw new GeminiRequestError('Failed to parse Gemini response', response.status);
+    }
+
+    if (!response.ok) {
+      const errorMessage = payload?.error?.message || `Gemini API request failed with status ${response.status}`;
+      const err = new GeminiRequestError(errorMessage, response.status, payload);
+
+      if (response.status === 401 || response.status === 403) {
+        err.code = 'AI_AUTH_FAILED';
+        throw err; // Auth errors are not retryable
+      }
+
+      if (response.status === 429) {
+        err.code = 'AI_RATE_LIMIT';
+        lastError = err;
+        if (attempt < GEMINI_MAX_RETRIES) {
+          const delay = GEMINI_RETRY_BASE_MS * Math.pow(2, attempt);
+          logger.warn(`Gemini rate-limited (429). Retrying in ${delay}ms (attempt ${attempt + 1}/${GEMINI_MAX_RETRIES})...`);
+          await sleep(delay);
+          continue;
+        }
+        throw err; // Exhausted retries
+      }
+
+      if (response.status >= 500) {
+        lastError = err;
+        if (attempt < GEMINI_MAX_RETRIES) {
+          const delay = GEMINI_RETRY_BASE_MS * Math.pow(2, attempt);
+          logger.warn(`Gemini server error (${response.status}). Retrying in ${delay}ms (attempt ${attempt + 1}/${GEMINI_MAX_RETRIES})...`);
+          await sleep(delay);
+          continue;
+        }
+      }
+
+      throw err;
+    }
+
+    const parts = payload?.candidates?.[0]?.content?.parts || [];
+    const combined = parts.map((part) => part.text || '').join('').trim();
+
+    if (!combined) {
+      throw new GeminiRequestError('Gemini API returned an empty response', response.status, payload);
+    }
+
+    return {
+      text: combined,
+      raw: payload,
+      model: payload?.model || GEMINI_MODEL
+    };
   }
 
-  const parts = payload?.candidates?.[0]?.content?.parts || [];
-  const combined = parts.map((part) => part.text || '').join('').trim();
-
-  if (!combined) {
-    throw new GeminiRequestError('Gemini API returned an empty response', response.status, payload);
-  }
-
-  return {
-    text: combined,
-    raw: payload,
-    model: payload?.model || GEMINI_MODEL
-  };
+  throw lastError || new GeminiRequestError('Gemini API call failed after retries');
 };
 
 const collectColumnSummary = (columns = [], maxColumns = 10) => {
@@ -206,6 +243,10 @@ const normalizeStringArray = (value) => {
     .filter(Boolean);
 };
 
+// Maximum number of chatHistory messages to include in each prompt.
+// Keeps Gemini token usage predictable; older context is trimmed from the start.
+const CHAT_HISTORY_WINDOW = parseInt(process.env.CHAT_HISTORY_WINDOW, 10) || 12;
+
 const interpretChatIntent = async ({ message, schema, connection = {}, runQuery = true, chatHistory = [], queryHistory = [], savedQueries = [] }) => {
   const trimmedMessage = (message || '').trim();
   if (!trimmedMessage) {
@@ -218,12 +259,15 @@ const interpretChatIntent = async ({ message, schema, connection = {}, runQuery 
     };
   }
 
+  // Issue 7 fix: cap history to last N messages to avoid oversized prompts
+  const cappedHistory = Array.isArray(chatHistory) ? chatHistory.slice(-CHAT_HISTORY_WINDOW) : [];
+
   const schemaSummary = summarizeSchemaForPrompt(schema);
   const isMongoDB = connection.type === 'mongodb';
-  
-  // DEBUG: Log schema summary
-  if (process.env.DEBUG_SCHEMA) {
-    console.log('[DEBUG] Schema passed to interpretChatIntent:', {
+
+  // Issue 4 fix: debug logging gated behind non-production env only
+  if (process.env.NODE_ENV !== 'production' && process.env.DEBUG_SCHEMA) {
+    logger.info('[DEBUG] Schema passed to interpretChatIntent:', {
       schemaExists: !!schema,
       schemaType: typeof schema,
       isArray: Array.isArray(schema),
@@ -323,13 +367,13 @@ const interpretChatIntent = async ({ message, schema, connection = {}, runQuery 
   const runCapability = runQuery && connection.connected ? 'true' : 'false';
 
   // Format chat history for context - Make it VERY prominent
-  const chatHistorySection = Array.isArray(chatHistory) && chatHistory.length > 0
+  const chatHistorySection = cappedHistory.length > 0
     ? `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📝 CONVERSATION HISTORY (Last ${chatHistory.length} messages):
+📝 CONVERSATION HISTORY (Last ${cappedHistory.length} messages):
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-${chatHistory
+${cappedHistory
   .map((msg, idx) => {
     const role = msg.role === 'assistant' ? '🤖 Assistant' : '👤 User';
     const content = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);

@@ -47,7 +47,13 @@ const UserConnectionSchema = new mongoose.Schema(
       type: Date,
       default: Date.now
     },
-    disconnectedAt: Date
+    disconnectedAt: Date,
+    // Persisted whitelist configuration for this connection
+    whitelistConfig: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+      description: 'Whitelist config (tables/columns) persisted across server restarts'
+    }
   },
   {
     timestamps: true

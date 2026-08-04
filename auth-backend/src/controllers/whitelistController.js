@@ -35,7 +35,7 @@ class WhitelistController {
         });
       }
 
-      const whitelist = whitelistManager.getWhitelist(connectionId);
+      const whitelist = await whitelistManager.getWhitelist(connectionId);
 
       logger.info(`User ${userId} fetched whitelist for connection ${connectionId}`);
       return res.json({
@@ -76,7 +76,7 @@ class WhitelistController {
         });
       }
 
-      const whitelist = whitelistManager.setWhitelistEnabled(connectionId, enabled);
+      const whitelist = await whitelistManager.setWhitelistEnabled(connectionId, enabled);
 
       logger.info(`User ${userId} ${enabled ? 'enabled' : 'disabled'} whitelist for connection: ${connectionId}`);
       return res.json({
@@ -118,7 +118,7 @@ class WhitelistController {
         });
       }
 
-      const whitelist = whitelistManager.addTable(connectionId, tableName, allowedColumns);
+      const whitelist = await whitelistManager.addTable(connectionId, tableName, allowedColumns);
 
       logger.info(`User ${userId} added table '${tableName}' to whitelist for connection: ${connectionId}`);
       return res.json({
@@ -159,7 +159,7 @@ class WhitelistController {
         });
       }
 
-      const whitelist = whitelistManager.removeTable(connectionId, tableName);
+      const whitelist = await whitelistManager.removeTable(connectionId, tableName);
 
       logger.info(`User ${userId} removed table '${tableName}' from whitelist for connection: ${connectionId}`);
       return res.json({
@@ -202,7 +202,7 @@ class WhitelistController {
         });
       }
 
-      const whitelist = whitelistManager.addColumnsToTable(
+      const whitelist = await whitelistManager.addColumnsToTable(
         connectionId,
         tableName,
         allowedColumns || []
@@ -255,7 +255,7 @@ class WhitelistController {
         });
       }
 
-      const whitelist = whitelistManager.removeColumnsFromTable(
+      const whitelist = await whitelistManager.removeColumnsFromTable(
         connectionId,
         tableName,
         columnNames
@@ -300,7 +300,7 @@ class WhitelistController {
         });
       }
 
-      const config = whitelistManager.exportWhitelist(connectionId);
+      const config = await whitelistManager.exportWhitelist(connectionId);
 
       logger.info(`User ${userId} exported whitelist for connection ${connectionId}`);
       return res.json({
@@ -348,7 +348,7 @@ class WhitelistController {
         });
       }
 
-      const whitelist = whitelistManager.importWhitelist(connectionId, configuration);
+      const whitelist = await whitelistManager.importWhitelist(connectionId, configuration);
 
       logger.info(`User ${userId} imported whitelist for connection: ${connectionId}`);
       return res.json({
